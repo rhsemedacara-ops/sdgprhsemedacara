@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SDGP Login</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTA0IiBoZWlnaHQ9IjEwNCIgdmlld0JveD0iMCAwIDEwNCAxMDQiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDQiIGhlaWdodD0iMTA0IiByeD0iMjQiIGZpbGw9InVybCgjZzIpIi8+CjxyZWN0IHg9IjIwIiB5PSIzMCIgd2lkdGg9IjI2IiBoZWlnaHQ9IjM0IiByeD0iNC41IiBmaWxsPSIjRjZGM0VDIiBvcGFjaXR5PSIuOSIgdHJhbnNmb3JtPSJyb3RhdGUoLTcgMzMgNDcpIi8+CjxyZWN0IHg9IjI1IiB5PSIzOCIgd2lkdGg9IjE1IiBoZWlnaHQ9IjIuNCIgcng9IjEuMiIgZmlsbD0iIzBCNEY0QSIgdHJhbnNmb3JtPSJyb3RhdGUoLTcgMzMgNDcpIi8+CjxyZWN0IHg9IjI1IiB5PSI0NCIgd2lkdGg9IjE1IiBoZWlnaHQ9IjIuNCIgcng9IjEuMiIgZmlsbD0iIzBCNEY0QSIgdHJhbnNmb3JtPSJyb3RhdGUoLTcgMzMgNDcpIi8+CjxyZWN0IHg9IjI1IiB5PSI1MCIgd2lkdGg9IjEwIiBoZWlnaHQ9IjIuNCIgcng9IjEuMiIgZmlsbD0iIzBCNEY0QSIgdHJhbnNmb3JtPSJyb3RhdGUoLTcgMzMgNDcpIi8+CjxjaXJjbGUgY3g9IjY4IiBjeT0iMzgiIHI9IjEwLjUiIGZpbGw9IiNGNkYzRUMiLz4KPHBhdGggZD0iTTQ4IDc2YzAtMTMuNSA5LTIxIDIwLTIxczIwIDcuNSAyMCAyMSIgc3Ryb2tlPSIjRjZGM0VDIiBzdHJva2Utd2lkdGg9IjgiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0ibm9uZSIvPgo8Y2lyY2xlIGN4PSIzMCIgY3k9IjcyIiByPSI5IiBmaWxsPSIjRDRBMDE3IiBzdHJva2U9IiMwQjRGNEEiIHN0cm9rZS13aWR0aD0iMi4yIi8+CjxwYXRoIGQ9Ik0yNiA3MmwyLjggMi44TDM0LjUgNjkiIHN0cm9rZT0iI0Y2RjNFQyIgc3Ryb2tlLXdpZHRoPSIyLjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZmlsbD0ibm9uZSIvPgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJnMiIgeDE9IjAiIHkxPSIwIiB4Mj0iMTA0IiB5Mj0iMTA0IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiMxMjY2NUYiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMEI0RjRBIi8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+Cg==">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -42,8 +43,10 @@
     font-family:'IBM Plex Sans', sans-serif;
     min-height:100vh;
     position:relative;
+    display:flex;
+    flex-direction:column;
   }
-  .wrap{max-width:100%;margin:0 auto;padding:28px 32px 80px; position:relative; z-index:1;}
+  .wrap{max-width:100%;margin:0 auto;padding:28px 32px 40px; position:relative; z-index:1; flex:1 0 auto;}
 
   /* Decorative background: gradient frame bands + centered watermark */
   .bg-decor{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden;}
@@ -62,10 +65,96 @@
 
   /* Header */
   header{
-    padding-bottom:22px;
-    padding-top:96px;
-    margin-bottom:26px;
+    padding-bottom:14px;
+    padding-top:22px;
+    margin-bottom:18px;
     position:relative;
+    min-height:44px;
+  }
+
+  .welcome-message{
+    text-align:center;
+    padding:80px 20px 100px;
+    color:var(--muted);
+  }
+  .welcome-message svg{color:var(--primary-light); margin-bottom:16px;}
+  .welcome-message h2{
+    font-family:'Fraunces', serif;
+    font-size:26px;
+    color:var(--primary-dark);
+    margin:0 0 8px;
+  }
+  .welcome-message p{font-size:14.5px; margin:0;}
+
+  /* Barra de logo em largura total, fixa ao rolar */
+  .top-brand-bar{
+    position:sticky; top:0; z-index:40;
+    width:100%;
+    background:linear-gradient(155deg, var(--primary-dark), #0a3c38);
+    box-shadow:0 2px 10px rgba(0,0,0,.18);
+  }
+  .top-brand-bar::after{
+    content:'';
+    display:block;
+    height:4px;
+    background:linear-gradient(90deg, var(--seal-gold-light), var(--seal-gold) 45%, var(--stamp-red));
+  }
+
+  .bottom-bar{
+    width:100%;
+    margin-top:24px;
+    background:linear-gradient(155deg, var(--primary-dark), #0a3c38);
+  }
+  .bottom-bar::before{
+    content:'';
+    display:block;
+    height:3px;
+    background:linear-gradient(90deg, var(--seal-gold-light), var(--seal-gold) 45%, var(--stamp-red));
+  }
+  .bottom-bar footer.note{
+    max-width:1600px;
+    margin:0 auto;
+    padding:14px 32px;
+    color:rgba(255,255,255,.75);
+  }
+  .top-brand-inner{
+    max-width:1600px;
+    margin:0 auto;
+    padding:14px 32px;
+    display:flex;
+    align-items:center;
+    gap:18px;
+  }
+  .top-brand-text{display:flex; flex-direction:column;}
+  .tb-sdgp{
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size:26px;
+    letter-spacing:.01em;
+    color:#fff;
+    line-height:1;
+  }
+  .tb-sub1{
+    font-family:'IBM Plex Sans', sans-serif;
+    font-weight:700;
+    font-size:11.5px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--seal-gold-light);
+    margin-top:6px;
+  }
+  .tb-sub2{
+    font-family:'IBM Plex Sans', sans-serif;
+    font-weight:600;
+    font-size:10.5px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,.6);
+    margin-top:2px;
+  }
+  @media (max-width:600px){
+    .top-brand-inner{padding:12px 18px; gap:12px;}
+    .tb-sdgp{font-size:21px;}
   }
   .logout-btn{
     position:absolute; top:0; right:0;
@@ -543,7 +632,6 @@
   .loading{padding:60px; text-align:center; color:var(--muted); font-family:'IBM Plex Mono', monospace; font-size:13px;}
 
   footer.note{
-    margin-top:18px;
     font-size:12px;
     color:var(--muted);
     display:flex;
@@ -727,36 +815,31 @@
 </head>
 <body>
 
-<div class="bg-decor" aria-hidden="true">
-  <svg class="bg-band bg-band-top" viewBox="0 0 1440 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="bandGradTop" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#1B3B7A"/>
-        <stop offset="55%" stop-color="#1D6E63"/>
-        <stop offset="100%" stop-color="#1E8E4F"/>
-      </linearGradient>
-    </defs>
-    <path d="M0,0 L1440,0 L1440,45 Q1080,105 720,55 Q360,5 0,45 Z" fill="url(#bandGradTop)"/>
-  </svg>
-  <svg class="bg-band bg-band-bottom" viewBox="0 0 1440 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="bandGradBottom" x1="0%" y1="100%" x2="100%" y2="0%">
-        <stop offset="0%" stop-color="#1B3B7A"/>
-        <stop offset="55%" stop-color="#1D6E63"/>
-        <stop offset="100%" stop-color="#1E8E4F"/>
-      </linearGradient>
-    </defs>
-    <path d="M0,100 L1440,100 L1440,55 Q1080,-5 720,45 Q360,95 0,55 Z" fill="url(#bandGradBottom)"/>
-  </svg>
-</div>
-
 <div class="bg-watermark-wrap" aria-hidden="true">
   <div class="bg-watermark"></div>
 </div>
 
 <div id="loginScreen" class="login-screen">
   <form id="loginForm" class="login-card" autocomplete="off">
-    <div class="login-seal"><img id="loginSealImg" alt=""></div>
+    <div class="login-seal">
+      <svg width="100%" height="100%" viewBox="0 0 104 104" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="104" height="104" rx="24" fill="url(#gLoginSeal)"/>
+        <rect x="20" y="30" width="26" height="34" rx="4.5" fill="#F6F3EC" opacity=".9" transform="rotate(-7 33 47)"/>
+        <rect x="25" y="38" width="15" height="2.4" rx="1.2" fill="#0B4F4A" transform="rotate(-7 33 47)"/>
+        <rect x="25" y="44" width="15" height="2.4" rx="1.2" fill="#0B4F4A" transform="rotate(-7 33 47)"/>
+        <rect x="25" y="50" width="10" height="2.4" rx="1.2" fill="#0B4F4A" transform="rotate(-7 33 47)"/>
+        <circle cx="68" cy="38" r="10.5" fill="#F6F3EC"/>
+        <path d="M48 76c0-13.5 9-21 20-21s20 7.5 20 21" stroke="#F6F3EC" stroke-width="8" stroke-linecap="round" fill="none"/>
+        <circle cx="30" cy="72" r="9" fill="#D4A017" stroke="#0B4F4A" stroke-width="2.2"/>
+        <path d="M26 72l2.8 2.8L34.5 69" stroke="#F6F3EC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <defs>
+          <linearGradient id="gLoginSeal" x1="0" y1="0" x2="104" y2="104" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#12665F"/>
+            <stop offset="1" stop-color="#0B4F4A"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
     <h2>Acesso restrito</h2>
     <p class="login-sub">SDGP · RH SEMED ACARÁ</p>
     <div class="field">
@@ -777,20 +860,45 @@
   </form>
 </div>
 
+<div id="topBrandBar" class="top-brand-bar" style="display:none;">
+  <div class="top-brand-inner">
+    <svg width="52" height="52" viewBox="0 0 104 104" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="104" height="104" rx="24" fill="#0E5C55" stroke="rgba(212,160,23,.35)" stroke-width="1.5"/>
+      <rect x="20" y="30" width="26" height="34" rx="4.5" fill="#F6F3EC" opacity=".9" transform="rotate(-7 33 47)"/>
+      <rect x="25" y="38" width="15" height="2.4" rx="1.2" fill="#0B4F4A" transform="rotate(-7 33 47)"/>
+      <rect x="25" y="44" width="15" height="2.4" rx="1.2" fill="#0B4F4A" transform="rotate(-7 33 47)"/>
+      <rect x="25" y="50" width="10" height="2.4" rx="1.2" fill="#0B4F4A" transform="rotate(-7 33 47)"/>
+      <circle cx="68" cy="38" r="10.5" fill="#F6F3EC"/>
+      <path d="M48 76c0-13.5 9-21 20-21s20 7.5 20 21" stroke="#F6F3EC" stroke-width="8" stroke-linecap="round" fill="none"/>
+      <circle cx="30" cy="72" r="9" fill="#E8BE4E" stroke="#0E5C55" stroke-width="2.2"/>
+      <path d="M26 72l2.8 2.8L34.5 69" stroke="#0B4F4A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </svg>
+    <div class="top-brand-text">
+      <span class="tb-sdgp">SDGP</span>
+      <span class="tb-sub1">Sistema de Gestão Pessoal</span>
+      <span class="tb-sub2">RH · SEMED Acará — PA</span>
+    </div>
+  </div>
+</div>
+
 <div class="wrap" id="appWrap" style="display:none;">
   <header>
     <div class="year-selector-wrap">
       <label for="anoSelector">Ano</label>
       <select id="anoSelector">
+        <option value="">-</option>
         <option value="2026">2026</option>
         <option value="2027">2027</option>
       </select>
     </div>
-    <h1>SDGP - SISTEMA DE GESTÃO PESSOAL (RH SEMED ACARÁ)</h1>
-    <div class="subtitle">Acompanhamento de memorandos, ofícios, autorizações e contratos de admissão de servidores.</div>
     <button type="button" id="logoutBtn" class="logout-btn">Sair</button>
   </header>
 
+  <div id="welcomeMessage" class="welcome-message" style="display:none;">
+    <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/></svg>
+    <h2>Bem-vindo(a) ao SDGP</h2>
+    <p>Selecione o ano no topo da tela para começar a visualizar e cadastrar os registros.</p>
+  </div>
 
   <div id="appContent">
   <div class="tabs">
@@ -873,8 +981,6 @@
     <div id="indicacoesTableArea"></div>
   </div>
   </div>
-
-  <footer class="note">© Todos os direitos reservados — Copyright © 2026-2026</footer>
 
   <button type="button" id="diagFab" class="diag-fab" aria-label="Diagnóstico do sistema">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
@@ -1088,6 +1194,10 @@
   <span id="successFloatText"></span>
 </div>
 
+<div class="bottom-bar">
+  <footer class="note">© Todos os direitos reservados — Copyright © 2026-2026</footer>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style/dist/xlsx.bundle.js"></script>
@@ -1121,11 +1231,10 @@ let records = [];
 let editingId = null;
 let loaded = false;
 let activeTab = 'registros';
-let selectedAno = localStorage.getItem('sdgp_ano_selecionado') || '2026';
+let selectedAno = '';
 
 // --- Autenticação (login único compartilhado pela equipe) ---
 const loginScreen = document.getElementById('loginScreen');
-document.getElementById('loginSealImg').src = LOGO_ACARA_B64;
 const appWrap = document.getElementById('appWrap');
 const loginForm = document.getElementById('loginForm');
 const loginError = document.getElementById('loginError');
@@ -1136,13 +1245,17 @@ auth.onAuthStateChanged((user) => {
     document.title = 'SDGP RH SEMED';
     loginScreen.style.display = 'none';
     appWrap.style.display = 'block';
-    document.getElementById('anoSelector').value = selectedAno;
+    document.getElementById('topBrandBar').style.display = 'block';
+    selectedAno = '';
+    document.getElementById('anoSelector').value = '';
+    document.querySelector('.year-selector-wrap').style.display = 'flex';
     updateAppContentVisibility();
     loadRecords();
   }else{
     document.title = 'SDGP Login';
     loginScreen.style.display = 'flex';
     appWrap.style.display = 'none';
+    document.getElementById('topBrandBar').style.display = 'none';
   }
 });
 
@@ -1182,14 +1295,23 @@ function anoEstaLiberado(ano){
 }
 
 function updateAppContentVisibility(){
+  const welcomeEl = document.getElementById('welcomeMessage');
+  if(!selectedAno){
+    welcomeEl.style.display = 'block';
+    document.getElementById('appContent').style.display = 'none';
+    return;
+  }
+  welcomeEl.style.display = 'none';
   const ativo = anoEstaLiberado(selectedAno);
   document.getElementById('appContent').style.display = ativo ? '' : 'none';
 }
 
 document.getElementById('anoSelector').addEventListener('change', (e)=>{
   selectedAno = e.target.value;
-  localStorage.setItem('sdgp_ano_selecionado', selectedAno);
   updateAppContentVisibility();
+  if(selectedAno){
+    document.querySelector('.year-selector-wrap').style.display = 'none';
+  }
   render();
 });
 
