@@ -792,6 +792,7 @@
   </header>
 
 
+  <div id="appContent">
   <div class="tabs">
     <button class="tab-btn active" id="tabRegistros" type="button">Registros Servidores</button>
     <button class="tab-btn" id="tabContas" type="button">Abertura de Conta</button>
@@ -870,6 +871,7 @@
 
   <div class="table-card" id="tableCardIndicacoes" style="display:none;">
     <div id="indicacoesTableArea"></div>
+  </div>
   </div>
 
   <footer class="note">© Todos os direitos reservados — Copyright © 2026-2026</footer>
@@ -1134,6 +1136,7 @@ auth.onAuthStateChanged((user) => {
     loginScreen.style.display = 'none';
     appWrap.style.display = 'block';
     document.getElementById('anoSelector').value = selectedAno;
+    updateAppContentVisibility();
     loadRecords();
   }else{
     loginScreen.style.display = 'flex';
@@ -1167,9 +1170,24 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
   auth.signOut();
 });
 
+// Um ano só libera as abas quando a data REAL do dia chega em 1º de janeiro daquele ano.
+// Ex: selecionar "2027" antes de 01/01/2027 mostra a tela em branco (só a estética);
+// a partir dessa data, libera automaticamente, sem precisar mexer no código.
+function anoEstaLiberado(ano){
+  const hoje = new Date();
+  const inicioDoAno = new Date(parseInt(ano, 10), 0, 1); // 1º de janeiro do ano, 00:00
+  return hoje >= inicioDoAno;
+}
+
+function updateAppContentVisibility(){
+  const ativo = anoEstaLiberado(selectedAno);
+  document.getElementById('appContent').style.display = ativo ? '' : 'none';
+}
+
 document.getElementById('anoSelector').addEventListener('change', (e)=>{
   selectedAno = e.target.value;
   localStorage.setItem('sdgp_ano_selecionado', selectedAno);
+  updateAppContentVisibility();
   render();
 });
 
