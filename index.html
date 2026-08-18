@@ -2639,6 +2639,13 @@ window.selectMonth = function(idx){
 
 let selectedEmissaoTipo = 'oficios';
 
+// Extrai o valor numérico de um número de documento (ex: "0012" -> 12), para ordenar
+// pelo maior número em uso primeiro, independente de zeros à esquerda ou texto junto.
+function numeroDocValor(numero){
+  const n = parseInt(String(numero || '').replace(/\D/g, ''), 10);
+  return isNaN(n) ? -Infinity : n;
+}
+
 function getEmissoesData(tipo){
   const base = recordsDoAno();
   if(tipo === 'memorando'){
@@ -2674,7 +2681,7 @@ function renderEmissoes(){
     btn.classList.toggle('active', btn.dataset.tipo === selectedEmissaoTipo);
   });
 
-  const dados = getEmissoesData(selectedEmissaoTipo).sort((a,b)=> (b.criadoEm||0) - (a.criadoEm||0));
+  const dados = getEmissoesData(selectedEmissaoTipo).sort((a,b)=> numeroDocValor(b.numero) - numeroDocValor(a.numero));
 
   document.getElementById('emissoesCountPill').textContent = `${dados.length} documento(s)`;
 
@@ -2712,7 +2719,7 @@ document.getElementById('emissoesSubTabs').addEventListener('click', (e)=>{
 
 document.getElementById('exportEmissoesBtn').addEventListener('click', ()=>{
   if(!window.XLSX){ showToast('Não foi possível carregar o exportador de Excel.'); return; }
-  const dados = getEmissoesData(selectedEmissaoTipo).sort((a,b)=> (b.criadoEm||0) - (a.criadoEm||0));
+  const dados = getEmissoesData(selectedEmissaoTipo).sort((a,b)=> numeroDocValor(b.numero) - numeroDocValor(a.numero));
   if(dados.length === 0){ showToast('Não há documentos para exportar.'); return; }
   const rows = dados.map(d => ({ 'Nº': d.numero, 'TIPO': d.tipo, 'SERVIDOR': d.servidor || '' }));
   const ws = XLSX.utils.json_to_sheet(rows);
