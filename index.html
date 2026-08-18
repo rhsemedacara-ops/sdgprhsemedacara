@@ -783,6 +783,7 @@
       <label for="anoSelector">Ano</label>
       <select id="anoSelector">
         <option value="2026">2026</option>
+        <option value="2027">2027</option>
       </select>
     </div>
     <h1>SDGP - SISTEMA DE GESTÃO PESSOAL (RH SEMED ACARÁ)</h1>
@@ -861,9 +862,10 @@
   </div>
 
   <div class="toolbar" id="toolbarIndicacoes" style="display:none;">
-    <input type="search" id="indicacoesSearchInput" placeholder="Buscar por nome, indicação, núcleo...">
+    <input type="search" id="indicacoesSearchInput" placeholder="Buscar pelo nome da indicação...">
     <span class="spacer"></span>
     <span class="count-pill" id="indicacoesCountPill"></span>
+    <button class="btn-ghost" id="exportIndicacoesPdfBtn">Baixar PDF</button>
   </div>
 
   <div class="table-card" id="tableCardIndicacoes" style="display:none;">
@@ -2705,7 +2707,7 @@ function renderIndicacoes(){
 
   const q = document.getElementById('indicacoesSearchInput').value.trim();
   const base = recordsDoAno().slice().sort((a,b)=> (b.criadoEm||0) - (a.criadoEm||0));
-  const filtered = base.filter(r => matchesText(r, q));
+  const filtered = base.filter(r => !q || (r.indicacao || '').toLowerCase().includes(q.toLowerCase()));
 
   document.getElementById('indicacoesCountPill').textContent = `${filtered.length} de ${base.length}`;
 
@@ -2731,7 +2733,6 @@ function renderIndicacoes(){
       <td class="wrap-cell">${r.diretor || '—'}</td>
       <td class="wrap-cell">${r.local || '—'}</td>
       <td>${r.ch || '—'}</td>
-      <td class="pdf-cell"><button class="icon-btn" title="Baixar Indicação (PDF)" onclick="gerarIndicacaoPDF('${r.id}')">${PDF_ICON_SVG}</button></td>
     </tr>
   `).join('');
 
@@ -2739,13 +2740,13 @@ function renderIndicacoes(){
     <div class="table-scroll">
       <table class="tbl-fixed">
         <colgroup>
-          <col style="width:130px"><col style="width:160px"><col style="width:110px"><col style="width:130px"><col style="width:120px">
-          <col style="width:100px"><col style="width:90px"><col style="width:140px"><col style="width:130px"><col style="width:120px">
-          <col style="width:50px"><col style="width:60px">
+          <col style="width:140px"><col style="width:170px"><col style="width:120px"><col style="width:140px"><col style="width:130px">
+          <col style="width:100px"><col style="width:90px"><col style="width:150px"><col style="width:140px"><col style="width:130px">
+          <col style="width:50px">
         </colgroup>
         <thead><tr>
           <th>Indicação</th><th>Servidor</th><th>Telefone</th><th>Cargo</th><th>Função</th>
-          <th>Turno</th><th>Adm</th><th>Núcleo</th><th>Diretor</th><th>Local</th><th>CH</th><th></th>
+          <th>Turno</th><th>Adm</th><th>Núcleo</th><th>Diretor</th><th>Local</th><th>CH</th>
         </tr></thead>
         <tbody>${rows}</tbody>
       </table>
@@ -2754,46 +2755,111 @@ function renderIndicacoes(){
 
 document.getElementById('indicacoesSearchInput').addEventListener('input', render);
 
-// Gera um PDF simples com os dados de indicação de um único registro.
-window.gerarIndicacaoPDF = function(id){
-  const r = records.find(x => x.id === id);
-  if(!r){ showToast('Registro não encontrado.'); return; }
+// Gera um PDF com a RELAÇÃO GERAL de indicações (tabela), respeitando a busca ativa na tela.
+function gerarIndicacoesPDFGeral(){
   if(!window.jspdf){ showToast('Não foi possível carregar o gerador de PDF.'); return; }
+
+  const q = document.getElementById('indicacoesSearchInput').value.trim();
+  const dados = recordsDoAno()
+    .slice()
+    .sort((a,b)=> (b.criadoEm||0) - (a.criadoEm||0))
+    .filter(r => !q || (r.indicacao || '').toLowerCase().includes(q.toLowerCase()));
+
+  if(dados.length === 0){ showToast('Não há indicações para gerar o PDF.'); return; }
+
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-  const marginX = 20;
-  let y = 24;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'landscape' });
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const marginX = 12;
+  const marginTop = 16;
+  const marginBottom = 14;
+  const rowH = 7;
 
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(14);
-  doc.text('FICHA DE INDICAÇÃO', marginX, y);
-  y += 12;
+  const cols = [
+    { label: 'Indicação', key: 'indicacao', w: 32 },
+    { label: 'Servidor',  key: 'servidor',  w: 44 },
+    { label: 'Telefone',  key: 'contato',   w: 24 },
+    { label: 'Cargo',     key: 'cargo',     w: 32 },
+    { label: 'Função',    key: 'funcao',    w: 30 },
+    { label: 'Turno',     key: 'turno',     w: 20 },
+    { label: 'Adm',       key: '__adm',     w: 18 },
+    { label: 'Núcleo',    key: 'nucleo',    w: 36 },
+    { label: 'Diretor',   key: 'diretor',   w: 32 },
+    { label: 'Local',     key: 'local',     w: 28 },
+    { label: 'CH',        key: 'ch',        w: 14 }
+  ];
 
-  const campo = (label, valor) => {
+  function desenhaCabecalho(y){
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
-    doc.text(`${label}:`, marginX, y);
-    const labelWidth = doc.getTextWidth(`${label}: `) + 2;
+    doc.setFontSize(13);
+    doc.text('RELAÇÃO GERAL DE INDICAÇÕES', marginX, y);
+    doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
-    doc.text(String(valor || '—'), marginX + labelWidth, y);
-    y += 8;
-  };
+    doc.text(`Ano: ${selectedAno}  ·  Gerado em: ${new Date().toLocaleDateString('pt-BR')}  ·  Total: ${dados.length}`, pageWidth - marginX, y, { align: 'right' });
+    y += 6;
+    return desenhaLinhaCabecalhoTabela(y);
+  }
 
-  campo('Indicação', r.indicacao);
-  campo('Servidor', r.servidor);
-  campo('Telefone', r.contato);
-  campo('Cargo', r.cargo);
-  campo('Função', r.funcao);
-  campo('Turno', r.turno);
-  campo('Admissão', r.admissao ? new Date(r.admissao+'T00:00:00').toLocaleDateString('pt-BR') : '—');
-  campo('Núcleo', r.nucleo);
-  campo('Diretor', r.diretor);
-  campo('Local', r.local);
-  campo('CH', r.ch);
+  function desenhaLinhaCabecalhoTabela(y){
+    let x = marginX;
+    doc.setFillColor(43, 76, 63);
+    doc.rect(marginX, y, cols.reduce((s,c)=>s+c.w,0), rowH, 'F');
+    doc.setTextColor(255,255,255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    cols.forEach(c => {
+      doc.text(c.label, x + 1.5, y + rowH/2 + 1.2);
+      x += c.w;
+    });
+    doc.setTextColor(0,0,0);
+    return y + rowH;
+  }
+
+  let y = marginTop;
+  y = desenhaCabecalho(y);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5);
+
+  dados.forEach((r, idx) => {
+    if(y + rowH > pageHeight - marginBottom){
+      doc.addPage();
+      y = marginTop;
+      y = desenhaLinhaCabecalhoTabela(y);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7.5);
+    }
+
+    if(idx % 2 === 1){
+      doc.setFillColor(245, 244, 238);
+      doc.rect(marginX, y, cols.reduce((s,c)=>s+c.w,0), rowH, 'F');
+    }
+
+    let x = marginX;
+    cols.forEach(c => {
+      let valor;
+      if(c.key === '__adm'){
+        valor = r.admissao ? new Date(r.admissao+'T00:00:00').toLocaleDateString('pt-BR') : '—';
+      }else{
+        valor = r[c.key] || '—';
+      }
+      const texto = doc.splitTextToSize(String(valor), c.w - 3)[0] || '';
+      doc.text(texto, x + 1.5, y + rowH/2 + 1.2);
+      x += c.w;
+    });
+
+    doc.setDrawColor(220, 220, 210);
+    doc.line(marginX, y + rowH, marginX + cols.reduce((s,c)=>s+c.w,0), y + rowH);
+
+    y += rowH;
+  });
 
   const blobUrl = doc.output('bloburl');
   window.open(blobUrl, '_blank');
-};
+}
+
+document.getElementById('exportIndicacoesPdfBtn').addEventListener('click', gerarIndicacoesPDFGeral);
 
 function renderDashboard(){
   const area = document.getElementById('dashboardArea');
