@@ -7,12 +7,12 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTA0IiBoZWlnaHQ9IjEwNCIgdmlld0JveD0iMCAwIDEwNCAxMDQiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDQiIGhlaWdodD0iMTA0IiByeD0iMjQiIGZpbGw9InVybCgjZzIpIi8+CjxyZWN0IHg9IjIwIiB5PSIzMCIgd2lkdGg9IjI2IiBoZWlnaHQ9IjM0IiByeD0iNC41IiBmaWxsPSIjRjZGM0VDIiBvcGFjaXR5PSIuOSIgdHJhbnNmb3JtPSJyb3RhdGUoLTcgMzMgNDcpIi8+CjxyZWN0IHg9IjI1IiB5PSIzOCIgd2lkdGg9IjE1IiBoZWlnaHQ9IjIuNCIgcng9IjEuMiIgZmlsbD0iIzBCNEY0QSIgdHJhbnNmb3JtPSJyb3RhdGUoLTcgMzMgNDcpIi8+CjxyZWN0IHg9IjI1IiB5PSI0NCIgd2lkdGg9IjE1IiBoZWlnaHQ9IjIuNCIgcng9IjEuMiIgZmlsbD0iIzBCNEY0QSIgdHJhbnNmb3JtPSJyb3RhdGUoLTcgMzMgNDcpIi8+CjxyZWN0IHg9IjI1IiB5PSI1MCIgd2lkdGg9IjEwIiBoZWlnaHQ9IjIuNCIgcng9IjEuMiIgZmlsbD0iIzBCNEY0QSIgdHJhbnNmb3JtPSJyb3RhdGUoLTcgMzMgNDcpIi8+CjxjaXJjbGUgY3g9IjY4IiBjeT0iMzgiIHI9IjEwLjUiIGZpbGw9IiNGNkYzRUMiLz4KPHBhdGggZD0iTTQ4IDc2YzAtMTMuNSA5LTIxIDIwLTIxczIwIDcuNSAyMCAyMSIgc3Ryb2tlPSIjRjZGM0VDIiBzdHJva2Utd2lkdGg9IjgiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0ibm9uZSIvPgo8Y2lyY2xlIGN4PSIzMCIgY3k9IjcyIiByPSI5IiBmaWxsPSIjRDRBMDE3IiBzdHJva2U9IiMwQjRGNEEiIHN0cm9rZS13aWR0aD0iMi4yIi8+CjxwYXRoIGQ9Ik0yNiA3MmwyLjggMi44TDM0LjUgNjkiIHN0cm9rZT0iI0Y2RjNFQyIgc3Ryb2tlLXdpZHRoPSIyLjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZmlsbD0ibm9uZSIvPgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJnMiIgeDE9IjAiIHkxPSIwIiB4Mj0iMTA0IiB5Mj0iMTA0IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiMxMjY2NUYiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMEI0RjRBIi8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+Cg==">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --paper:#F2F2F2;
     --surface:#FFFFFF;
-    --ink:#22281F;
+    --ink:#141414;
     --primary:#2B4C3F;
     --primary-dark:#1B332A;
     --primary-light:#3E6B56;
@@ -21,7 +21,7 @@
     --seal-gold-light:#C9A54D;
     --line:#DCD6C4;
     --line-strong:#CFC9B7;
-    --muted:#6E7266;
+    --muted:#333333;
     --success:#3E6B4F;
     --amber:#93641E;
     --danger:#A23A2C;
@@ -46,7 +46,7 @@
     display:flex;
     flex-direction:column;
   }
-  .wrap{max-width:100%;margin:0 auto;padding:28px 32px 40px; position:relative; z-index:1; flex:1 0 auto;}
+  .wrap{max-width:100%;margin:0 auto;padding:20px 32px 40px; position:relative; z-index:1; flex:1 0 auto;}
 
   /* Decorative background: gradient frame bands + centered watermark */
   .bg-decor{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden;}
@@ -93,6 +93,13 @@
     background:linear-gradient(155deg, var(--primary-dark), #0a3c38);
     box-shadow:0 2px 10px rgba(0,0,0,.18);
   }
+  .top-brand-bar .logout-btn{
+    position:absolute; top:50%; right:24px; transform:translateY(-50%);
+    background:rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.3);
+    color:#fff;
+  }
+  .top-brand-bar .logout-btn:hover{background:rgba(255,255,255,.22); border-color:rgba(255,255,255,.5);}
   .top-brand-bar::after{
     content:'';
     display:block;
@@ -313,22 +320,32 @@
   }
 
   /* Tabs */
+  .app-shell{
+    display:block;
+  }
+  .main-panel{margin-left:244px; width:auto; display:block;}
+  #tableArea{display:block; width:100%;}
+
   .tabs{
     display:flex;
+    flex-direction:column;
     flex-wrap:nowrap;
-    overflow-x:auto;
     gap:8px;
-    margin-bottom:20px;
-    padding-bottom:8px;
-    scrollbar-width:thin;
+    width:220px;
+    position:fixed;
+    top:112px;
+    left:32px;
+    max-height:calc(100vh - 124px);
+    overflow-y:auto;
+    z-index:30;
   }
-  .tab-btn{white-space:nowrap; flex:0 0 auto;}
+  .tab-btn{white-space:nowrap; width:100%; text-align:left;}
   .tab-btn{
     background:var(--surface);
     color:var(--muted);
     border:1.4px solid var(--line-strong);
     border-radius:var(--r-sm);
-    padding:9px 16px;
+    padding:11px 16px;
     margin-right:0;
     font-family:'IBM Plex Sans', sans-serif;
     font-size:13.5px;
@@ -336,12 +353,27 @@
     box-shadow:var(--shadow-sm);
     transition:all .15s ease;
   }
-  .tab-btn:hover{border-color:var(--primary); color:var(--primary-dark); transform:translateY(-1px); box-shadow:var(--shadow);}
+  .tab-btn:hover{border-color:var(--primary); color:var(--primary-dark); transform:translateX(2px); box-shadow:var(--shadow);}
   .tab-btn.active{
     color:var(--primary-dark);
     border-color:var(--primary-light);
     background:linear-gradient(180deg, #E4EFE7, #CFE3D5);
     box-shadow:inset 0 1px 2px rgba(27,51,42,.08), var(--shadow-sm);
+    border-left:4px solid var(--stamp-red);
+  }
+  @media (max-width:900px){
+    .main-panel{margin-left:0;}
+    .tabs{
+      flex-direction:row;
+      flex-wrap:wrap;
+      overflow-x:auto;
+      overflow-y:visible;
+      width:100%;
+      max-height:none;
+      position:static;
+      margin-bottom:16px;
+    }
+    .tab-btn{width:auto;}
   }
 
   /* Month sub-tabs (Contratações por Período) */
@@ -493,7 +525,9 @@
     border-color:var(--stamp-red);
     box-shadow:0 0 0 3.5px var(--ring);
   }
-  .toolbar input[type="search"]{flex:1 1 240px; min-width:180px;}
+  .toolbar input[type="search"]{flex:1 1 220px; min-width:140px;}
+  .toolbar .spacer{flex:1 1 auto; min-width:8px;}
+  .toolbar .count-pill, .toolbar > button{flex:0 0 auto;}
   .toolbar select{min-width:170px;}
   .spacer{flex:1;}
   .count-pill{
@@ -533,6 +567,8 @@
 
   /* Table */
   .table-card{
+    width:100%;
+    box-sizing:border-box;
     background:var(--surface);
     border-radius:var(--r-md);
     box-shadow:var(--shadow-md);
@@ -557,9 +593,10 @@
     text-align:left;
     font-family:'IBM Plex Mono', monospace;
     font-size:11px;
-    letter-spacing:.08em;
+    font-weight:700;
+    letter-spacing:.06em;
     text-transform:uppercase;
-    color:var(--muted);
+    color:#1A1A1A;
     background:#F7F6F0;
     padding:12px 14px;
     border-bottom:1.5px solid #3A3A3A;
@@ -623,6 +660,9 @@
   }
 
   .empty-state{
+    display:block;
+    width:100%;
+    box-sizing:border-box;
     text-align:center;
     padding:70px 20px;
     color:var(--muted);
@@ -764,6 +804,21 @@
   }
   .success-float.show{opacity:1; transform:translateX(-50%) translateY(0);}
 
+  .inactivity-warning{
+    position:fixed; top:96px; left:50%; transform:translateX(-50%) translateY(-12px);
+    display:flex; align-items:center; gap:10px;
+    background:#93641E; color:#fff;
+    padding:12px 22px; border-radius:10px;
+    max-width:520px;
+    font-family:'IBM Plex Sans', sans-serif; font-size:13.5px; font-weight:600;
+    box-shadow:0 10px 30px rgba(0,0,0,.22);
+    opacity:0; pointer-events:none;
+    transition:opacity .25s ease, transform .25s ease;
+    z-index:210;
+  }
+  .inactivity-warning svg{flex:0 0 auto;}
+  .inactivity-warning.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
   /* Ícone flutuante de diagnóstico (estilo chat) */
   .diag-fab{
     position:fixed; bottom:22px; right:22px; z-index:150;
@@ -879,6 +934,7 @@
       <span class="tb-sub2">RH · SEMED Acará — PA</span>
     </div>
   </div>
+  <button type="button" id="logoutBtn" class="logout-btn">Sair</button>
 </div>
 
 <div class="wrap" id="appWrap" style="display:none;">
@@ -891,7 +947,6 @@
         <option value="2027">2027</option>
       </select>
     </div>
-    <button type="button" id="logoutBtn" class="logout-btn">Sair</button>
   </header>
 
   <div id="welcomeMessage" class="welcome-message" style="display:none;">
@@ -901,7 +956,8 @@
   </div>
 
   <div id="appContent">
-  <div class="tabs">
+  <div class="app-shell">
+  <nav class="tabs" id="sideTabs">
     <button class="tab-btn active" id="tabRegistros" type="button">Registros Servidores</button>
     <button class="tab-btn" id="tabContas" type="button">Abertura de Conta</button>
     <button class="tab-btn" id="tabDistrato" type="button">Distrato</button>
@@ -909,8 +965,9 @@
     <button class="tab-btn" id="tabEmissoes" type="button">Acomp. Emi. Doc's</button>
     <button class="tab-btn" id="tabIndicacoes" type="button">Indicações</button>
     <button class="tab-btn" id="tabDashboard" type="button">Dashboard Geral</button>
-  </div>
+  </nav>
 
+  <div class="main-panel">
   <div class="toolbar" id="toolbarRegistros">
     <input type="search" id="searchInput" placeholder="Buscar por nome, CPF, cargo, núcleo, contrato...">
     <span class="spacer"></span>
@@ -960,7 +1017,7 @@
   </div>
 
   <div id="emissoesArea" style="display:none;">
-    <div class="month-tabs" id="emissoesSubTabs">
+    <div class="month-tabs" id="emissoesSubTabs" style="margin-top:4px;">
       <button class="month-btn active" data-tipo="oficios" type="button">Ofícios</button>
       <button class="month-btn" data-tipo="memorando" type="button">Memorando</button>
       <button class="month-btn" data-tipo="autorizacao" type="button">Autorização</button>
@@ -979,6 +1036,8 @@
 
   <div class="table-card" id="tableCardIndicacoes" style="display:none;">
     <div id="indicacoesTableArea"></div>
+  </div>
+  </div>
   </div>
   </div>
 
@@ -1194,12 +1253,16 @@
   <span id="successFloatText"></span>
 </div>
 
+<div class="inactivity-warning" id="inactivityWarning">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+  <span>Você será desconectado por inatividade em 5 minutos. Mexa o mouse ou clique na tela para continuar conectado(a).</span>
+</div>
+
 <div class="bottom-bar">
   <footer class="note">© Todos os direitos reservados — Copyright © 2026-2026</footer>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style/dist/xlsx.bundle.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
@@ -1240,6 +1303,37 @@ const loginForm = document.getElementById('loginForm');
 const loginError = document.getElementById('loginError');
 const loginSubmitBtn = document.getElementById('loginSubmitBtn');
 
+// --- Logout automático por inatividade (30 min), com aviso 5 min antes ---
+const INATIVIDADE_LIMITE_MS = 30 * 60 * 1000;
+const AVISO_ANTES_MS = 5 * 60 * 1000;
+let inatividadeTimer = null;
+let avisoInatividadeTimer = null;
+const inactivityWarningEl = document.getElementById('inactivityWarning');
+
+function esconderAvisoInatividade(){
+  inactivityWarningEl.classList.remove('show');
+}
+
+function mostrarAvisoInatividade(){
+  inactivityWarningEl.classList.add('show');
+}
+
+function resetarTimersInatividade(){
+  clearTimeout(inatividadeTimer);
+  clearTimeout(avisoInatividadeTimer);
+  esconderAvisoInatividade();
+  if(!auth.currentUser) return;
+  avisoInatividadeTimer = setTimeout(mostrarAvisoInatividade, INATIVIDADE_LIMITE_MS - AVISO_ANTES_MS);
+  inatividadeTimer = setTimeout(() => {
+    esconderAvisoInatividade();
+    auth.signOut();
+  }, INATIVIDADE_LIMITE_MS);
+}
+
+['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart'].forEach(evt => {
+  document.addEventListener(evt, resetarTimersInatividade, { passive: true });
+});
+
 auth.onAuthStateChanged((user) => {
   if(user){
     document.title = 'SDGP RH SEMED';
@@ -1248,14 +1342,19 @@ auth.onAuthStateChanged((user) => {
     document.getElementById('topBrandBar').style.display = 'block';
     selectedAno = '';
     document.getElementById('anoSelector').value = '';
+    document.querySelector('header').style.display = '';
     document.querySelector('.year-selector-wrap').style.display = 'flex';
     updateAppContentVisibility();
     loadRecords();
+    resetarTimersInatividade();
   }else{
     document.title = 'SDGP Login';
     loginScreen.style.display = 'flex';
     appWrap.style.display = 'none';
     document.getElementById('topBrandBar').style.display = 'none';
+    clearTimeout(inatividadeTimer);
+    clearTimeout(avisoInatividadeTimer);
+    esconderAvisoInatividade();
   }
 });
 
@@ -1310,7 +1409,7 @@ document.getElementById('anoSelector').addEventListener('change', (e)=>{
   selectedAno = e.target.value;
   updateAppContentVisibility();
   if(selectedAno){
-    document.querySelector('.year-selector-wrap').style.display = 'none';
+    document.querySelector('header').style.display = 'none';
   }
   render();
 });
@@ -1777,605 +1876,464 @@ function escapeHtmlPdf(s){
 }
 
 // Monta o HTML do ofício replicando exatamente o layout, margens e espaçamento do modelo .docx original.
-function buildOficioHtml(r){
-  const servidor = escapeHtmlPdf(r.servidor || '');
-  // O nome do diretor é sempre atrelado ao núcleo do servidor (fonte: NUCLEO_CONFIG),
-  // garantindo consistência mesmo que o campo "diretor" do registro esteja desatualizado.
-  const nucleoDiretor = (NUCLEO_CONFIG[r.nucleo] && NUCLEO_CONFIG[r.nucleo].diretor && NUCLEO_CONFIG[r.nucleo].diretor[0]) || r.diretor;
-  const diretor = escapeHtmlPdf(nucleoDiretor || '_______________________________');
-  const local = escapeHtmlPdf(r.local || '____________________');
-  const nucleo = escapeHtmlPdf(r.nucleo || '____________________');
-  const cargo = escapeHtmlPdf(r.cargo || '____________');
-  const funcao = escapeHtmlPdf(r.funcao || '____________');
-  const ch = escapeHtmlPdf(r.ch || '____');
-  const turno = escapeHtmlPdf(r.turno || '____________');
-  const oficioNum = escapeHtmlPdf(r.oficio || '_______');
-  const obs = r.obs ? escapeHtmlPdf(r.obs) : '.';
-  const inicio = fmtDataCurta(r.admissao);
-  const dataPorExtenso = dataExtenso(r.admissao);
+// ============================================================================
+// Motor de texto real para os documentos em PDF (Ofício, Memo, Autorização,
+// Abertura de Conta, Distrato). Diferente da versão anterior (que "fotografava"
+// um HTML e colava como imagem), aqui o texto é escrito diretamente no PDF pelo
+// jsPDF — por isso agora dá para selecionar e copiar o texto do documento.
+// ============================================================================
 
-  const P = 'margin:0;padding:0;'; // parágrafo padrão: sem espaçamento extra (igual ao modelo original)
-  const BLANK = `<p style="${P}">&nbsp;</p>`;
-  const IND = 'text-indent:30mm;'; // recuo de primeira linha (30mm), usado nos parágrafos indicados no modelo
-  const BLOCK_IND = 'margin-left:30mm;'; // recuo de bloco inteiro, usado nos campos Nome...Observação
+function pdfFont(doc, bold){ doc.setFont('helvetica', bold ? 'bold' : 'normal'); }
 
-  return `
-  <div style="width:210mm;height:297mm;box-sizing:border-box;position:relative;background:#ffffff;
-              font-family:Arial, Helvetica, sans-serif;font-size:12pt;line-height:1.15;color:#000000;
-              padding:10mm 20mm 20mm 30mm;">
+// Escreve um parágrafo com quebra de linha automática, aceitando trechos em
+// negrito (runs = [{t:'texto', b:true/false}, ...]) e alinhamento.
+// Retorna o Y logo após o parágrafo (útil para empilhar conteúdo dinamicamente).
+function pdfParagraph(doc, runs, x, y, width, opts = {}){
+  const fontSize = opts.fontSize || 12;
+  const lineH = opts.lineHeight || fontSize * 0.44;
+  const align = opts.align || 'left'; // left | right | center | justify
+  const firstIndent = opts.firstIndent || 0;
+  doc.setFontSize(fontSize);
 
-    <div style="display:flex;align-items:center;width:100%;padding-bottom:1.5mm;border-bottom:1.5pt solid #000000;margin-bottom:5mm;">
-      <div style="width:27mm;flex-shrink:0;">
-        <img src="${LOGO_ACARA_B64}" style="width:26.7mm;height:auto;display:block;">
-      </div>
-      <div style="flex:1;text-align:center;font-weight:bold;font-size:10pt;line-height:1.3;">
-        MUNICÍPIO DE ACARÁ<br>
-        PREFEITURA MUNICIPAL DE ACARÁ<br>
-        SECRETARIA MUNICIPAL DE EDUCAÇÃO<br>
-        COMISSÃO DE LOTAÇÃO
-      </div>
-      <div style="width:35mm;flex-shrink:0;text-align:right;">
-        <img src="${LOGO_SEMED_B64}" style="height:14mm;width:auto;display:inline-block;">
-      </div>
-    </div>
+  if(align === 'right' || align === 'center'){
+    pdfFont(doc, runs.some(r => r.b));
+    const full = runs.map(r => r.t).join('');
+    const xPos = align === 'right' ? x + width : x + width / 2;
+    doc.text(full, xPos, y, { align });
+    return y + lineH;
+  }
 
-    <p style="${P}">Ofício n° ${oficioNum}/2026 - DAS/SEMED</p>
-    ${BLANK}
-    <p style="${P}text-align:right;">Acará/PA, ${dataPorExtenso}.</p>
-    <p style="${P}">A (o). Sr. (a)</p>
-    <p style="${P}text-align:justify;">${diretor}</p>
-    <p style="${P}text-align:justify;">DIRETOR (A) DA ${nucleo}</p>
-    ${BLANK}
-    <p style="${P}text-align:justify;"><strong>Assunto: Encaminhamento de Servidor Temporário - ${servidor}.</strong></p>
-    ${BLANK}
-    ${BLANK}
-    <p style="${P}${IND}">Senhor (a) Diretor (a),</p>
-    ${BLANK}
-    ${BLANK}
-    <p style="${P}${IND}text-align:justify;line-height:1.8;">Cumprimentando-o (a) e, considerando as necessidades dos serviços dessa escola e, tendo em vista ainda o número insuficiente de servidores ocupantes do Cargo de ${cargo} no quadro de efetivos desta secretaria, para atuar na função de ${funcao}, encaminho o (a) servidor (a) abaixo mencionado (a), para exercer suas atribuições, em caráter temporário, nessa instituição:</p>
-    ${BLANK}
-    <p style="${P}${BLOCK_IND}text-align:justify;"><strong>Nome:</strong> ${servidor};</p>
-    <p style="${P}${BLOCK_IND}text-align:justify;"><strong>Cargo/Função:</strong> ${cargo} / ${funcao};</p>
-    <p style="${P}${BLOCK_IND}text-align:justify;"><strong>Carga horaria:</strong> ${ch} HS;</p>
-    <p style="${P}${BLOCK_IND}text-align:justify;"><strong>Turno:</strong> ${turno};</p>
-    <p style="${P}${BLOCK_IND}text-align:justify;"><strong>Lotação:</strong> ${local};</p>
-    <p style="${P}${BLOCK_IND}text-align:justify;"><strong>Início:</strong> ${inicio}.</p>
-    <p style="${P}${IND}text-align:justify;">Observação: ${obs}</p>
-    ${BLANK}${BLANK}
-    <p style="${P}${IND}">Atenciosamente,</p>
+  // Tokeniza preservando espaços e o atributo de negrito de cada trecho.
+  let tokens = [];
+  runs.forEach(run => {
+    run.t.split(/(\s+)/).forEach(p => { if(p !== '') tokens.push({ w: p, b: run.b }); });
+  });
 
-    <div style="position:absolute;left:30mm;right:20mm;bottom:30mm;">
-      ${BLANK}${BLANK}${BLANK}${BLANK}${BLANK}${BLANK}
+  let lines = [];
+  let current = [];
+  let currentWidth = 0;
+  let firstLine = true;
+  let usableWidth = width - firstIndent;
 
-      <p style="${P}">Ciente do (a) Servidor (a):</p>
-      ${BLANK}
-      <p style="${P}">Data: _____/_____2026</p>
-      ${BLANK}
-      <p style="${P}">_______________________________________________</p>
-      <p style="${P}">${servidor}</p>
-    </div>
+  tokens.forEach(tok => {
+    pdfFont(doc, tok.b);
+    const w = doc.getTextWidth(tok.w);
+    if(currentWidth + w > usableWidth && current.length){
+      lines.push({ toks: current, indent: firstLine ? firstIndent : 0 });
+      current = []; currentWidth = 0; firstLine = false; usableWidth = width;
+    }
+    current.push(tok);
+    currentWidth += w;
+  });
+  if(current.length) lines.push({ toks: current, indent: firstLine ? firstIndent : 0 });
 
-    <div style="position:absolute;left:30mm;right:20mm;bottom:10mm;text-align:center;font-size:9pt;line-height:1.35;padding-top:1.5mm;border-top:1.5pt solid #000000;">
-      Rodovia PA 252, km 01, Bairro Alegria, CEP: 68.690-000 - Acará/PA<br>
-      Email: das@semedacara.com.br
-    </div>
-  </div>`;
+  lines.forEach((line, idx) => {
+    let toks = line.toks.slice();
+    while(toks.length && /^\s+$/.test(toks[toks.length - 1].w)) toks.pop();
+    const isLast = idx === lines.length - 1;
+    let naturalWidth = 0;
+    toks.forEach(t => { pdfFont(doc, t.b); naturalWidth += doc.getTextWidth(t.w); });
+
+    let cx = x + line.indent;
+    if(align === 'justify' && !isLast){
+      const spaces = toks.filter(t => /^\s+$/.test(t.w)).length;
+      const extra = spaces > 0 ? (width - line.indent - naturalWidth) / spaces : 0;
+      toks.forEach(t => {
+        pdfFont(doc, t.b);
+        doc.text(t.w, cx, y);
+        cx += doc.getTextWidth(t.w) + (/^\s+$/.test(t.w) ? extra : 0);
+      });
+    }else{
+      toks.forEach(t => {
+        pdfFont(doc, t.b);
+        doc.text(t.w, cx, y);
+        cx += doc.getTextWidth(t.w);
+      });
+    }
+    y += lineH;
+  });
+
+  pdfFont(doc, false);
+  return y;
 }
 
+function pdfHLine(doc, x1, y, x2, weight){
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(weight || 0.4);
+  doc.line(x1, y, x2, y);
+}
+
+const PDF_X0 = 30;      // margem esquerda (mm), igual ao padding-left dos modelos originais
+const PDF_X1 = 190;     // margem direita = 210 - 20mm
+const PDF_W = PDF_X1 - PDF_X0; // largura útil = 160mm
+
+// Desenha o timbre padrão (brasão + texto centralizado + logo SEMED + linha inferior),
+// usado por Ofício, Memorando e Ofício de Abertura de Conta. Retorna o Y após a linha.
+function desenhaTimbrePadrao(doc, linha4){
+  // Medidas exatas extraídas dos modelos .docx originais (logo SEMED um pouco menor, a pedido).
+  const semedW = 33, semedH = 16;
+  doc.addImage(LOGO_ACARA_B64, 'PNG', PDF_X0, 6, 26.72, 20.36);
+  doc.addImage(LOGO_SEMED_B64, 'PNG', PDF_X1 - semedW, 7, semedW, semedH);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  const centerX = (PDF_X0 + 26.72 + (PDF_X1 - semedW)) / 2;
+  let ty = 11;
+  ['MUNICÍPIO DE ACARÁ', 'PREFEITURA MUNICIPAL DE ACARÁ', 'SECRETARIA MUNICIPAL DE EDUCAÇÃO', linha4].forEach(l => {
+    doc.text(l, centerX, ty, { align: 'center' });
+    ty += 4.2;
+  });
+  const borderY = 29;
+  pdfHLine(doc, PDF_X0, borderY, PDF_X1, 0.6);
+  return borderY + 7;
+}
+
+// Desenha o rodapé padrão (linha + endereço + e-mail, opcional) fixado perto do fim da página.
+function desenhaRodapePadrao(doc, linhas, comBorda){
+  const y0 = 281;
+  if(comBorda !== false) pdfHLine(doc, PDF_X0, y0, PDF_X1, 0.5);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  let ty = y0 + 4.5;
+  linhas.forEach(l => {
+    doc.text(l, (PDF_X0 + PDF_X1) / 2, ty, { align: 'center' });
+    ty += 4.5;
+  });
+}
+
+function abrirPdfEmNovaAba(doc){
+  const blobUrl = doc.output('bloburl');
+  window.open(blobUrl, '_blank');
+}
+
+// ---------------------------------------------------------------------------
+// ENC. OFÍCIO
+// ---------------------------------------------------------------------------
 async function gerarOficioMailMerge(r){
-  if(!window.html2canvas || !window.jspdf){ showToast('Não foi possível carregar o gerador de PDF.'); return; }
-  const { jsPDF } = window.jspdf;
-
-  const holder = document.createElement('div');
-  holder.style.position = 'fixed';
-  holder.style.left = '-10000px';
-  holder.style.top = '0';
-  holder.innerHTML = buildOficioHtml(r);
-  document.body.appendChild(holder);
-  const pageEl = holder.firstElementChild;
-
+  if(!window.jspdf){ showToast('Não foi possível carregar o gerador de PDF.'); return; }
   try{
-    // Garante que as imagens do timbre estejam carregadas antes de capturar.
-    const imgs = Array.from(pageEl.querySelectorAll('img'));
-    await Promise.all(imgs.map(img => img.complete ? Promise.resolve() : new Promise(resolve => { img.onload = resolve; img.onerror = resolve; })));
-    await new Promise(resolve => setTimeout(resolve, 60));
-
-    const canvas = await window.html2canvas(pageEl, {
-      scale: 4,
-      useCORS: true,
-      backgroundColor: '#ffffff',
-      width: pageEl.offsetWidth,
-      height: pageEl.offsetHeight
-    });
-
-    const imgData = canvas.toDataURL('image/png');
+    const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-    doc.addImage(imgData, 'PNG', 0, 0, pageWidth, pageHeight);
 
-    const fileName = `oficio-encaminhamento-${(r.servidor || 'servidor').replace(/\s+/g,'_')}.pdf`;
-    const blobUrl = doc.output('bloburl');
-    window.open(blobUrl, '_blank');
+    const nucleoDiretor = (NUCLEO_CONFIG[r.nucleo] && NUCLEO_CONFIG[r.nucleo].diretor && NUCLEO_CONFIG[r.nucleo].diretor[0]) || r.diretor;
+    const diretor = nucleoDiretor || '_______________________________';
+    const local = r.local || '____________________';
+    const nucleo = r.nucleo || '____________________';
+    const cargo = r.cargo || '____________';
+    const funcao = r.funcao || '____________';
+    const ch = r.ch || '____';
+    const turno = r.turno || '____________';
+    const oficioNum = r.oficio || '_______';
+    const obs = r.obs || '.';
+    const inicio = fmtDataCurta(r.admissao);
+    const dataPorExtenso = dataExtenso(r.admissao);
+    const servidor = r.servidor || '';
+
+    let y = desenhaTimbrePadrao(doc, 'COMISSÃO DE LOTAÇÃO');
+
+    y = pdfParagraph(doc, [{ t: `Ofício n° ${oficioNum}/2026 - DAS/SEMED` }], PDF_X0, y, PDF_W); y += 5;
+    y = pdfParagraph(doc, [{ t: `Acará/PA, ${dataPorExtenso}.` }], PDF_X0, y, PDF_W, { align: 'right' });
+    y = pdfParagraph(doc, [{ t: 'A (o). Sr. (a)' }], PDF_X0, y, PDF_W);
+    y = pdfParagraph(doc, [{ t: diretor }], PDF_X0, y, PDF_W);
+    y = pdfParagraph(doc, [{ t: `DIRETOR (A) DA ${nucleo}` }], PDF_X0, y, PDF_W); y += 5;
+    y = pdfParagraph(doc, [{ t: `Assunto: Encaminhamento de Servidor Temporário - ${servidor}.`, b: true }], PDF_X0, y, PDF_W); y += 10;
+    y = pdfParagraph(doc, [{ t: 'Senhor (a) Diretor (a),' }], PDF_X0, y, PDF_W, { firstIndent: 30 }); y += 10;
+    y = pdfParagraph(doc, [{ t: `Cumprimentando-o (a) e, considerando as necessidades dos serviços dessa escola e, tendo em vista ainda o número insuficiente de servidores ocupantes do Cargo de ${cargo} no quadro de efetivos desta secretaria, para atuar na função de ${funcao}, encaminho o (a) servidor (a) abaixo mencionado (a), para exercer suas atribuições, em caráter temporário, nessa instituição:` }], PDF_X0, y, PDF_W, { align: 'justify', firstIndent: 30, lineHeight: 7.5 }); y += 5;
+
+    const fx = PDF_X0 + 30, fw = PDF_W - 30;
+    y = pdfParagraph(doc, [{ t: 'Nome: ', b: true }, { t: `${servidor};` }], fx, y, fw, { lineHeight: 6.5 });
+    y = pdfParagraph(doc, [{ t: 'Cargo/Função: ', b: true }, { t: `${cargo} / ${funcao};` }], fx, y, fw, { lineHeight: 6.5 });
+    y = pdfParagraph(doc, [{ t: 'Carga horaria: ', b: true }, { t: `${ch} HS;` }], fx, y, fw, { lineHeight: 6.5 });
+    y = pdfParagraph(doc, [{ t: 'Turno: ', b: true }, { t: `${turno};` }], fx, y, fw, { lineHeight: 6.5 });
+    y = pdfParagraph(doc, [{ t: 'Lotação: ', b: true }, { t: `${local};` }], fx, y, fw, { lineHeight: 6.5 });
+    y = pdfParagraph(doc, [{ t: 'Início: ', b: true }, { t: `${inicio}.` }], fx, y, fw, { lineHeight: 6.5 });
+    y = pdfParagraph(doc, [{ t: 'Observação: ', b: true }, { t: obs }], PDF_X0, y, PDF_W, { firstIndent: 30 }); y += 10;
+    pdfParagraph(doc, [{ t: 'Atenciosamente,' }], PDF_X0, y, PDF_W, { firstIndent: 30 });
+
+    let sy = 242;
+    sy = pdfParagraph(doc, [{ t: 'Ciente do (a) Servidor (a):' }], PDF_X0, sy, PDF_W); sy += 8;
+    sy = pdfParagraph(doc, [{ t: 'Data: _____/_____2026' }], PDF_X0, sy, PDF_W); sy += 8;
+    sy = pdfParagraph(doc, [{ t: '_______________________________________________' }], PDF_X0, sy, PDF_W);
+    pdfParagraph(doc, [{ t: servidor }], PDF_X0, sy, PDF_W);
+
+    desenhaRodapePadrao(doc, ['Rodovia PA 252, km 01, Bairro Alegria, CEP: 68.690-000 - Acará/PA', 'Email: das@semedacara.com.br']);
+
+    abrirPdfEmNovaAba(doc);
   }catch(err){
     console.error(err);
     showToast('Erro ao gerar o PDF. Tente novamente.');
-  }finally{
-    document.body.removeChild(holder);
   }
 }
 
-// Monta o HTML do Memorando replicando o layout do modelo 1_2_MEMO_DE_ENC._DE_TEMP._2026_-_SEMED.docx.
-function buildMemoHtml(r){
-  const servidor = escapeHtmlPdf(r.servidor || '');
-  const nucleoDiretor = (NUCLEO_CONFIG[r.nucleo] && NUCLEO_CONFIG[r.nucleo].diretor && NUCLEO_CONFIG[r.nucleo].diretor[0]) || r.diretor;
-  const diretor = escapeHtmlPdf(nucleoDiretor || '_______________________________');
-  const local = escapeHtmlPdf(r.local || '____________________');
-  const nucleo = escapeHtmlPdf(r.nucleo || '____________________');
-  const cargo = escapeHtmlPdf(r.cargo || '____________');
-  const funcao = escapeHtmlPdf(r.funcao || '____________');
-  const ch = escapeHtmlPdf(r.ch || '____');
-  const turno = escapeHtmlPdf(r.turno || '____________');
-  const memoNum = escapeHtmlPdf(r.memo || '_______');
-  const obs = r.obs ? escapeHtmlPdf(r.obs) : '.';
-  const inicio = fmtDataCurta(r.admissao);
-  const dataPorExtenso = dataExtenso(r.admissao);
-
-  const P = 'margin:0;padding:0;';
-  const BLANK = `<p style="${P}">&nbsp;</p>`;
-  const IND = 'text-indent:30mm;';
-  const BLOCK_IND = 'margin-left:30mm;';
-
-  return `
-  <div style="width:210mm;height:297mm;box-sizing:border-box;position:relative;background:#ffffff;
-              font-family:Arial, Helvetica, sans-serif;font-size:12pt;line-height:1.15;color:#000000;
-              padding:10mm 20mm 20mm 30mm;">
-
-    <div style="display:flex;align-items:center;width:100%;padding-bottom:1.5mm;border-bottom:1.5pt solid #000000;margin-bottom:5mm;">
-      <div style="width:27mm;flex-shrink:0;">
-        <img src="${LOGO_ACARA_B64}" style="width:26.7mm;height:auto;display:block;">
-      </div>
-      <div style="flex:1;text-align:center;font-weight:bold;font-size:10pt;line-height:1.3;">
-        MUNICÍPIO DE ACARÁ<br>
-        PREFEITURA MUNICIPAL DE ACARÁ<br>
-        SECRETARIA MUNICIPAL DE EDUCAÇÃO<br>
-        COMISSÃO DE LOTAÇÃO
-      </div>
-      <div style="width:35mm;flex-shrink:0;text-align:right;">
-        <img src="${LOGO_SEMED_B64}" style="height:14mm;width:auto;display:inline-block;">
-      </div>
-    </div>
-
-    <p style="${P}">Memorando n° ${memoNum}/2026 - DAS/SEMED</p>
-    ${BLANK}
-    <p style="${P}text-align:right;">Acará/PA, ${dataPorExtenso}.</p>
-    ${BLANK}
-    <p style="${P}">A (o). Sr. (a)</p>
-    <p style="${P}text-align:justify;">${diretor}</p>
-    <p style="${P}text-align:justify;">${nucleo}</p>
-    ${BLANK}
-    <p style="${P}text-align:justify;"><strong>Assunto: Encaminhamento de Servidor Temporário - ${servidor}.</strong></p>
-    ${BLANK}
-    ${BLANK}
-    <p style="${P}${IND}">Senhor (a) Diretor (a),</p>
-    ${BLANK}
-    ${BLANK}
-    <p style="${P}${IND}text-align:justify;line-height:1.8;">Cumprimentando-o (a) e, considerando as necessidades dos serviços dessa diretoria e, tendo em vista ainda o número insuficiente de servidores ocupantes do Cargo/Função de ${funcao} no quadro de efetivos desta secretaria, encaminho o (a) servidor (a) abaixo mencionado (a), para exercer suas atribuições, em caráter temporário, nesse setor:</p>
-    ${BLANK}
-    <p style="${P}${BLOCK_IND}text-align:justify;"><strong>Nome:</strong> ${servidor};</p>
-    <p style="${P}${BLOCK_IND}text-align:justify;"><strong>Cargo/Função:</strong> ${cargo}; ${funcao};</p>
-    <p style="${P}${BLOCK_IND}text-align:justify;"><strong>Carga horaria:</strong> ${ch} HS;</p>
-    <p style="${P}${BLOCK_IND}text-align:justify;"><strong>Turno:</strong> ${turno};</p>
-    <p style="${P}${BLOCK_IND}text-align:justify;"><strong>Lotação:</strong> ${local}</p>
-    <p style="${P}${BLOCK_IND}text-align:justify;"><strong>Início:</strong> ${inicio}.</p>
-    <p style="${P}${IND}text-align:justify;">Observação: ${obs}</p>
-    ${BLANK}${BLANK}
-    <p style="${P}${IND}">Atenciosamente,</p>
-
-    <div style="position:absolute;left:30mm;right:20mm;bottom:30mm;">
-      ${BLANK}${BLANK}${BLANK}${BLANK}${BLANK}${BLANK}
-
-      <p style="${P}">Ciente do (a) Servidor (a):</p>
-      ${BLANK}
-      <p style="${P}">Data: _____/_____2026</p>
-      ${BLANK}
-      <p style="${P}">_______________________________________________</p>
-      <p style="${P}">${servidor}</p>
-    </div>
-
-    <div style="position:absolute;left:30mm;right:20mm;bottom:10mm;text-align:center;font-size:9pt;line-height:1.35;padding-top:1.5mm;border-top:1.5pt solid #000000;">
-      Rodovia PA 252, km 01, Bairro Alegria, CEP: 68.690-000 - Acará/PA<br>
-      Email: das@semedacara.com.br
-    </div>
-  </div>`;
-}
-
+// ---------------------------------------------------------------------------
+// ENC. MEMO
+// ---------------------------------------------------------------------------
 async function gerarMemoMailMerge(r){
-  if(!window.html2canvas || !window.jspdf){ showToast('Não foi possível carregar o gerador de PDF.'); return; }
-  const { jsPDF } = window.jspdf;
-
-  const holder = document.createElement('div');
-  holder.style.position = 'fixed';
-  holder.style.left = '-10000px';
-  holder.style.top = '0';
-  holder.innerHTML = buildMemoHtml(r);
-  document.body.appendChild(holder);
-  const pageEl = holder.firstElementChild;
-
+  if(!window.jspdf){ showToast('Não foi possível carregar o gerador de PDF.'); return; }
   try{
-    const imgs = Array.from(pageEl.querySelectorAll('img'));
-    await Promise.all(imgs.map(img => img.complete ? Promise.resolve() : new Promise(resolve => { img.onload = resolve; img.onerror = resolve; })));
-    await new Promise(resolve => setTimeout(resolve, 60));
-
-    const canvas = await window.html2canvas(pageEl, {
-      scale: 4,
-      useCORS: true,
-      backgroundColor: '#ffffff',
-      width: pageEl.offsetWidth,
-      height: pageEl.offsetHeight
-    });
-
-    const imgData = canvas.toDataURL('image/png');
+    const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-    doc.addImage(imgData, 'PNG', 0, 0, pageWidth, pageHeight);
 
-    const fileName = `memo-encaminhamento-${(r.servidor || 'servidor').replace(/\s+/g,'_')}.pdf`;
-    const blobUrl = doc.output('bloburl');
-    window.open(blobUrl, '_blank');
+    const nucleoDiretor = (NUCLEO_CONFIG[r.nucleo] && NUCLEO_CONFIG[r.nucleo].diretor && NUCLEO_CONFIG[r.nucleo].diretor[0]) || r.diretor;
+    const diretor = nucleoDiretor || '_______________________________';
+    const local = r.local || '____________________';
+    const nucleo = r.nucleo || '____________________';
+    const cargo = r.cargo || '____________';
+    const funcao = r.funcao || '____________';
+    const ch = r.ch || '____';
+    const turno = r.turno || '____________';
+    const memoNum = r.memo || '_______';
+    const obs = r.obs || '.';
+    const inicio = fmtDataCurta(r.admissao);
+    const dataPorExtenso = dataExtenso(r.admissao);
+    const servidor = r.servidor || '';
+
+    let y = desenhaTimbrePadrao(doc, 'COMISSÃO DE LOTAÇÃO');
+
+    y = pdfParagraph(doc, [{ t: `Memorando n° ${memoNum}/2026 - DAS/SEMED` }], PDF_X0, y, PDF_W); y += 5;
+    y = pdfParagraph(doc, [{ t: `Acará/PA, ${dataPorExtenso}.` }], PDF_X0, y, PDF_W, { align: 'right' }); y += 5;
+    y = pdfParagraph(doc, [{ t: 'A (o). Sr. (a)' }], PDF_X0, y, PDF_W);
+    y = pdfParagraph(doc, [{ t: diretor }], PDF_X0, y, PDF_W);
+    y = pdfParagraph(doc, [{ t: nucleo }], PDF_X0, y, PDF_W); y += 5;
+    y = pdfParagraph(doc, [{ t: `Assunto: Encaminhamento de Servidor Temporário - ${servidor}.`, b: true }], PDF_X0, y, PDF_W); y += 10;
+    y = pdfParagraph(doc, [{ t: 'Senhor (a) Diretor (a),' }], PDF_X0, y, PDF_W, { firstIndent: 30 }); y += 10;
+    y = pdfParagraph(doc, [{ t: `Cumprimentando-o (a) e, considerando as necessidades dos serviços dessa diretoria e, tendo em vista ainda o número insuficiente de servidores ocupantes do Cargo/Função de ${funcao} no quadro de efetivos desta secretaria, encaminho o (a) servidor (a) abaixo mencionado (a), para exercer suas atribuições, em caráter temporário, nesse setor:` }], PDF_X0, y, PDF_W, { align: 'justify', firstIndent: 30, lineHeight: 7.5 }); y += 5;
+
+    const fx = PDF_X0 + 30, fw = PDF_W - 30;
+    y = pdfParagraph(doc, [{ t: 'Nome: ', b: true }, { t: `${servidor};` }], fx, y, fw, { lineHeight: 6.5 });
+    y = pdfParagraph(doc, [{ t: 'Cargo/Função: ', b: true }, { t: `${cargo}; ${funcao};` }], fx, y, fw, { lineHeight: 6.5 });
+    y = pdfParagraph(doc, [{ t: 'Carga horaria: ', b: true }, { t: `${ch} HS;` }], fx, y, fw, { lineHeight: 6.5 });
+    y = pdfParagraph(doc, [{ t: 'Turno: ', b: true }, { t: `${turno};` }], fx, y, fw, { lineHeight: 6.5 });
+    y = pdfParagraph(doc, [{ t: 'Lotação: ', b: true }, { t: local }], fx, y, fw, { lineHeight: 6.5 });
+    y = pdfParagraph(doc, [{ t: 'Início: ', b: true }, { t: `${inicio}.` }], fx, y, fw, { lineHeight: 6.5 });
+    y = pdfParagraph(doc, [{ t: 'Observação: ', b: true }, { t: obs }], PDF_X0, y, PDF_W, { firstIndent: 30 }); y += 10;
+    pdfParagraph(doc, [{ t: 'Atenciosamente,' }], PDF_X0, y, PDF_W, { firstIndent: 30 });
+
+    let sy = 242;
+    sy = pdfParagraph(doc, [{ t: 'Ciente do (a) Servidor (a):' }], PDF_X0, sy, PDF_W); sy += 8;
+    sy = pdfParagraph(doc, [{ t: 'Data: _____/_____2026' }], PDF_X0, sy, PDF_W); sy += 8;
+    sy = pdfParagraph(doc, [{ t: '_______________________________________________' }], PDF_X0, sy, PDF_W);
+    pdfParagraph(doc, [{ t: servidor }], PDF_X0, sy, PDF_W);
+
+    desenhaRodapePadrao(doc, ['Rodovia PA 252, km 01, Bairro Alegria, CEP: 68.690-000 - Acará/PA', 'Email: das@semedacara.com.br']);
+
+    abrirPdfEmNovaAba(doc);
   }catch(err){
     console.error(err);
     showToast('Erro ao gerar o PDF. Tente novamente.');
-  }finally{
-    document.body.removeChild(holder);
   }
 }
 
-// Monta o HTML da Autorização de Contratação replicando o layout do modelo 1_3_AUTORIZAÇÃO_DE_CONTRATAÇÃO.docx.
-// Diferente do Ofício/Memo: é sempre endereçada à Diretoria Administrativa e Setorial (independe do núcleo do servidor),
-// tem cabeçalho com "Assessoria de Política Estratégica", rodapé sem e-mail, e inclui um canhoto de protocolo de recebimento.
-function buildAutorizacaoHtml(r){
-  const servidor = escapeHtmlPdf(r.servidor || '');
-  const cargo = escapeHtmlPdf(r.cargo || '____________');
-  const funcao = escapeHtmlPdf(r.funcao || '____________');
-  const ch = escapeHtmlPdf(r.ch || '____');
-  const turno = escapeHtmlPdf(r.turno || '____________');
-  const local = escapeHtmlPdf(r.local || '____________________');
-  const autorizacaoNum = escapeHtmlPdf(r.autorizacao || '_______');
-  const inicio = fmtDataCurta(r.admissao);
-  const dataPorExtenso = dataExtenso(r.admissao);
-
-  const P = 'margin:0;padding:0;';
-  const BLANK = `<p style="${P}">&nbsp;</p>`;
-  const IND = 'text-indent:30mm;';
-  const BLOCK_IND = 'margin-left:30mm;';
-
-  return `
-  <div style="width:210mm;height:297mm;box-sizing:border-box;position:relative;background:#ffffff;
-              font-family:Arial, Helvetica, sans-serif;font-size:12pt;line-height:1.15;color:#000000;
-              padding:10mm 20mm 22.5mm 30mm;">
-
-    <div style="display:flex;align-items:center;width:100%;padding-bottom:1.5mm;border-bottom:1.5pt solid #000000;margin-bottom:5mm;">
-      <div style="width:27mm;flex-shrink:0;">
-        <img src="${LOGO_ACARA_B64}" style="width:26.7mm;height:auto;display:block;">
-      </div>
-      <div style="flex:1;text-align:center;font-weight:bold;font-size:10pt;line-height:1.3;">
-        MUNICÍPIO DE ACARÁ<br>
-        PREFEITURA MUNICIPAL DE ACARÁ<br>
-        SECRETARIA MUNICIPAL DE EDUCAÇÃO<br>
-        Assessoria de Política Estratégica
-      </div>
-      <div style="width:35mm;flex-shrink:0;text-align:right;">
-        <img src="${LOGO_SEMED_B64}" style="height:14mm;width:auto;display:inline-block;">
-      </div>
-    </div>
-
-    <p style="${P}text-align:center;">AUTORIZAÇÃO DE CONTRATAÇÃO N° ${autorizacaoNum}/2026</p>
-    ${BLANK}
-    <p style="${P}">À</p>
-    <p style="${P}">DIRETORIA ADMINISTRATIVA E SETORIAL</p>
-    ${BLANK}
-    <p style="${P}text-align:justify;"><strong>Assunto: Autorização de contratação de servidor Temporário - ${servidor}.</strong></p>
-    ${BLANK}
-    <p style="${P}${IND}">Senhor (a) Diretor (a),</p>
-    ${BLANK}
-    <p style="${P}${IND}text-align:justify;line-height:1.8;">Cumprimentando-o (a) e, considerando as necessidades dos serviços educacionais desta secretaria e, diante do número insuficiente de servidores no quadro de efetivos, autorizo a contratação temporária abaixo:</p>
-    ${BLANK}
-    <p style="${P}${BLOCK_IND}text-align:justify;"><strong>Nome: ${servidor}</strong></p>
-    <p style="${P}${BLOCK_IND}text-align:justify;"><strong>Cargo/Função:</strong> ${cargo}/${funcao};</p>
-    <p style="${P}${BLOCK_IND}text-align:justify;"><strong>Carga horaria:</strong> ${ch} HORAS;</p>
-    <p style="${P}${BLOCK_IND}text-align:justify;"><strong>Turno:</strong> ${turno};</p>
-    <p style="${P}${BLOCK_IND}text-align:justify;"><strong>Lotação:</strong> ${local};</p>
-    <p style="${P}${BLOCK_IND}text-align:justify;"><strong>Data de início:</strong> ${inicio};</p>
-    <p style="${P}${BLOCK_IND}text-align:justify;"><strong>Data final:</strong> 31/12/2026.</p>
-    ${BLANK}
-    <p style="${P}text-align:right;">Acará/PA, ${dataPorExtenso}.</p>
-    ${BLANK}
-    <p style="${P}${IND}">Atenciosamente,</p>
-    ${BLANK}
-    <p style="${P}text-align:center;">______________________________</p>
-
-    ${BLANK}${BLANK}${BLANK}${BLANK}${BLANK}
-
-    <div style="width:80mm;margin-left:auto;border:1pt solid #000000;padding:4mm;box-sizing:border-box;text-align:center;font-size:10pt;line-height:1.4;">
-      Secretaria municipal de educação<br>
-      Diretoria Administrativa e Setorial<br>
-      <strong>PROTOCOLO DE RECEBIMENTO</strong>
-      ${BLANK}
-      Recebi em:
-      ${BLANK}
-      Data: _____ de agosto de 2026.
-      ${BLANK}
-      ___________________________
-    </div>
-
-    <div style="position:absolute;left:30mm;right:20mm;bottom:9mm;text-align:center;font-size:9pt;line-height:1.35;padding-top:1.5mm;border-top:1.5pt solid #000000;">
-      Rodovia PA 252, km 01, Bairro Alegria, CEP: 68.690-000 - Acará/PA
-    </div>
-  </div>`;
-}
-
+// ---------------------------------------------------------------------------
+// AUTORIZAÇÃO
+// ---------------------------------------------------------------------------
 async function gerarAutorizacaoMailMerge(r){
-  if(!window.html2canvas || !window.jspdf){ showToast('Não foi possível carregar o gerador de PDF.'); return; }
-  const { jsPDF } = window.jspdf;
-
-  const holder = document.createElement('div');
-  holder.style.position = 'fixed';
-  holder.style.left = '-10000px';
-  holder.style.top = '0';
-  holder.innerHTML = buildAutorizacaoHtml(r);
-  document.body.appendChild(holder);
-  const pageEl = holder.firstElementChild;
-
+  if(!window.jspdf){ showToast('Não foi possível carregar o gerador de PDF.'); return; }
   try{
-    const imgs = Array.from(pageEl.querySelectorAll('img'));
-    await Promise.all(imgs.map(img => img.complete ? Promise.resolve() : new Promise(resolve => { img.onload = resolve; img.onerror = resolve; })));
-    await new Promise(resolve => setTimeout(resolve, 60));
-
-    const canvas = await window.html2canvas(pageEl, {
-      scale: 4,
-      useCORS: true,
-      backgroundColor: '#ffffff',
-      width: pageEl.offsetWidth,
-      height: pageEl.offsetHeight
-    });
-
-    const imgData = canvas.toDataURL('image/png');
+    const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-    doc.addImage(imgData, 'PNG', 0, 0, pageWidth, pageHeight);
 
-    const fileName = `autorizacao-contratacao-${(r.servidor || 'servidor').replace(/\s+/g,'_')}.pdf`;
-    const blobUrl = doc.output('bloburl');
-    window.open(blobUrl, '_blank');
+    const cargo = r.cargo || '____________';
+    const funcao = r.funcao || '____________';
+    const ch = r.ch || '____';
+    const turno = r.turno || '____________';
+    const local = r.local || '____________________';
+    const autorizacaoNum = r.autorizacao || '_______';
+    const inicio = fmtDataCurta(r.admissao);
+    const dataPorExtenso = dataExtenso(r.admissao);
+    const servidor = r.servidor || '';
+
+    let y = desenhaTimbrePadrao(doc, 'Assessoria de Política Estratégica');
+
+    y = pdfParagraph(doc, [{ t: `AUTORIZAÇÃO DE CONTRATAÇÃO N° ${autorizacaoNum}/2026` }], PDF_X0, y, PDF_W, { align: 'center' }); y += 5;
+    y = pdfParagraph(doc, [{ t: 'À' }], PDF_X0, y, PDF_W);
+    y = pdfParagraph(doc, [{ t: 'DIRETORIA ADMINISTRATIVA E SETORIAL' }], PDF_X0, y, PDF_W); y += 5;
+    y = pdfParagraph(doc, [{ t: `Assunto: Autorização de contratação de servidor Temporário - ${servidor}.`, b: true }], PDF_X0, y, PDF_W); y += 5;
+    y = pdfParagraph(doc, [{ t: 'Senhor (a) Diretor (a),' }], PDF_X0, y, PDF_W, { firstIndent: 30 }); y += 5;
+    y = pdfParagraph(doc, [{ t: 'Cumprimentando-o (a) e, considerando as necessidades dos serviços educacionais desta secretaria e, diante do número insuficiente de servidores no quadro de efetivos, autorizo a contratação temporária abaixo:' }], PDF_X0, y, PDF_W, { align: 'justify', firstIndent: 30, lineHeight: 7.5 }); y += 5;
+
+    const fx = PDF_X0 + 30, fw = PDF_W - 30;
+    y = pdfParagraph(doc, [{ t: `Nome: ${servidor}`, b: true }], fx, y, fw, { lineHeight: 6.5 });
+    y = pdfParagraph(doc, [{ t: 'Cargo/Função: ', b: true }, { t: `${cargo}/${funcao};` }], fx, y, fw, { lineHeight: 6.5 });
+    y = pdfParagraph(doc, [{ t: 'Carga horaria: ', b: true }, { t: `${ch} HORAS;` }], fx, y, fw, { lineHeight: 6.5 });
+    y = pdfParagraph(doc, [{ t: 'Turno: ', b: true }, { t: `${turno};` }], fx, y, fw, { lineHeight: 6.5 });
+    y = pdfParagraph(doc, [{ t: 'Lotação: ', b: true }, { t: `${local};` }], fx, y, fw, { lineHeight: 6.5 });
+    y = pdfParagraph(doc, [{ t: 'Data de início: ', b: true }, { t: `${inicio};` }], fx, y, fw, { lineHeight: 6.5 });
+    y = pdfParagraph(doc, [{ t: 'Data final: ', b: true }, { t: '31/12/2026.' }], fx, y, fw, { lineHeight: 6.5 }); y += 5;
+    y = pdfParagraph(doc, [{ t: `Acará/PA, ${dataPorExtenso}.` }], PDF_X0, y, PDF_W, { align: 'right' }); y += 5;
+    y = pdfParagraph(doc, [{ t: 'Atenciosamente,' }], PDF_X0, y, PDF_W, { firstIndent: 30 }); y += 5;
+    y = pdfParagraph(doc, [{ t: '______________________________' }], PDF_X0, y, PDF_W, { align: 'center' }); y += 22;
+
+    // Caixa de protocolo (alinhada à direita, 80mm de largura)
+    const boxW = 80, boxX = PDF_X1 - boxW, boxPad = 4;
+    const boxTop = y;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    let by = boxTop + boxPad + 4;
+    const boxTextW = boxW - boxPad * 2;
+    const boxCenterX = boxX + boxPad;
+    by = pdfParagraph(doc, [{ t: 'Secretaria municipal de educação' }], boxCenterX, by, boxTextW, { align: 'center', fontSize: 10 });
+    by = pdfParagraph(doc, [{ t: 'Diretoria Administrativa e Setorial' }], boxCenterX, by, boxTextW, { align: 'center', fontSize: 10 });
+    by = pdfParagraph(doc, [{ t: 'PROTOCOLO DE RECEBIMENTO', b: true }], boxCenterX, by, boxTextW, { align: 'center', fontSize: 10 }); by += 5;
+    by = pdfParagraph(doc, [{ t: 'Recebi em:' }], boxCenterX, by, boxTextW, { align: 'center', fontSize: 10 }); by += 5;
+    by = pdfParagraph(doc, [{ t: 'Data: _____ de agosto de 2026.' }], boxCenterX, by, boxTextW, { align: 'center', fontSize: 10 }); by += 5;
+    by = pdfParagraph(doc, [{ t: '___________________________' }], boxCenterX, by, boxTextW, { align: 'center', fontSize: 10 });
+    const boxBottom = by + boxPad - 3;
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(0.3);
+    doc.rect(boxX, boxTop, boxW, boxBottom - boxTop);
+
+    desenhaRodapePadrao(doc, ['Rodovia PA 252, km 01, Bairro Alegria, CEP: 68.690-000 - Acará/PA']);
+
+    abrirPdfEmNovaAba(doc);
   }catch(err){
     console.error(err);
     showToast('Erro ao gerar o PDF. Tente novamente.');
-  }finally{
-    document.body.removeChild(holder);
   }
 }
 
-// Monta o HTML do Ofício de Solicitação de Abertura de Conta, replicando o modelo
-// 2_1_OFÍCIO_DE_SOLICITAÇÃO_DE_ABERTURA_DE_CONTA.docx (mesmo timbre/rodapé do Ofício de Encaminhamento).
-function buildAberturaContaHtml(r){
-  const servidor = escapeHtmlPdf(r.servidor || '');
-  const cpf = escapeHtmlPdf(r.cpf || '___________________');
-  const endereco = escapeHtmlPdf(r.enderecoAbertura || '____________________');
-  const cargo = escapeHtmlPdf(r.cargo || '____________');
-  const salario = escapeHtmlPdf(r.salarioBaseAbertura || '____________');
-  const banco = escapeHtmlPdf(r.bancoAbertura || '____________________');
-  const oficioNum = escapeHtmlPdf(r.oficioAberturaConta || '_______');
-  const inicio = fmtDataCurta(r.admissao);
-  const dataPorExtenso = dataExtenso(r.admissao);
-
-  const P = 'margin:0;padding:0;';
-  const BLANK = `<p style="${P}">&nbsp;</p>`;
-  const IND = 'text-indent:30mm;';
-
-  return `
-  <div style="width:210mm;height:297mm;box-sizing:border-box;position:relative;background:#ffffff;
-              font-family:Arial, Helvetica, sans-serif;font-size:12pt;line-height:1.15;color:#000000;
-              padding:10mm 20mm 20mm 30mm;">
-
-    <div style="display:flex;align-items:center;width:100%;padding-bottom:1.5mm;border-bottom:1.5pt solid #000000;margin-bottom:5mm;">
-      <div style="width:27mm;flex-shrink:0;">
-        <img src="${LOGO_ACARA_B64}" style="width:26.7mm;height:auto;display:block;">
-      </div>
-      <div style="flex:1;text-align:center;font-weight:bold;font-size:10pt;line-height:1.3;">
-        MUNICÍPIO DE ACARÁ<br>
-        PREFEITURA MUNICIPAL DE ACARÁ<br>
-        SECRETARIA MUNICIPAL DE EDUCAÇÃO<br>
-        COMISSÃO DE LOTAÇÃO
-      </div>
-      <div style="width:35mm;flex-shrink:0;text-align:right;">
-        <img src="${LOGO_SEMED_B64}" style="height:14mm;width:auto;display:inline-block;">
-      </div>
-    </div>
-
-    <p style="${P}">Ofício n° ${oficioNum}/2026 - DAS/SEMED</p>
-    ${BLANK}
-    <p style="${P}text-align:right;">Acará/PA, ${dataPorExtenso}.</p>
-    ${BLANK}
-    <p style="${P}">A (o). Sr. (a)</p>
-    <p style="${P}text-align:justify;">SETOR DE RECURSOS HUMANOS DA PREFEITURA MUNICIPAL DE ACARÁ</p>
-    ${BLANK}
-    <p style="${P}text-align:justify;"><strong>Assunto: Solicitação de abertura de conta – ${servidor}.</strong></p>
-    ${BLANK}
-    ${BLANK}
-    <p style="${P}${IND}">Senhor (a) Diretor (a),</p>
-    ${BLANK}
-    ${BLANK}
-    <p style="${P}${IND}text-align:justify;line-height:1.8;">Cumprimentando-o (a) e, considerando a contratação em caráter temporário do Sr (a). ${servidor}, CPF n° ${cpf}, no dia ${inicio}, residente ${endereco}, cargo de ${cargo}, com salário base de R$ ${salario}, <strong>solicito a expedição de autorização para a abertura de conta no ${banco}</strong>, para fins de efetivação de seus proventos.</p>
-    ${BLANK}
-    <p style="${P}${IND}">Atenciosamente,</p>
-    ${BLANK}${BLANK}
-
-    <div style="position:absolute;left:30mm;right:20mm;bottom:10mm;text-align:center;font-size:9pt;line-height:1.35;padding-top:1.5mm;border-top:1.5pt solid #000000;">
-      Rodovia PA 252, km 01, Bairro Alegria, CEP: 68.690-000 - Acará/PA<br>
-      Email: das@semedacara.com.br
-    </div>
-  </div>`;
-}
-
-// Monta o HTML do Termo de Distrato, replicando o modelo DISTRATO.docx
-// (timbre "ESTADO DO PARÁ / Município do Acará / Prefeitura Municipal de Acará / Poder Executivo").
-function buildDistratoHtml(r){
-  const servidor = escapeHtmlPdf(r.servidor || '');
-  const cpf = escapeHtmlPdf(r.cpf || '___________________');
-  const rg = escapeHtmlPdf(r.distratoRg || '___________________');
-  const endereco = escapeHtmlPdf(r.distratoEndereco || '____________________');
-  const numero = escapeHtmlPdf(r.distratoNumero || 'SN');
-  const bairro = escapeHtmlPdf(r.distratoBairro || '____________________');
-  const municipio = escapeHtmlPdf(r.distratoMunicipio || 'ACARÁ');
-  const contrato = escapeHtmlPdf(r.contrato || '_______');
-  const dataCurta = fmtDataCurta(r.situacaoData);
-
-  const P = 'margin:0;padding:0;';
-  const BLANK = `<p style="${P}">&nbsp;</p>`;
-
-  return `
-  <div style="width:210mm;height:297mm;box-sizing:border-box;position:relative;background:#ffffff;
-              font-family:Arial, Helvetica, sans-serif;font-size:11pt;line-height:1.1;color:#000000;
-              padding:6mm 20mm 14mm 30mm;">
-
-    <div style="text-align:center;padding-bottom:1mm;border-bottom:1pt solid #000000;margin-bottom:4mm;">
-      <img src="${LOGO_DISTRATO_B64}" style="width:18mm;height:auto;display:inline-block;margin-bottom:1mm;">
-      <div style="font-weight:bold;font-size:9pt;line-height:1.2;">
-        ESTADO DO PARÁ<br>
-        Município do Acará<br>
-        Prefeitura Municipal de Acará<br>
-        Poder Executivo
-      </div>
-    </div>
-
-    <p style="${P}text-align:center;font-weight:bold;font-size:11pt;">DISTRATO DO CONTRATO ${contrato}</p>
-    ${BLANK}
-    <p style="${P}margin-left:75mm;text-align:justify;">Termo de Distrato Administrativo de Serviços temporários, que celebram PREFEITURA MUNICIPAL DE ACARÁ e ${servidor} como abaixo se infere.</p>
-    ${BLANK}
-    <p style="${P}text-indent:15mm;text-align:justify;line-height:1.3;"> <strong>A PREFEITURA MUNICIPAL DE ACARÁ</strong>, pessoa jurídica de direito público, com sede à Trav. São José, 120, Centro, CEP: 68.690-000, Acará - PA, CNPJ: 05.196.548/0001-72, neste ato representado pelo Prefeito Municipal, Sr. <strong>PEDRO PAULO GOUVEA MORAES</strong>, brasileiro, casado, residente e domiciliado na Rua Marechal Deodoro da Fonseca, s/n, Bairro Centro, neste Município, portador do RG 2502088 – PC/PA e do CPF Nº 452.132.162-34, doravante denominada simplesmente <strong>DISTRATANTE</strong>, e o(a) Sr.(a) <strong>${servidor}</strong>, brasileiro, residente e domiciliado à <strong>${endereco}</strong>, N° <strong>${numero}</strong>, Bairro <strong>${bairro}</strong>, Município de ${municipio}, UF: PA, RG: <strong>${rg}</strong>, CPF: <strong>${cpf}</strong>, doravante denominado <strong>DISTRATADO(A)</strong>, têm justos e pactuado nos termos da Lei Orgânica do Município, regulamentado pela Lei Municipal n° 1.688/97, de 30/01/1997, alterado pela Lei Municipal n° 001/2005 e Lei Municipal nº 028/2005 de 30 de Dezembro de 2005, observadas as cláusulas e condições seguintes, que reciprocamente se outorgam e obrigam-se:</p>
-    ${BLANK}
-    <p style="${P}text-align:justify;"><strong>CLÁUSULA I</strong></p>
-    <p style="${P}text-align:justify;">Fica distratado o Contrato Administrativo Nº ${contrato}, <strong>${servidor}</strong> cujo objetivo era a prestação de serviços temporários.</p>
-    ${BLANK}
-    <p style="${P}text-align:justify;"><strong>CLAÚSULA II</strong></p>
-    <p style="${P}text-align:justify;">Com a celebração do presente Ato, ficam distratadas as obrigações de ambas as partes contraídas do Contrato Temporário Nº ${contrato}, <strong>${servidor}</strong>, e por estarem de pleno acordo firmam o presente Termo de Distrato, em 3 (três) vias de igual teor e forma, na presença das testemunhas abaixo.</p>
-    ${BLANK}
-    <p style="${P}text-align:right;">Acará – PA, em ${dataCurta}.</p>
-    ${BLANK}
-
-    <p style="${P}text-align:center;">________________________________________________</p>
-    <p style="${P}text-align:center;">PEDRO PAULO GOUVEA MORAES</p>
-    <p style="${P}text-align:center;">Prefeito Municipal</p>
-    <p style="${P}">&nbsp;</p>
-    <p style="${P}text-align:center;">________________________________________________</p>
-    <p style="${P}text-align:center;">CARLA LUCIANA SEABRA PORTAL</p>
-    <p style="${P}text-align:center;">Secretária Municipal de Educação</p>
-    <p style="${P}">&nbsp;</p>
-    <p style="${P}text-align:center;">________________________________________________</p>
-    <p style="${P}text-align:center;">${servidor}</p>
-    <p style="${P}text-align:center;">Distratado (a)</p>
-
-    <div style="display:flex;margin-top:27mm;">
-      <div style="width:65mm;margin-left:7mm;text-align:center;">
-        <p style="${P}">______________________________</p>
-        <p style="${P}">Testemunha – 1</p>
-      </div>
-      <div style="width:65mm;margin-left:15mm;text-align:center;">
-        <p style="${P}">______________________________</p>
-        <p style="${P}">Testemunha – 2</p>
-      </div>
-    </div>
-
-    <div style="position:absolute;left:30mm;right:20mm;bottom:6mm;text-align:center;font-size:7.5pt;font-weight:bold;line-height:1.2;">
-      Travessa São José nº. 120 – Praça da Matriz Centro – Acará / Pará – CEP 68.690-000 CNPJ: 05.196.548/0001-72
-    </div>
-  </div>`;
-}
-
-async function gerarDistratoPDF(r){
-  if(!window.html2canvas || !window.jspdf){ showToast('Não foi possível carregar o gerador de PDF.'); return; }
-  const { jsPDF } = window.jspdf;
-
-  const holder = document.createElement('div');
-  holder.style.position = 'fixed';
-  holder.style.left = '-10000px';
-  holder.style.top = '0';
-  holder.innerHTML = buildDistratoHtml(r);
-  document.body.appendChild(holder);
-  const pageEl = holder.firstElementChild;
-
-  try{
-    const imgs = Array.from(pageEl.querySelectorAll('img'));
-    await Promise.all(imgs.map(img => img.complete ? Promise.resolve() : new Promise(resolve => { img.onload = resolve; img.onerror = resolve; })));
-    await new Promise(resolve => setTimeout(resolve, 60));
-
-    const canvas = await window.html2canvas(pageEl, {
-      scale: 4,
-      useCORS: true,
-      backgroundColor: '#ffffff',
-      width: pageEl.offsetWidth,
-      height: pageEl.offsetHeight
-    });
-
-    const imgData = canvas.toDataURL('image/png');
-    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-    doc.addImage(imgData, 'PNG', 0, 0, pageWidth, pageHeight);
-
-    const fileName = `distrato-${(r.servidor || 'servidor').replace(/\s+/g,'_')}.pdf`;
-    const blobUrl = doc.output('bloburl');
-    window.open(blobUrl, '_blank');
-  }catch(err){
-    console.error(err);
-    showToast('Erro ao gerar o PDF. Tente novamente.');
-  }finally{
-    document.body.removeChild(holder);
-  }
-}
-
+// ---------------------------------------------------------------------------
+// DOC. ABERT. CONTA
+// ---------------------------------------------------------------------------
 async function gerarAberturaContaPDF(r){
-  if(!window.html2canvas || !window.jspdf){ showToast('Não foi possível carregar o gerador de PDF.'); return; }
-  const { jsPDF } = window.jspdf;
-
-  const holder = document.createElement('div');
-  holder.style.position = 'fixed';
-  holder.style.left = '-10000px';
-  holder.style.top = '0';
-  holder.innerHTML = buildAberturaContaHtml(r);
-  document.body.appendChild(holder);
-  const pageEl = holder.firstElementChild;
-
+  if(!window.jspdf){ showToast('Não foi possível carregar o gerador de PDF.'); return; }
   try{
-    const imgs = Array.from(pageEl.querySelectorAll('img'));
-    await Promise.all(imgs.map(img => img.complete ? Promise.resolve() : new Promise(resolve => { img.onload = resolve; img.onerror = resolve; })));
-    await new Promise(resolve => setTimeout(resolve, 60));
-
-    const canvas = await window.html2canvas(pageEl, {
-      scale: 4,
-      useCORS: true,
-      backgroundColor: '#ffffff',
-      width: pageEl.offsetWidth,
-      height: pageEl.offsetHeight
-    });
-
-    const imgData = canvas.toDataURL('image/png');
+    const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-    doc.addImage(imgData, 'PNG', 0, 0, pageWidth, pageHeight);
 
-    const fileName = `abertura-conta-${(r.servidor || 'servidor').replace(/\s+/g,'_')}.pdf`;
-    const blobUrl = doc.output('bloburl');
-    window.open(blobUrl, '_blank');
+    const cpf = r.cpf || '___________________';
+    const endereco = r.enderecoAbertura || '____________________';
+    const cargo = r.cargo || '____________';
+    const salario = r.salarioBaseAbertura || '____________';
+    const banco = r.bancoAbertura || '____________________';
+    const oficioNum = r.oficioAberturaConta || '_______';
+    const inicio = fmtDataCurta(r.admissao);
+    const dataPorExtenso = dataExtenso(r.admissao);
+    const servidor = r.servidor || '';
+
+    let y = desenhaTimbrePadrao(doc, 'COMISSÃO DE LOTAÇÃO');
+
+    y = pdfParagraph(doc, [{ t: `Ofício n° ${oficioNum}/2026 - DAS/SEMED` }], PDF_X0, y, PDF_W); y += 5;
+    y = pdfParagraph(doc, [{ t: `Acará/PA, ${dataPorExtenso}.` }], PDF_X0, y, PDF_W, { align: 'right' }); y += 5;
+    y = pdfParagraph(doc, [{ t: 'A (o). Sr. (a)' }], PDF_X0, y, PDF_W);
+    y = pdfParagraph(doc, [{ t: 'SETOR DE RECURSOS HUMANOS DA PREFEITURA MUNICIPAL DE ACARÁ' }], PDF_X0, y, PDF_W); y += 5;
+    y = pdfParagraph(doc, [{ t: `Assunto: Solicitação de abertura de conta – ${servidor}.`, b: true }], PDF_X0, y, PDF_W); y += 10;
+    y = pdfParagraph(doc, [{ t: 'Senhor (a) Diretor (a),' }], PDF_X0, y, PDF_W, { firstIndent: 30 }); y += 10;
+    y = pdfParagraph(doc, [
+      { t: `Cumprimentando-o (a) e, considerando a contratação em caráter temporário do Sr (a). ` },
+      { t: servidor },
+      { t: `, CPF n° ${cpf}, no dia ${inicio}, residente ${endereco}, cargo de ${cargo}, com salário base de R$ ${salario}, ` },
+      { t: `solicito a expedição de autorização para a abertura de conta no ${banco}`, b: true },
+      { t: `, para fins de efetivação de seus proventos.` }
+    ], PDF_X0, y, PDF_W, { align: 'justify', firstIndent: 30, lineHeight: 7.5 }); y += 5;
+    pdfParagraph(doc, [{ t: 'Atenciosamente,' }], PDF_X0, y, PDF_W, { firstIndent: 30 });
+
+    desenhaRodapePadrao(doc, ['Rodovia PA 252, km 01, Bairro Alegria, CEP: 68.690-000 - Acará/PA', 'Email: das@semedacara.com.br']);
+
+    abrirPdfEmNovaAba(doc);
   }catch(err){
     console.error(err);
     showToast('Erro ao gerar o PDF. Tente novamente.');
-  }finally{
-    document.body.removeChild(holder);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// DISTRATO
+// ---------------------------------------------------------------------------
+async function gerarDistratoPDF(r){
+  if(!window.jspdf){ showToast('Não foi possível carregar o gerador de PDF.'); return; }
+  try{
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+
+    const cpf = r.cpf || '___________________';
+    const rg = r.distratoRg || '___________________';
+    const endereco = r.distratoEndereco || '____________________';
+    const numero = r.distratoNumero || 'SN';
+    const bairro = r.distratoBairro || '____________________';
+    const municipio = r.distratoMunicipio || 'ACARÁ';
+    const contrato = r.contrato || '_______';
+    const dataCurta = fmtDataCurta(r.situacaoData);
+    const servidor = r.servidor || '';
+
+    // Timbre próprio do Distrato (logo centralizado + texto, sem SEMED)
+    doc.addImage(LOGO_DISTRATO_B64, 'PNG', 97.5, 5, 15.08, 14.55);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    let ty = 22;
+    ['ESTADO DO PARÁ', 'Município do Acará', 'Prefeitura Municipal de Acará', 'Poder Executivo'].forEach(l => {
+      doc.text(l, 105, ty, { align: 'center' });
+      ty += 3.8;
+    });
+    const borderY = ty + 1;
+    pdfHLine(doc, PDF_X0, borderY, PDF_X1, 0.4);
+    let y = borderY + 6;
+
+    y = pdfParagraph(doc, [{ t: `DISTRATO DO CONTRATO ${contrato}`, b: true }], PDF_X0, y, PDF_W, { align: 'center', fontSize: 11 }); y += 6;
+    y = pdfParagraph(doc, [
+      { t: 'Termo de Distrato Administrativo de Serviços temporários, que celebram ' },
+      { t: 'PREFEITURA MUNICIPAL DE ACARÁ', b: true },
+      { t: ' e ' },
+      { t: servidor, b: true },
+      { t: ' como abaixo se infere.' }
+    ], PDF_X0 + 75, y, PDF_W - 75, { align: 'justify', fontSize: 11 }); y += 6;
+
+    y = pdfParagraph(doc, [
+      { t: 'A PREFEITURA MUNICIPAL DE ACARÁ', b: true },
+      { t: ', pessoa jurídica de direito público, com sede à Trav. São José, 120, Centro, CEP: 68.690-000, Acará - PA, CNPJ: 05.196.548/0001-72, neste ato representado pelo Prefeito Municipal, Sr. ' },
+      { t: 'PEDRO PAULO GOUVEA MORAES', b: true },
+      { t: ', brasileiro, casado, residente e domiciliado na Rua Marechal Deodoro da Fonseca, s/n, Bairro Centro, neste Município, portador do RG 2502088 – PC/PA e do CPF Nº 452.132.162-34, doravante denominada simplesmente ' },
+      { t: 'DISTRATANTE', b: true },
+      { t: ', e o(a) Sr.(a) ' },
+      { t: servidor, b: true },
+      { t: ', brasileiro, residente e domiciliado à ' },
+      { t: endereco, b: true },
+      { t: ', N° ' },
+      { t: numero, b: true },
+      { t: ', Bairro ' },
+      { t: bairro, b: true },
+      { t: `, Município de ${municipio}, UF: PA, RG: ` },
+      { t: rg, b: true },
+      { t: ', CPF: ' },
+      { t: cpf, b: true },
+      { t: ', doravante denominado ' },
+      { t: 'DISTRATADO(A)', b: true },
+      { t: ', têm justos e pactuado nos termos da Lei Orgânica do Município, regulamentado pela Lei Municipal n° 1.688/97, de 30/01/1997, alterado pela Lei Municipal n° 001/2005 e Lei Municipal nº 028/2005 de 30 de Dezembro de 2005, observadas as cláusulas e condições seguintes, que reciprocamente se outorgam e obrigam-se:' }
+    ], PDF_X0, y, PDF_W, { align: 'justify', firstIndent: 15, fontSize: 11, lineHeight: 4.6 }); y += 5;
+
+    y = pdfParagraph(doc, [{ t: 'CLÁUSULA I', b: true }], PDF_X0, y, PDF_W, { fontSize: 11 });
+    y = pdfParagraph(doc, [{ t: `Fica distratado o Contrato Administrativo Nº ${contrato}, ` }, { t: servidor, b: true }, { t: ' cujo objetivo era a prestação de serviços temporários.' }], PDF_X0, y, PDF_W, { align: 'justify', fontSize: 11 }); y += 5;
+
+    y = pdfParagraph(doc, [{ t: 'CLAÚSULA II', b: true }], PDF_X0, y, PDF_W, { fontSize: 11 });
+    y = pdfParagraph(doc, [{ t: `Com a celebração do presente Ato, ficam distratadas as obrigações de ambas as partes contraídas do Contrato Temporário Nº ${contrato}, ` }, { t: servidor, b: true }, { t: ', e por estarem de pleno acordo firmam o presente Termo de Distrato, em 3 (três) vias de igual teor e forma, na presença das testemunhas abaixo.' }], PDF_X0, y, PDF_W, { align: 'justify', fontSize: 11 }); y += 5;
+
+    y = pdfParagraph(doc, [{ t: `Acará – PA, em ${dataCurta}.` }], PDF_X0, y, PDF_W, { align: 'right', fontSize: 11 });
+
+    // Assinaturas e testemunhas ficam em posição fixa perto do fim da página,
+    // para nunca saírem da folha mesmo se o texto acima for mais longo.
+    let sy = 200;
+    sy = pdfParagraph(doc, [{ t: '________________________________________________' }], PDF_X0, sy, PDF_W, { align: 'center', fontSize: 11 });
+    sy = pdfParagraph(doc, [{ t: 'PEDRO PAULO GOUVEA MORAES' }], PDF_X0, sy, PDF_W, { align: 'center', fontSize: 11 });
+    sy = pdfParagraph(doc, [{ t: 'Prefeito Municipal' }], PDF_X0, sy, PDF_W, { align: 'center', fontSize: 11 }); sy += 5;
+    sy = pdfParagraph(doc, [{ t: '________________________________________________' }], PDF_X0, sy, PDF_W, { align: 'center', fontSize: 11 });
+    sy = pdfParagraph(doc, [{ t: 'CARLA LUCIANA SEABRA PORTAL' }], PDF_X0, sy, PDF_W, { align: 'center', fontSize: 11 });
+    sy = pdfParagraph(doc, [{ t: 'Secretária Municipal de Educação' }], PDF_X0, sy, PDF_W, { align: 'center', fontSize: 11 }); sy += 5;
+    sy = pdfParagraph(doc, [{ t: '________________________________________________' }], PDF_X0, sy, PDF_W, { align: 'center', fontSize: 11 });
+    sy = pdfParagraph(doc, [{ t: servidor }], PDF_X0, sy, PDF_W, { align: 'center', fontSize: 11 });
+    sy = pdfParagraph(doc, [{ t: 'Distratado (a)' }], PDF_X0, sy, PDF_W, { align: 'center', fontSize: 11 }); sy += 12;
+
+    pdfParagraph(doc, [{ t: '______________________________' }], PDF_X0 + 7, sy, 65, { align: 'center', fontSize: 11 });
+    pdfParagraph(doc, [{ t: 'Testemunha – 1' }], PDF_X0 + 7, sy + 5, 65, { align: 'center', fontSize: 11 });
+    pdfParagraph(doc, [{ t: '______________________________' }], PDF_X0 + 87, sy, 65, { align: 'center', fontSize: 11 });
+    pdfParagraph(doc, [{ t: 'Testemunha – 2' }], PDF_X0 + 87, sy + 5, 65, { align: 'center', fontSize: 11 });
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(7.5);
+    doc.text('Travessa São José nº. 120 – Praça da Matriz Centro – Acará / Pará – CEP 68.690-000 CNPJ: 05.196.548/0001-72', 105, 291, { align: 'center' });
+
+    abrirPdfEmNovaAba(doc);
+  }catch(err){
+    console.error(err);
+    showToast('Erro ao gerar o PDF. Tente novamente.');
   }
 }
 
@@ -2619,8 +2577,8 @@ function renderContas(){
     <tr data-id="${r.id}">
       <td>
         <div class="servidor-name">${r.servidor || '—'}</div>
-        <div class="servidor-cargo">${r.cargo || ''}</div>
       </td>
+      <td>${r.cargo || '—'}</td>
       <td class="mono">${fmtCPF(r.cpf)}</td>
       <td class="mono">${r.oficioAberturaConta || '—'}</td>
       <td>${r.salarioBaseAbertura || '—'}</td>
@@ -2632,7 +2590,7 @@ function renderContas(){
   tableArea.innerHTML = `
     <div class="table-scroll">
       <table>
-        <thead><tr><th>Servidor</th><th>CPF</th><th>Nº Ofício</th><th>Salário base</th><th>Banco</th><th>Endereço</th></tr></thead>
+        <thead><tr><th>Servidor</th><th>Cargo</th><th>CPF</th><th>Nº Ofício</th><th>Salário base</th><th>Banco</th><th>Endereço</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
     </div>`;
