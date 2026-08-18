@@ -80,6 +80,25 @@
   }
   .logout-btn:hover{background:#3A4131; border-color:#3A4131;}
 
+  .year-selector-wrap{
+    position:absolute; top:0; left:0;
+    display:flex; align-items:center; gap:8px;
+  }
+  .year-selector-wrap label{
+    font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin:0;
+  }
+  .year-selector-wrap select{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13.5px; font-weight:700;
+    color:var(--primary-dark);
+    background:var(--surface);
+    border:1.4px solid var(--line-strong);
+    border-radius:var(--r-sm);
+    padding:6px 10px;
+    box-shadow:var(--shadow-sm);
+  }
+  .year-selector-wrap select:focus{outline:none; border-color:var(--stamp-red); box-shadow:0 0 0 3.5px var(--ring);}
+
   /* Login screen */
   .login-screen{
     position:fixed; inset:0; z-index:50;
@@ -760,6 +779,12 @@
 
 <div class="wrap" id="appWrap" style="display:none;">
   <header>
+    <div class="year-selector-wrap">
+      <label for="anoSelector">Ano</label>
+      <select id="anoSelector">
+        <option value="2026">2026</option>
+      </select>
+    </div>
     <h1>SDGP - SISTEMA DE GESTÃO PESSOAL (RH SEMED ACARÁ)</h1>
     <div class="subtitle">Acompanhamento de memorandos, ofícios, autorizações e contratos de admissão de servidores.</div>
     <button type="button" id="logoutBtn" class="logout-btn">Sair</button>
@@ -772,6 +797,7 @@
     <button class="tab-btn" id="tabDistrato" type="button">Distrato</button>
     <button class="tab-btn" id="tabPeriodo" type="button">Contratações por Período</button>
     <button class="tab-btn" id="tabEmissoes" type="button">Acomp. Emi. Doc's</button>
+    <button class="tab-btn" id="tabIndicacoes" type="button">Indicações</button>
     <button class="tab-btn" id="tabDashboard" type="button">Dashboard Geral</button>
   </div>
 
@@ -832,6 +858,16 @@
     <div class="table-card">
       <div id="emissoesTableArea"></div>
     </div>
+  </div>
+
+  <div class="toolbar" id="toolbarIndicacoes" style="display:none;">
+    <input type="search" id="indicacoesSearchInput" placeholder="Buscar por nome, indicação, núcleo...">
+    <span class="spacer"></span>
+    <span class="count-pill" id="indicacoesCountPill"></span>
+  </div>
+
+  <div class="table-card" id="tableCardIndicacoes" style="display:none;">
+    <div id="indicacoesTableArea"></div>
   </div>
 
   <footer class="note">© Todos os direitos reservados — Copyright © 2026-2026</footer>
@@ -1081,6 +1117,7 @@ let records = [];
 let editingId = null;
 let loaded = false;
 let activeTab = 'registros';
+let selectedAno = localStorage.getItem('sdgp_ano_selecionado') || '2026';
 
 // --- Autenticação (login único compartilhado pela equipe) ---
 const loginScreen = document.getElementById('loginScreen');
@@ -1094,6 +1131,7 @@ auth.onAuthStateChanged((user) => {
   if(user){
     loginScreen.style.display = 'none';
     appWrap.style.display = 'block';
+    document.getElementById('anoSelector').value = selectedAno;
     loadRecords();
   }else{
     loginScreen.style.display = 'flex';
@@ -1125,6 +1163,12 @@ loginForm.addEventListener('submit', async (e) => {
 
 document.getElementById('logoutBtn').addEventListener('click', () => {
   auth.signOut();
+});
+
+document.getElementById('anoSelector').addEventListener('change', (e)=>{
+  selectedAno = e.target.value;
+  localStorage.setItem('sdgp_ano_selecionado', selectedAno);
+  render();
 });
 
 const EYE_OPEN_SVG = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>';
@@ -1546,6 +1590,12 @@ function attachMask(input, maskFn){
     const pos = Math.max(0, input.value.length - cursorFromEnd);
     input.setSelectionRange(pos, pos);
   });
+}
+
+// Retorna só os registros do ano selecionado no topo da tela.
+// Registros antigos sem o campo "ano" (criados antes desse recurso existir) são tratados como 2026.
+function recordsDoAno(){
+  return records.filter(r => (r.ano || '2026') === selectedAno);
 }
 
 function statusClass(s){
@@ -2303,6 +2353,7 @@ function render(){
   if(activeTab === 'distrato') return renderDistrato();
   if(activeTab === 'periodo') return renderPeriodo();
   if(activeTab === 'emissoes') return renderEmissoes();
+  if(activeTab === 'indicacoes') return renderIndicacoes();
   if(activeTab === 'dashboard') return renderDashboard();
   return renderRegistros();
 }
@@ -2310,10 +2361,11 @@ function render(){
 function renderRegistros(){
   const q = document.getElementById('searchInput').value.trim();
   const statusVal = '';
-  const filtered = records.filter(r => matchesFilter(r, q, statusVal));
+  const recordsAno = recordsDoAno();
+  const filtered = recordsAno.filter(r => matchesFilter(r, q, statusVal));
 
   document.getElementById('countPill').textContent =
-    filtered.length === records.length ? `${records.length} registro(s)` : `${filtered.length} de ${records.length}`;
+    filtered.length === recordsAno.length ? `${recordsAno.length} registro(s)` : `${filtered.length} de ${recordsAno.length}`;
 
   if(!loaded){
     tableArea.innerHTML = '<div class="loading">Carregando registros…</div>';
@@ -2327,9 +2379,9 @@ function renderRegistros(){
     return;
   }
 
-  if(records.length === 0){
+  if(recordsAno.length === 0){
     tableArea.innerHTML = `<div class="empty-state">
-      <div class="big">Nenhum registro cadastrado</div>
+      <div class="big">Nenhum registro cadastrado em ${selectedAno}</div>
       Clique em "+ Novo registro" para lançar a primeira contratação.
     </div>`;
     return;
@@ -2397,7 +2449,7 @@ function renderRegistros(){
 }
 
 function matchesText(r, q){
-  const hay = [r.servidor, r.cargo, r.nucleo, r.cpf, r.contrato].filter(Boolean).join(' ').toLowerCase();
+  const hay = [r.servidor, r.cargo, r.nucleo, r.cpf, r.contrato, r.indicacao].filter(Boolean).join(' ').toLowerCase();
   return !q || hay.includes(q.toLowerCase());
 }
 
@@ -2405,7 +2457,7 @@ function renderContas(){
   if(!loaded){ tableArea.innerHTML = '<div class="loading">Carregando registros…</div>'; return; }
 
   const q = document.getElementById('contasSearchInput').value.trim();
-  const base = records.filter(r => r.aberturaConta === 'Sim');
+  const base = recordsDoAno().filter(r => r.aberturaConta === 'Sim');
   const filtered = base.filter(r => matchesText(r, q));
 
   document.getElementById('contasCountPill').textContent = `${filtered.length} de ${base.length}`;
@@ -2446,7 +2498,7 @@ function renderDistrato(){
   if(!loaded){ tableArea.innerHTML = '<div class="loading">Carregando registros…</div>'; return; }
 
   const q = document.getElementById('distratoSearchInput').value.trim();
-  const base = records.filter(r => r.situacao === 'Distratado(a)' && !!((r.distratoRg && r.distratoRg.trim()) || (r.distratoEndereco && r.distratoEndereco.trim()) || (r.distratoBairro && r.distratoBairro.trim()) || (r.distratoMunicipio && r.distratoMunicipio.trim())));
+  const base = recordsDoAno().filter(r => r.situacao === 'Distratado(a)' && !!((r.distratoRg && r.distratoRg.trim()) || (r.distratoEndereco && r.distratoEndereco.trim()) || (r.distratoBairro && r.distratoBairro.trim()) || (r.distratoMunicipio && r.distratoMunicipio.trim())));
   const filtered = base.filter(r => matchesText(r, q));
 
   document.getElementById('distratoCountPill').textContent = `${filtered.length} de ${base.length}`;
@@ -2497,9 +2549,10 @@ function renderPeriodo(){
     return;
   }
 
-  // conta quantos registros existem por mês (independente do ano) para exibir nas abas
+  // conta quantos registros existem por mês (dentro do ano selecionado) para exibir nas abas
+  const recordsAno = recordsDoAno();
   const countsByMonth = new Array(12).fill(0);
-  records.forEach(r => {
+  recordsAno.forEach(r => {
     if(!r.admissao) return;
     const m = parseInt(r.admissao.slice(5,7), 10) - 1;
     if(m >= 0 && m < 12) countsByMonth[m]++;
@@ -2512,7 +2565,7 @@ function renderPeriodo(){
   `).join('');
 
   const q = document.getElementById('periodoSearchInput').value.trim();
-  const base = records.filter(r => {
+  const base = recordsAno.filter(r => {
     if(!r.admissao) return false;
     const m = parseInt(r.admissao.slice(5,7), 10) - 1;
     return m === selectedMonth;
@@ -2565,23 +2618,24 @@ window.selectMonth = function(idx){
 let selectedEmissaoTipo = 'oficios';
 
 function getEmissoesData(tipo){
+  const base = recordsDoAno();
   if(tipo === 'memorando'){
-    return records
+    return base
       .filter(r => (r.memo || '').trim())
-      .map(r => ({ numero: r.memo, tipo: 'Enc. Memorando', servidor: r.servidor, id: r.id }));
+      .map(r => ({ numero: r.memo, tipo: 'Enc. Memorando', servidor: r.servidor, id: r.id, criadoEm: r.criadoEm || 0 }));
   }
   if(tipo === 'autorizacao'){
-    return records
+    return base
       .filter(r => (r.autorizacao || '').trim())
-      .map(r => ({ numero: r.autorizacao, tipo: 'Autorização', servidor: r.servidor, id: r.id }));
+      .map(r => ({ numero: r.autorizacao, tipo: 'Autorização', servidor: r.servidor, id: r.id, criadoEm: r.criadoEm || 0 }));
   }
   // oficios: junta Enc. Ofício + Ofício Abertura de Conta num único acompanhamento
-  const encOficios = records
+  const encOficios = base
     .filter(r => (r.oficio || '').trim())
-    .map(r => ({ numero: r.oficio, tipo: 'Enc. Ofício', servidor: r.servidor, id: r.id }));
-  const oficiosAbertura = records
+    .map(r => ({ numero: r.oficio, tipo: 'Enc. Ofício', servidor: r.servidor, id: r.id, criadoEm: r.criadoEm || 0 }));
+  const oficiosAbertura = base
     .filter(r => (r.oficioAberturaConta || '').trim())
-    .map(r => ({ numero: r.oficioAberturaConta, tipo: 'Ofício Abert. Conta', servidor: r.servidor, id: r.id }));
+    .map(r => ({ numero: r.oficioAberturaConta, tipo: 'Ofício Abert. Conta', servidor: r.servidor, id: r.id, criadoEm: r.criadoEm || 0 }));
   return [...encOficios, ...oficiosAbertura];
 }
 
@@ -2598,7 +2652,7 @@ function renderEmissoes(){
     btn.classList.toggle('active', btn.dataset.tipo === selectedEmissaoTipo);
   });
 
-  const dados = getEmissoesData(selectedEmissaoTipo).sort((a,b)=> (a.numero||'').localeCompare(b.numero||'', undefined, {numeric:true}));
+  const dados = getEmissoesData(selectedEmissaoTipo).sort((a,b)=> (b.criadoEm||0) - (a.criadoEm||0));
 
   document.getElementById('emissoesCountPill').textContent = `${dados.length} documento(s)`;
 
@@ -2636,7 +2690,7 @@ document.getElementById('emissoesSubTabs').addEventListener('click', (e)=>{
 
 document.getElementById('exportEmissoesBtn').addEventListener('click', ()=>{
   if(!window.XLSX){ showToast('Não foi possível carregar o exportador de Excel.'); return; }
-  const dados = getEmissoesData(selectedEmissaoTipo).sort((a,b)=> (a.numero||'').localeCompare(b.numero||'', undefined, {numeric:true}));
+  const dados = getEmissoesData(selectedEmissaoTipo).sort((a,b)=> (b.criadoEm||0) - (a.criadoEm||0));
   if(dados.length === 0){ showToast('Não há documentos para exportar.'); return; }
   const rows = dados.map(d => ({ 'Nº': d.numero, 'TIPO': d.tipo, 'SERVIDOR': d.servidor || '' }));
   const ws = XLSX.utils.json_to_sheet(rows);
@@ -2645,19 +2699,117 @@ document.getElementById('exportEmissoesBtn').addEventListener('click', ()=>{
   XLSX.writeFile(wb, `emissoes-${selectedEmissaoTipo}.xlsx`);
 });
 
+function renderIndicacoes(){
+  const area = document.getElementById('indicacoesTableArea');
+  if(!loaded){ area.innerHTML = '<div class="loading">Carregando registros…</div>'; return; }
+
+  const q = document.getElementById('indicacoesSearchInput').value.trim();
+  const base = recordsDoAno().slice().sort((a,b)=> (b.criadoEm||0) - (a.criadoEm||0));
+  const filtered = base.filter(r => matchesText(r, q));
+
+  document.getElementById('indicacoesCountPill').textContent = `${filtered.length} de ${base.length}`;
+
+  if(base.length === 0){
+    area.innerHTML = `<div class="empty-state"><div class="big">Nenhuma indicação registrada em ${selectedAno}</div></div>`;
+    return;
+  }
+  if(filtered.length === 0){
+    area.innerHTML = `<div class="empty-state"><div class="big">Nada encontrado</div>Ajuste a busca.</div>`;
+    return;
+  }
+
+  const rows = filtered.map(r => `
+    <tr data-id="${r.id}">
+      <td class="wrap-cell">${r.indicacao || '—'}</td>
+      <td class="servidor-cell"><div class="servidor-name">${r.servidor || '—'}</div></td>
+      <td class="mono">${r.contato || '—'}</td>
+      <td class="wrap-cell">${r.cargo || '—'}</td>
+      <td class="wrap-cell">${r.funcao || '—'}</td>
+      <td>${r.turno || '—'}</td>
+      <td>${r.admissao ? new Date(r.admissao+'T00:00:00').toLocaleDateString('pt-BR') : '—'}</td>
+      <td class="wrap-cell">${r.nucleo || '—'}</td>
+      <td class="wrap-cell">${r.diretor || '—'}</td>
+      <td class="wrap-cell">${r.local || '—'}</td>
+      <td>${r.ch || '—'}</td>
+      <td class="pdf-cell"><button class="icon-btn" title="Baixar Indicação (PDF)" onclick="gerarIndicacaoPDF('${r.id}')">${PDF_ICON_SVG}</button></td>
+    </tr>
+  `).join('');
+
+  area.innerHTML = `
+    <div class="table-scroll">
+      <table class="tbl-fixed">
+        <colgroup>
+          <col style="width:130px"><col style="width:160px"><col style="width:110px"><col style="width:130px"><col style="width:120px">
+          <col style="width:100px"><col style="width:90px"><col style="width:140px"><col style="width:130px"><col style="width:120px">
+          <col style="width:50px"><col style="width:60px">
+        </colgroup>
+        <thead><tr>
+          <th>Indicação</th><th>Servidor</th><th>Telefone</th><th>Cargo</th><th>Função</th>
+          <th>Turno</th><th>Adm</th><th>Núcleo</th><th>Diretor</th><th>Local</th><th>CH</th><th></th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+document.getElementById('indicacoesSearchInput').addEventListener('input', render);
+
+// Gera um PDF simples com os dados de indicação de um único registro.
+window.gerarIndicacaoPDF = function(id){
+  const r = records.find(x => x.id === id);
+  if(!r){ showToast('Registro não encontrado.'); return; }
+  if(!window.jspdf){ showToast('Não foi possível carregar o gerador de PDF.'); return; }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const marginX = 20;
+  let y = 24;
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.text('FICHA DE INDICAÇÃO', marginX, y);
+  y += 12;
+
+  const campo = (label, valor) => {
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.text(`${label}:`, marginX, y);
+    const labelWidth = doc.getTextWidth(`${label}: `) + 2;
+    doc.setFont('helvetica', 'normal');
+    doc.text(String(valor || '—'), marginX + labelWidth, y);
+    y += 8;
+  };
+
+  campo('Indicação', r.indicacao);
+  campo('Servidor', r.servidor);
+  campo('Telefone', r.contato);
+  campo('Cargo', r.cargo);
+  campo('Função', r.funcao);
+  campo('Turno', r.turno);
+  campo('Admissão', r.admissao ? new Date(r.admissao+'T00:00:00').toLocaleDateString('pt-BR') : '—');
+  campo('Núcleo', r.nucleo);
+  campo('Diretor', r.diretor);
+  campo('Local', r.local);
+  campo('CH', r.ch);
+
+  const blobUrl = doc.output('bloburl');
+  window.open(blobUrl, '_blank');
+};
+
 function renderDashboard(){
   const area = document.getElementById('dashboardArea');
   if(!loaded){ area.innerHTML = '<div class="loading">Carregando registros…</div>'; return; }
 
-  if(records.length === 0){
-    area.innerHTML = `<div class="empty-state"><div class="big">Nenhum dado ainda</div>Cadastre registros para ver o dashboard.</div>`;
+  const recordsAno = recordsDoAno();
+
+  if(recordsAno.length === 0){
+    area.innerHTML = `<div class="empty-state"><div class="big">Nenhum dado ainda em ${selectedAno}</div>Cadastre registros para ver o dashboard.</div>`;
     return;
   }
 
-  const total = records.length;
-  const countBy = (fn) => records.reduce((acc, r)=>{ const k = fn(r) || '—'; acc[k] = (acc[k]||0)+1; return acc; }, {});
+  const total = recordsAno.length;
+  const countBy = (fn) => recordsAno.reduce((acc, r)=>{ const k = fn(r) || '—'; acc[k] = (acc[k]||0)+1; return acc; }, {});
   const situacoes = countBy(r => r.situacao || 'Ativo');
-  const ativos = records.filter(r => (r.situacao || 'Ativo') === 'Ativo');
+  const ativos = recordsAno.filter(r => (r.situacao || 'Ativo') === 'Ativo');
   const localsAtivos = ativos.reduce((acc, r)=>{ const k = r.local || '—'; acc[k] = (acc[k]||0)+1; return acc; }, {});
   const funcoesAtivos = ativos.reduce((acc, r)=>{ const k = r.funcao || '—'; acc[k] = (acc[k]||0)+1; return acc; }, {});
 
@@ -2839,12 +2991,14 @@ document.getElementById('saveBtn').addEventListener('click', async ()=>{
     { el: form.oficioAberturaConta, label: 'Nº Ofício (Abert. Conta)' }
   ];
 
+  const recordsAnoAtual = recordsDoAno();
+
   for(const c of camposNumeracaoSimples){
     const valor = c.el.value.trim();
     if(!valor) continue;
-    const duplicado = records.find(r => r.id !== editingId && c.campos.some(campo => (r[campo] || '').trim() === valor));
+    const duplicado = recordsAnoAtual.find(r => r.id !== editingId && c.campos.some(campo => (r[campo] || '').trim() === valor));
     if(duplicado){
-      showToast(`Já existe um registro com "${c.label}" = ${valor} (${duplicado.servidor || 'sem nome'}). Use outro número.`, 5000);
+      showToast(`Já existe um registro de ${selectedAno} com "${c.label}" = ${valor} (${duplicado.servidor || 'sem nome'}). Use outro número.`, 5000);
       c.el.focus();
       return;
     }
@@ -2853,9 +3007,9 @@ document.getElementById('saveBtn').addEventListener('click', async ()=>{
   for(const c of camposOficioCompartilhado){
     const valor = c.el.value.trim();
     if(!valor) continue;
-    const duplicado = records.find(r => r.id !== editingId && ((r.oficio || '').trim() === valor || (r.oficioAberturaConta || '').trim() === valor));
+    const duplicado = recordsAnoAtual.find(r => r.id !== editingId && ((r.oficio || '').trim() === valor || (r.oficioAberturaConta || '').trim() === valor));
     if(duplicado){
-      showToast(`O número ${valor} já está em uso em "Enc. Ofício" ou "Ofício Abert. Conta" (${duplicado.servidor || 'sem nome'}). Ofício e Abert. Conta compartilham a mesma sequência — use outro número.`, 5500);
+      showToast(`O número ${valor} já está em uso em "Enc. Ofício" ou "Ofício Abert. Conta" de ${selectedAno} (${duplicado.servidor || 'sem nome'}). Ofício e Abert. Conta compartilham a mesma sequência — use outro número.`, 5500);
       c.el.focus();
       return;
     }
@@ -2871,6 +3025,10 @@ document.getElementById('saveBtn').addEventListener('click', async ()=>{
 
   const data = {};
   fields.forEach(f => data[f] = form[f] ? form[f].value.trim() : '');
+  if(!editingId){
+    data.ano = selectedAno;
+    data.criadoEm = Date.now();
+  }
 
   const saveBtn = document.getElementById('saveBtn');
   saveBtn.disabled = true;
@@ -2922,12 +3080,13 @@ document.getElementById('distratoSearchInput').addEventListener('input', render)
 document.getElementById('periodoSearchInput').addEventListener('input', render);
 
 const TABS = {
-  registros: { btn: 'tabRegistros', toolbar: 'toolbarRegistros', view: 'table' },
-  contas:    { btn: 'tabContas',    toolbar: 'toolbarContas',    view: 'table' },
-  distrato:  { btn: 'tabDistrato',  toolbar: 'toolbarDistrato',  view: 'table' },
-  periodo:   { btn: 'tabPeriodo',   toolbar: 'toolbarPeriodo',   view: 'periodo' },
-  emissoes:  { btn: 'tabEmissoes',  toolbar: 'toolbarEmissoes',  view: 'emissoes' },
-  dashboard: { btn: 'tabDashboard', toolbar: null,                view: 'dashboard' }
+  registros:  { btn: 'tabRegistros',  toolbar: 'toolbarRegistros',  view: 'table' },
+  contas:     { btn: 'tabContas',     toolbar: 'toolbarContas',     view: 'table' },
+  distrato:   { btn: 'tabDistrato',   toolbar: 'toolbarDistrato',   view: 'table' },
+  periodo:    { btn: 'tabPeriodo',    toolbar: 'toolbarPeriodo',    view: 'periodo' },
+  emissoes:   { btn: 'tabEmissoes',   toolbar: 'toolbarEmissoes',   view: 'emissoes' },
+  indicacoes: { btn: 'tabIndicacoes', toolbar: 'toolbarIndicacoes', view: 'indicacoes' },
+  dashboard:  { btn: 'tabDashboard',  toolbar: null,                 view: 'dashboard' }
 };
 
 function switchTab(tabKey){
@@ -2941,6 +3100,7 @@ function switchTab(tabKey){
   document.getElementById('dashboardArea').style.display = cfg.view === 'dashboard' ? 'block' : 'none';
   document.getElementById('periodoArea').style.display = cfg.view === 'periodo' ? 'block' : 'none';
   document.getElementById('emissoesArea').style.display = cfg.view === 'emissoes' ? 'block' : 'none';
+  document.getElementById('tableCardIndicacoes').style.display = cfg.view === 'indicacoes' ? 'block' : 'none';
   render();
 }
 
@@ -2950,9 +3110,10 @@ Object.entries(TABS).forEach(([key, cfg])=>{
 
 document.getElementById('exportExcelBtn').addEventListener('click', ()=>{
   if(!window.XLSX){ showToast('Não foi possível carregar o exportador de Excel.'); return; }
-  if(records.length === 0){ showToast('Não há registros para exportar.'); return; }
+  const recordsAno = recordsDoAno();
+  if(recordsAno.length === 0){ showToast('Não há registros para exportar.'); return; }
   const fmtDateXLSX = v => v ? new Date(v+'T00:00:00').toLocaleDateString('pt-BR') : '';
-  const rows = records.map(r => ({
+  const rows = recordsAno.map(r => ({
     'Nº MEMO': r.memo || '',
     'Nº OFÍCIO': r.oficio || '',
     'Nº AUTORIZAÇÃO': r.autorizacao || '',
@@ -2979,18 +3140,18 @@ document.getElementById('exportExcelBtn').addEventListener('click', ()=>{
   const ws = XLSX.utils.json_to_sheet(rows);
   const numColunas = Object.keys(rows[0] || {}).length;
   const linhasVermelhas = [];
-  records.forEach((r, idx) => {
+  recordsAno.forEach((r, idx) => {
     if(r.situacao === 'Distratado(a)' || r.situacao === 'Finalizado') linhasVermelhas.push(idx + 1); // +1 pula o cabeçalho
   });
   pintarLinhasVermelhas(ws, numColunas, linhasVermelhas);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Registros Servidores');
-  XLSX.writeFile(wb, 'controle-contratacao-rh.xlsx');
+  XLSX.writeFile(wb, `controle-contratacao-rh-${selectedAno}.xlsx`);
 });
 
 document.getElementById('exportContasBtn').addEventListener('click', ()=>{
   if(!window.XLSX){ showToast('Não foi possível carregar o exportador de Excel.'); return; }
-  const base = records.filter(r => r.aberturaConta === 'Sim');
+  const base = recordsDoAno().filter(r => r.aberturaConta === 'Sim');
   if(base.length === 0){ showToast('Não há registros de abertura de conta para exportar.'); return; }
   const rows = base.map(r => ({
     'SERVIDOR': r.servidor || '',
@@ -3004,12 +3165,12 @@ document.getElementById('exportContasBtn').addEventListener('click', ()=>{
   const ws = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Abertura de Conta');
-  XLSX.writeFile(wb, 'abertura-de-conta.xlsx');
+  XLSX.writeFile(wb, `abertura-de-conta-${selectedAno}.xlsx`);
 });
 
 document.getElementById('exportDistratoBtn').addEventListener('click', ()=>{
   if(!window.XLSX){ showToast('Não foi possível carregar o exportador de Excel.'); return; }
-  const base = records.filter(r => r.situacao === 'Distratado(a)' && !!((r.distratoRg && r.distratoRg.trim()) || (r.distratoEndereco && r.distratoEndereco.trim()) || (r.distratoBairro && r.distratoBairro.trim()) || (r.distratoMunicipio && r.distratoMunicipio.trim())));
+  const base = recordsDoAno().filter(r => r.situacao === 'Distratado(a)' && !!((r.distratoRg && r.distratoRg.trim()) || (r.distratoEndereco && r.distratoEndereco.trim()) || (r.distratoBairro && r.distratoBairro.trim()) || (r.distratoMunicipio && r.distratoMunicipio.trim())));
   if(base.length === 0){ showToast('Não há distratos para exportar.'); return; }
   const fmtDateXLSXLocal = v => v ? new Date(v+'T00:00:00').toLocaleDateString('pt-BR') : '';
   const rows = base.map(r => ({
@@ -3025,12 +3186,12 @@ document.getElementById('exportDistratoBtn').addEventListener('click', ()=>{
   const ws = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Distratos');
-  XLSX.writeFile(wb, 'distratos.xlsx');
+  XLSX.writeFile(wb, `distratos-${selectedAno}.xlsx`);
 });
 
 document.getElementById('exportPeriodoBtn').addEventListener('click', ()=>{
   if(!window.XLSX){ showToast('Não foi possível carregar o exportador de Excel.'); return; }
-  const base = records.filter(r => {
+  const base = recordsDoAno().filter(r => {
     if(!r.admissao) return false;
     const m = parseInt(r.admissao.slice(5,7), 10) - 1;
     return m === selectedMonth;
