@@ -420,6 +420,7 @@
   }
   .tab-btn{white-space:nowrap; width:100%; text-align:left;}
   .tab-btn{
+    display:block;
     background:var(--surface);
     color:var(--muted);
     border:1.4px solid var(--line-strong);
@@ -429,6 +430,8 @@
     font-family:'IBM Plex Sans', sans-serif;
     font-size:13.5px;
     font-weight:600;
+    text-decoration:none;
+    cursor:pointer;
     box-shadow:var(--shadow-sm);
     transition:all .15s ease;
   }
@@ -439,6 +442,25 @@
     background:linear-gradient(180deg, #E4EFE7, #CFE3D5);
     box-shadow:inset 0 1px 2px rgba(27,51,42,.08), var(--shadow-sm);
     border-left:4px solid var(--stamp-red);
+  }
+
+  .session-info{
+    margin-top:14px;
+    padding:14px 14px;
+    background:var(--surface);
+    border:1.4px solid var(--line);
+    border-radius:var(--r-sm);
+    display:flex; flex-direction:column; gap:10px;
+  }
+  .session-info-item{display:flex; flex-direction:column; gap:2px;}
+  .session-info-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:9.5px; letter-spacing:.06em; text-transform:uppercase;
+    color:var(--muted);
+  }
+  .session-info-value{
+    font-size:12.5px; font-weight:600; color:var(--ink);
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
   }
   @media (max-width:900px){
     .main-panel{margin-left:0;}
@@ -453,6 +475,7 @@
       margin-bottom:16px;
     }
     .tab-btn{width:auto;}
+    .session-info{display:none;}
   }
 
   /* Month sub-tabs (Contratações por Período) */
@@ -1104,14 +1127,29 @@
   <div id="appContent">
   <div class="app-shell">
   <nav class="tabs" id="sideTabs">
-    <button class="tab-btn" id="tabCadastro" type="button">Cadastro</button>
-    <button class="tab-btn active" id="tabRegistros" type="button">Controle Servidores</button>
-    <button class="tab-btn" id="tabContas" type="button">Abertura de Conta</button>
-    <button class="tab-btn" id="tabDistrato" type="button">Distrato</button>
-    <button class="tab-btn" id="tabPeriodo" type="button">Contratações por Período</button>
-    <button class="tab-btn" id="tabEmissoes" type="button">Acomp. Emi. Doc's</button>
-    <button class="tab-btn" id="tabIndicacoes" type="button">Indicações</button>
-    <button class="tab-btn" id="tabDashboard" type="button">Dashboard Geral</button>
+    <a class="tab-btn" id="tabCadastro" href="#cadastro">Cadastro</a>
+    <a class="tab-btn active" id="tabRegistros" href="#registros">Controle Servidores</a>
+    <a class="tab-btn" id="tabContas" href="#contas">Abertura de Conta</a>
+    <a class="tab-btn" id="tabDistrato" href="#distrato">Distrato</a>
+    <a class="tab-btn" id="tabPeriodo" href="#periodo">Contratações por Período</a>
+    <a class="tab-btn" id="tabEmissoes" href="#emissoes">Acomp. Emi. Doc's</a>
+    <a class="tab-btn" id="tabIndicacoes" href="#indicacoes">Indicações</a>
+    <a class="tab-btn" id="tabDashboard" href="#dashboard">Dashboard Geral</a>
+
+    <div class="session-info">
+      <div class="session-info-item">
+        <span class="session-info-label">Usuário</span>
+        <span class="session-info-value" id="sessaoUsuario">—</span>
+      </div>
+      <div class="session-info-item">
+        <span class="session-info-label">Último login</span>
+        <span class="session-info-value" id="sessaoUltimoLogin">—</span>
+      </div>
+      <div class="session-info-item">
+        <span class="session-info-label">Ano selecionado</span>
+        <span class="session-info-value" id="sessaoAno">—</span>
+      </div>
+    </div>
   </nav>
 
   <div class="main-panel">
@@ -1421,6 +1459,7 @@ const REGISTROS_COL = 'registros';
 let records = [];
 let editingId = null;
 let perfilAbertoId = null;
+let usuarioAtual = null;
 let loaded = false;
 let activeTab = 'registros';
 const REGISTROS_POR_PAGINA = 7;
@@ -1468,6 +1507,7 @@ function resetarTimersInatividade(){
 auth.onAuthStateChanged((user) => {
   if(user){
     document.title = 'SDGP RH SEMED';
+    usuarioAtual = user;
     loginScreen.style.display = 'none';
     appWrap.style.display = 'block';
     document.getElementById('topBrandBar').style.display = 'block';
@@ -1476,9 +1516,12 @@ auth.onAuthStateChanged((user) => {
     document.querySelector('header').style.display = '';
     document.querySelector('.year-selector-wrap').style.display = 'flex';
     updateAppContentVisibility();
+    atualizarPainelSessao();
+    switchTab(tabPelaHash());
     loadRecords();
     resetarTimersInatividade();
   }else{
+    usuarioAtual = null;
     document.title = 'SDGP Login';
     loginScreen.style.display = 'flex';
     appWrap.style.display = 'none';
@@ -1524,6 +1567,19 @@ function anoEstaLiberado(ano){
   return hoje >= inicioDoAno;
 }
 
+function atualizarPainelSessao(){
+  const elUsuario = document.getElementById('sessaoUsuario');
+  if(!elUsuario) return;
+  elUsuario.textContent = usuarioAtual ? usuarioAtual.email : '—';
+
+  const elUltimoLogin = document.getElementById('sessaoUltimoLogin');
+  const lastSignIn = usuarioAtual && usuarioAtual.metadata && usuarioAtual.metadata.lastSignInTime;
+  elUltimoLogin.textContent = lastSignIn ? new Date(lastSignIn).toLocaleString('pt-BR') : '—';
+
+  const elAno = document.getElementById('sessaoAno');
+  elAno.textContent = selectedAno || '—';
+}
+
 function updateAppContentVisibility(){
   const welcomeEl = document.getElementById('welcomeMessage');
   if(!selectedAno){
@@ -1539,6 +1595,7 @@ function updateAppContentVisibility(){
 document.getElementById('anoSelector').addEventListener('change', (e)=>{
   selectedAno = e.target.value;
   updateAppContentVisibility();
+  atualizarPainelSessao();
   if(selectedAno){
     document.querySelector('header').style.display = 'none';
   }
@@ -3723,11 +3780,23 @@ function switchTab(tabKey){
   document.getElementById('periodoArea').style.display = cfg.view === 'periodo' ? 'block' : 'none';
   document.getElementById('emissoesArea').style.display = cfg.view === 'emissoes' ? 'block' : 'none';
   document.getElementById('tableCardIndicacoes').style.display = cfg.view === 'indicacoes' ? 'block' : 'none';
+  if(location.hash !== '#' + tabKey){
+    history.replaceState(null, '', '#' + tabKey);
+  }
+  atualizarPainelSessao();
   render();
 }
 
-Object.entries(TABS).forEach(([key, cfg])=>{
-  document.getElementById(cfg.btn).addEventListener('click', ()=> switchTab(key));
+// As abas agora são links de verdade (href="#chave"). Clique normal troca de aba na
+// mesma tela via este listener de "hashchange"; Ctrl+clique ou clique do meio abrem
+// a mesma aba numa nova guia do navegador (comportamento padrão de links).
+function tabPelaHash(){
+  const key = (location.hash || '').replace('#', '');
+  return TABS[key] ? key : 'registros';
+}
+window.addEventListener('hashchange', () => {
+  const key = tabPelaHash();
+  if(key !== activeTab) switchTab(key);
 });
 
 document.getElementById('exportExcelBtn').addEventListener('click', ()=>{
