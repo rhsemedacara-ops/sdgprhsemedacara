@@ -1251,28 +1251,24 @@
   <div class="toolbar" id="toolbarRegistros">
     <input type="search" id="searchInput" placeholder="Buscar por nome, CPF, cargo, núcleo, contrato...">
     <span class="spacer"></span>
-    <span class="count-pill" id="countPill"></span>
     <button class="btn-ghost" id="exportExcelBtn">Exportar Excel</button>
   </div>
 
   <div class="toolbar" id="toolbarContas" style="display:none;">
     <input type="search" id="contasSearchInput" placeholder="Buscar por nome...">
     <span class="spacer"></span>
-    <span class="count-pill" id="contasCountPill"></span>
     <button class="btn-ghost" id="exportContasBtn">Exportar Excel</button>
   </div>
 
   <div class="toolbar" id="toolbarDistrato" style="display:none;">
     <input type="search" id="distratoSearchInput" placeholder="Buscar por nome...">
     <span class="spacer"></span>
-    <span class="count-pill" id="distratoCountPill"></span>
     <button class="btn-ghost" id="exportDistratoBtn">Exportar Excel</button>
   </div>
 
   <div class="toolbar" id="toolbarPeriodo" style="display:none;">
     <input type="search" id="periodoSearchInput" placeholder="Buscar por nome...">
     <span class="spacer"></span>
-    <span class="count-pill" id="periodoCountPill"></span>
     <button class="btn-ghost" id="exportPeriodoBtn">Exportar Excel</button>
   </div>
 
@@ -1291,7 +1287,6 @@
 
   <div class="toolbar" id="toolbarEmissoes" style="display:none;">
     <span class="spacer"></span>
-    <span class="count-pill" id="emissoesCountPill"></span>
     <button class="btn-ghost" id="exportEmissoesBtn">Exportar Excel</button>
   </div>
 
@@ -1309,7 +1304,6 @@
   <div class="toolbar" id="toolbarIndicacoes" style="display:none;">
     <input type="search" id="indicacoesSearchInput" placeholder="Buscar pelo nome da indicação...">
     <span class="spacer"></span>
-    <span class="count-pill" id="indicacoesCountPill"></span>
     <button class="btn-ghost" id="exportIndicacoesPdfBtn">Baixar PDF</button>
   </div>
 
@@ -2676,9 +2670,6 @@ function renderRegistros(){
   const recordsAno = recordsDoAno();
   const filtered = recordsAno.filter(r => matchesFilter(r, q, statusVal));
 
-  document.getElementById('countPill').textContent =
-    filtered.length === recordsAno.length ? `${recordsAno.length} registro(s)` : `${filtered.length} de ${recordsAno.length}`;
-
   if(!loaded){
     tableArea.innerHTML = '<div class="loading">Carregando registros…</div>';
     return;
@@ -2847,7 +2838,6 @@ function renderContas(){
   const base = recordsDoAno().filter(r => r.aberturaConta === 'Sim');
   const filtered = base.filter(r => matchesText(r, q));
 
-  document.getElementById('contasCountPill').textContent = `${filtered.length} de ${base.length}`;
 
   if(base.length === 0){
     tableArea.innerHTML = `<div class="empty-state"><div class="big">Nenhuma abertura de conta registrada</div></div>`;
@@ -2890,7 +2880,6 @@ function renderDistrato(){
   const base = recordsDoAno().filter(r => r.situacao === 'Distratado(a)' && !!((r.distratoRg && r.distratoRg.trim()) || (r.distratoEndereco && r.distratoEndereco.trim()) || (r.distratoBairro && r.distratoBairro.trim()) || (r.distratoMunicipio && r.distratoMunicipio.trim())));
   const filtered = base.filter(r => matchesText(r, q));
 
-  document.getElementById('distratoCountPill').textContent = `${filtered.length} de ${base.length}`;
 
   if(base.length === 0){
     tableArea.innerHTML = `<div class="empty-state"><div class="big">Nenhum distrato registrado</div></div>`;
@@ -2963,7 +2952,6 @@ function renderPeriodo(){
   });
   const filtered = base.filter(r => matchesText(r, q));
 
-  document.getElementById('periodoCountPill').textContent = `${filtered.length} de ${base.length}`;
 
   if(base.length === 0){
     periodoTableArea.innerHTML = `<div class="empty-state">Registros com admissão nesse mês aparecem aqui.</div>`;
@@ -3055,7 +3043,6 @@ function renderEmissoes(){
 
   const dados = getEmissoesData(selectedEmissaoTipo).sort((a,b)=> numeroDocValor(b.numero) - numeroDocValor(a.numero));
 
-  document.getElementById('emissoesCountPill').textContent = `${dados.length} documento(s)`;
 
   if(dados.length === 0){
     area.innerHTML = `<div class="empty-state"><div class="big">Nenhum documento emitido ainda</div>Números de ${selectedEmissaoTipo === 'oficios' ? 'ofícios' : selectedEmissaoTipo} aparecem aqui conforme forem cadastrados.</div>`;
@@ -3112,7 +3099,6 @@ function renderIndicacoes(){
   const base = recordsDoAno().slice().sort((a,b)=> (b.criadoEm||0) - (a.criadoEm||0));
   const filtered = base.filter(r => !q || (r.indicacao || '').toLowerCase().includes(q.toLowerCase()));
 
-  document.getElementById('indicacoesCountPill').textContent = `${filtered.length} de ${base.length}`;
 
   if(base.length === 0){
     area.innerHTML = `<div class="empty-state"><div class="big">Nenhuma indicação registrada em ${selectedAno}</div></div>`;
