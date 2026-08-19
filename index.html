@@ -754,7 +754,7 @@
   .modal{
     background:var(--surface);
     width:100%;
-    max-width:760px;
+    max-width:1180px;
     border-radius:var(--r-lg);
     box-shadow:0 24px 64px rgba(0,0,0,.28);
     overflow:hidden;
@@ -802,11 +802,12 @@
   }
   .grid{
     display:grid;
-    grid-template-columns:repeat(2, 1fr);
+    grid-template-columns:repeat(2, minmax(0, 1fr));
     gap:14px;
   }
-  .grid.cols-3{grid-template-columns:repeat(3, 1fr);}
-  .field{display:flex; flex-direction:column; gap:5px;}
+  .grid.cols-3{grid-template-columns:repeat(3, minmax(0, 1fr));}
+  .grid-lotacao{grid-template-columns:repeat(6, minmax(0, 1fr)) !important;}
+  .field{display:flex; flex-direction:column; gap:5px; min-width:0;}
   .field.full{grid-column:1 / -1;}
   label{font-size:12px; font-weight:600; color:var(--muted);}
   input[type=text], input[type=date], input[type=email], input[type=tel], select, textarea{
@@ -824,6 +825,7 @@
   input[type=text], input[type=date], input[type=email], input[type=tel], select{
     height:39px;
   }
+  select{text-overflow:ellipsis; overflow:hidden; white-space:nowrap;}
   #diretorField, #localField{min-height:64px;}
   input:focus, select:focus, textarea:focus{
     outline:none;
@@ -923,7 +925,8 @@
   }
 
   @media (max-width:720px){
-    .grid, .grid.cols-3{grid-template-columns:1fr;}
+    .grid, .grid.cols-3, .grid-lotacao{grid-template-columns:1fr !important;}
+    .grid-lotacao > *{grid-column:auto !important;}
     h1{font-size:27px;}
   }
 </style>
@@ -1177,8 +1180,8 @@
 
         <fieldset>
           <legend>03 · Lotação e admissão</legend>
-          <div class="grid cols-3">
-            <div class="field combo-field">
+          <div class="grid grid-lotacao">
+            <div class="field combo-field" style="grid-column:span 2;">
               <label>Cargo</label>
               <div class="combo" id="cargoCombo">
                 <button type="button" class="combo-toggle" id="cargoComboToggle">
@@ -1192,12 +1195,12 @@
                 </div>
               </div>
             </div>
-            <div class="field">
+            <div class="field" style="grid-column:span 2;">
               <label>Função</label>
               <input type="text" name="funcao" id="funcaoInput" list="funcaoList" autocomplete="off">
               <datalist id="funcaoList"></datalist>
             </div>
-            <div class="field">
+            <div class="field" style="grid-column:span 2;">
               <label>Turno</label>
               <select name="turno" autocomplete="off">
                 <option value="">—</option>
@@ -1212,9 +1215,9 @@
                 <option value="INTEGRAL">INTEGRAL</option>
               </select>
             </div>
-            <div class="field"><label>Admissão</label><input type="date" name="admissao" autocomplete="off"></div>
-            <div class="field"><label>CH (carga horária)</label><input type="text" name="ch" placeholder="ex: 40h" maxlength="3" autocomplete="off"></div>
-            <div class="field combo-field">
+            <div class="field" style="grid-column:span 2;"><label>Admissão</label><input type="date" name="admissao" autocomplete="off"></div>
+            <div class="field" style="grid-column:span 1;"><label>CH (carga horária)</label><input type="text" name="ch" placeholder="ex: 40h" maxlength="3" autocomplete="off"></div>
+            <div class="field combo-field" style="grid-column:span 3;">
               <label>Núcleo</label>
               <div class="combo" id="nucleoCombo">
                 <button type="button" class="combo-toggle" id="nucleoComboToggle">
@@ -1228,8 +1231,8 @@
                 </div>
               </div>
             </div>
-            <div class="field" id="diretorField"><label>Diretor</label><input type="text" name="diretor" autocomplete="off"></div>
-            <div class="field" id="localField" style="grid-column:span 2;"><label>Local</label><input type="text" name="local" autocomplete="off"></div>
+            <div class="field" id="diretorField" style="grid-column:span 3;"><label>Diretor</label><input type="text" name="diretor" autocomplete="off"></div>
+            <div class="field" id="localField" style="grid-column:span 3;"><label>Local</label><input type="text" name="local" autocomplete="off"></div>
             <div class="field full"><label>Observações</label><textarea name="obs" autocomplete="off"></textarea></div>
           </div>
         </fieldset>
