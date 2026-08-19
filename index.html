@@ -1496,6 +1496,7 @@ function resetarTimersInatividade(){
   avisoInatividadeTimer = setTimeout(mostrarAvisoInatividade, INATIVIDADE_LIMITE_MS - AVISO_ANTES_MS);
   inatividadeTimer = setTimeout(() => {
     esconderAvisoInatividade();
+    localStorage.removeItem('sdgp_ano_sessao');
     auth.signOut();
   }, INATIVIDADE_LIMITE_MS);
 }
@@ -1511,10 +1512,16 @@ auth.onAuthStateChanged((user) => {
     loginScreen.style.display = 'none';
     appWrap.style.display = 'block';
     document.getElementById('topBrandBar').style.display = 'block';
-    selectedAno = '';
-    document.getElementById('anoSelector').value = '';
-    document.querySelector('header').style.display = '';
-    document.querySelector('.year-selector-wrap').style.display = 'flex';
+    // O ano escolhido "dura" enquanto a sessão de login continuar (mesmo abrindo
+    // outras guias) — só volta a pedir o ano depois de um "Sair" de verdade.
+    selectedAno = localStorage.getItem('sdgp_ano_sessao') || '';
+    document.getElementById('anoSelector').value = selectedAno;
+    if(selectedAno){
+      document.querySelector('header').style.display = 'none';
+    }else{
+      document.querySelector('header').style.display = '';
+      document.querySelector('.year-selector-wrap').style.display = 'flex';
+    }
     updateAppContentVisibility();
     atualizarPainelSessao();
     switchTab(tabPelaHash());
@@ -1555,6 +1562,7 @@ loginForm.addEventListener('submit', async (e) => {
 });
 
 document.getElementById('logoutBtn').addEventListener('click', () => {
+  localStorage.removeItem('sdgp_ano_sessao');
   auth.signOut();
 });
 
@@ -1594,6 +1602,7 @@ function updateAppContentVisibility(){
 
 document.getElementById('anoSelector').addEventListener('change', (e)=>{
   selectedAno = e.target.value;
+  localStorage.setItem('sdgp_ano_sessao', selectedAno);
   updateAppContentVisibility();
   atualizarPainelSessao();
   if(selectedAno){
