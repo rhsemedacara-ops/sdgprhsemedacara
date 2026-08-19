@@ -274,6 +274,61 @@
     background:#fff;
   }
   .password-wrap{position:relative;}
+
+  /* Combobox de busca (Núcleo) */
+  .combo{position:relative;}
+  .combo-toggle{
+    width:100%;
+    height:39px;
+    box-sizing:border-box;
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    text-align:left;
+    background:#FCFBF7;
+    border:1.4px solid var(--line);
+    border-radius:var(--r-sm);
+    padding:9px 11px;
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:14px;
+    color:var(--ink);
+    transition:border-color .12s ease, box-shadow .12s ease;
+  }
+  .combo-toggle .combo-toggle-label{
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1;
+  }
+  .combo-toggle .combo-toggle-label.placeholder{color:#8a8a8a;}
+  .combo-toggle svg{flex:0 0 auto; color:var(--muted); transition:transform .15s ease;}
+  .combo.open .combo-toggle{border-color:var(--stamp-red); box-shadow:0 0 0 3.5px var(--ring);}
+  .combo.open .combo-toggle svg{transform:rotate(180deg);}
+  .combo-panel{
+    display:none;
+    position:absolute; top:calc(100% + 4px); left:0; right:0; z-index:60;
+    background:var(--surface);
+    border:1.4px solid var(--line-strong);
+    border-radius:var(--r-sm);
+    box-shadow:var(--shadow-lg);
+    overflow:hidden;
+  }
+  .combo.open .combo-panel{display:block;}
+  .combo-search{
+    width:100%;
+    border:none;
+    border-bottom:1px solid var(--line);
+    padding:10px 12px;
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:14px;
+    box-sizing:border-box;
+  }
+  .combo-search:focus{outline:none; background:#FAF7EE;}
+  .combo-list{max-height:220px; overflow-y:auto;}
+  .combo-option{
+    padding:9px 12px;
+    font-size:13.5px;
+    color:var(--ink);
+    cursor:pointer;
+  }
+  .combo-option:hover{background:#F2F0E6;}
+  .combo-option.selected{background:var(--primary); color:#fff; font-weight:600;}
+  .combo-option-empty{padding:12px; font-size:13px; color:var(--muted); text-align:center;}
   .password-wrap input{padding-right:42px;}
   .toggle-password-btn{
     position:absolute; top:50%; right:5px; transform:translateY(-50%);
@@ -763,8 +818,13 @@
     background:#FCFBF7;
     color:var(--ink);
     width:100%;
+    box-sizing:border-box;
     transition:border-color .12s ease, box-shadow .12s ease, background-color .12s ease;
   }
+  input[type=text], input[type=date], input[type=email], input[type=tel], select{
+    height:39px;
+  }
+  #diretorField, #localField{min-height:64px;}
   input:focus, select:focus, textarea:focus{
     outline:none;
     border-color:var(--stamp-red);
@@ -1075,7 +1135,11 @@
             <div class="field"><label>Nº Contrato</label><input type="text" name="contrato" id="regContratoInput" placeholder="0000/0000" maxlength="9" autocomplete="off"></div>
             <div class="field"><label>Cód. UO</label><input type="text" name="codUO" autocomplete="off"></div>
             <div class="field"><label>Cód. Local</label><input type="text" name="codLocal" autocomplete="off"></div>
-            <div class="field"><label>Indicação</label><input type="text" name="indicacao" autocomplete="off"></div>
+            <div class="field">
+              <label>Indicação</label>
+              <input type="text" name="indicacao" id="indicacaoInput" list="indicacaoList" autocomplete="off">
+              <datalist id="indicacaoList"></datalist>
+            </div>
             <div class="field">
               <label>Abertura de conta</label>
               <select name="aberturaConta" autocomplete="off">
@@ -1114,31 +1178,25 @@
         <fieldset>
           <legend>03 · Lotação e admissão</legend>
           <div class="grid cols-3">
-            <div class="field">
+            <div class="field combo-field">
               <label>Cargo</label>
-              <select name="cargo" autocomplete="off">
-                <option value="">—</option>
-                <option value="AG. DE MANUTENÇÃO - ELETRICISTA">AG. DE MANUTENÇÃO - ELETRICISTA</option>
-                <option value="AG. DE MANUTENÇÃO - ENCANADOR">AG. DE MANUTENÇÃO - ENCANADOR</option>
-                <option value="AG. DE MANUTENÇÃO - PINTOR">AG. DE MANUTENÇÃO - PINTOR</option>
-                <option value="ASSISTENTE SOCIAL">ASSISTENTE SOCIAL</option>
-                <option value="AUXILIAR DE ADMINISTRAÇÃO">AUXILIAR DE ADMINISTRAÇÃO</option>
-                <option value="AUXILIAR DE SERVIÇOS GERAIS">AUXILIAR DE SERVIÇOS GERAIS</option>
-                <option value="CONTADOR (A)">CONTADOR (A)</option>
-                <option value="MECÂNICO DE VEÍCULOS E MÁQUINAS">MECÂNICO DE VEÍCULOS E MÁQUINAS</option>
-                <option value="MOTORISTA DE VEÍCULOS LEVES">MOTORISTA DE VEÍCULOS LEVES</option>
-                <option value="MOTORISTA DE VEÍCULOS PESADOS">MOTORISTA DE VEÍCULOS PESADOS</option>
-                <option value="NUTRICIONISTA">NUTRICIONISTA</option>
-                <option value="OPERADOR DE EMBARCAÇÃO">OPERADOR DE EMBARCAÇÃO</option>
-                <option value="PROFESSOR (A)">PROFESSOR (A)</option>
-                <option value="PSICÓLOGO (A)">PSICÓLOGO (A)</option>
-                <option value="SECRETÁRIO (A) ESCOLAR">SECRETÁRIO (A) ESCOLAR</option>
-                <option value="TÉCNICO-PEDAGÓGICO">TÉCNICO-PEDAGÓGICO</option>
-                <option value="VIGIA">VIGIA</option>
-                <option value="TÉCNICO DE INFORMÁTICA">TÉCNICO DE INFORMÁTICA</option>
-              </select>
+              <div class="combo" id="cargoCombo">
+                <button type="button" class="combo-toggle" id="cargoComboToggle">
+                  <span id="cargoComboLabel" class="combo-toggle-label placeholder">Selecione o cargo...</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <input type="hidden" name="cargo" id="cargoInput">
+                <div class="combo-panel" id="cargoComboPanel">
+                  <input type="text" class="combo-search" id="cargoComboSearch" placeholder="Buscar cargo..." autocomplete="off">
+                  <div class="combo-list" id="cargoComboList"></div>
+                </div>
+              </div>
             </div>
-            <div class="field"><label>Função</label><input type="text" name="funcao" autocomplete="off"></div>
+            <div class="field">
+              <label>Função</label>
+              <input type="text" name="funcao" id="funcaoInput" list="funcaoList" autocomplete="off">
+              <datalist id="funcaoList"></datalist>
+            </div>
             <div class="field">
               <label>Turno</label>
               <select name="turno" autocomplete="off">
@@ -1156,56 +1214,22 @@
             </div>
             <div class="field"><label>Admissão</label><input type="date" name="admissao" autocomplete="off"></div>
             <div class="field"><label>CH (carga horária)</label><input type="text" name="ch" placeholder="ex: 40h" maxlength="3" autocomplete="off"></div>
-            <div class="field">
+            <div class="field combo-field">
               <label>Núcleo</label>
-              <input type="text" name="nucleo" id="nucleoInput" list="nucleoList" placeholder="Digite para buscar o núcleo..." autocomplete="off">
-              <datalist id="nucleoList">
-                <option value="GABINETE">
-                <option value="DIRETORIA ADMINISTRATIVA E SETORIAL">
-                <option value="DIRETORIA DE PLANEJAMENTO E GESTÃO EDUCACIONAL">
-                <option value="DIRETORIA DE LOGÍSTICA EDUCACIONAL, TRANSPORTE ESCOLAR E ALIMENTAÇÃO ESCOLAR">
-                <option value="DIRETORIA DE PROGRAMAS E PROJETOS EDUCACIONAIS">
-                <option value="DIRETORIA DE INFRAESTRUTURA ESCOLAR">
-                <option value="DIRETORIA DE EDUCAÇÃO BÁSICA">
-                <option value="ASSESSORIA POLÍTICA ESTRATÉGICA">
-                <option value="EMEIF 13 DE MAIO">
-                <option value="EMEIF SHALLON">
-                <option value="EMEIEF PROFESSORA MARIA ANTONIETA DE PAIVA">
-                <option value="EMEIF DOUTORA RUTH PASSARINHO">
-                <option value="EMEF PROFESSORA LUCIMAR DE JESUS SILVA LIMA">
-                <option value="EMEF PROFESSORA LYDIA LIMA">
-                <option value="EMEF PINTO MARQUES">
-                <option value="EMEF SÃO FRANCISCO DE ASSIS">
-                <option value="EMEIF BOA VISTA I">
-                <option value="EMEIF NOVA JERUSALEM I">
-                <option value="EMEIF URUCURE">
-                <option value="EMEIF EDUARDO ANGELIM II">
-                <option value="EMEIF SANTA LUZIA I">
-                <option value="EMEIF PAIVA MELO">
-                <option value="EMEIF MANOEL JOSE DA SILVA">
-                <option value="EMEIF CASEMIRO FRANCISCO DE PAIVA">
-                <option value="EMEIF NOVA ALIANÇA">
-                <option value="EMEIF MONTE HOREBE">
-                <option value="EMEF CORONEL SAMPAIO">
-                <option value="EMEIEF PROFESSORA IZABEL BARRAL">
-                <option value="EMEIF NOSSA SENHORA DO BOM REMEDIO I">
-                <option value="EMEIF JULIO CEZAR">
-                <option value="EMEIF PAULINO ANTONIO PENICHE">
-                <option value="EMEIEF GERALDO JOSE DE LIMA">
-                <option value="EMEI ANA MARIA DA SILVA FARIAS">
-                <option value="EMEF ALACID NUNES">
-                <option value="EMEIF NOSSA SENHORA DO PERPETUO SOCORRO II">
-                <option value="EMEIEF SÃO JOÃO BATISTA">
-                <option value="EMEIF SANTA MARIA III">
-                <option value="EMEIF NOSSA SENHORA DO PERPETUO SOCORRO I">
-                <option value="EMEIF SANTA BARBARA">
-                <option value="EMEIF PROFESSORA IVETE NAZARE DE OLIVEIRA">
-                <option value="CRECHE SANDRA MARIA DE OLIVEIRA SOUZA">
-                <option value="INATIVO">
-              </datalist>
+              <div class="combo" id="nucleoCombo">
+                <button type="button" class="combo-toggle" id="nucleoComboToggle">
+                  <span id="nucleoComboLabel" class="combo-toggle-label placeholder">Selecione o núcleo...</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <input type="hidden" name="nucleo" id="nucleoInput">
+                <div class="combo-panel" id="nucleoComboPanel">
+                  <input type="text" class="combo-search" id="nucleoComboSearch" placeholder="Buscar núcleo..." autocomplete="off">
+                  <div class="combo-list" id="nucleoComboList"></div>
+                </div>
+              </div>
             </div>
             <div class="field" id="diretorField"><label>Diretor</label><input type="text" name="diretor" autocomplete="off"></div>
-            <div class="field" id="localField"><label>Local</label><input type="text" name="local" autocomplete="off"></div>
+            <div class="field" id="localField" style="grid-column:span 2;"><label>Local</label><input type="text" name="local" autocomplete="off"></div>
             <div class="field full"><label>Observações</label><textarea name="obs" autocomplete="off"></textarea></div>
           </div>
         </fieldset>
@@ -1743,6 +1767,7 @@ function loadRecords(){
     (snapshot) => {
       records = snapshot.docs.map(doc => doc.data());
       loaded = true;
+      atualizarSugestoesFormulario();
       render();
     },
     (err) => {
@@ -1754,6 +1779,100 @@ function loadRecords(){
     }
   );
 }
+
+// Preenche as sugestões de "Indicação" e "Função" com os valores já usados em
+// registros anteriores, para evitar que o mesmo nome seja digitado de formas diferentes.
+function atualizarSugestoesFormulario(){
+  const indicacoes = [...new Set(records.map(r => (r.indicacao || '').trim()).filter(Boolean))].sort();
+  document.getElementById('indicacaoList').innerHTML = indicacoes.map(v => `<option value="${v.replace(/"/g,'&quot;')}">`).join('');
+  atualizarSugestoesFuncao();
+}
+
+// Sugestões de "Função" priorizam os valores já usados junto com o Cargo selecionado
+// (minimiza erros de digitação/inconsistência entre cargo e função). Sem cargo escolhido,
+// mostra todas as funções já cadastradas.
+function atualizarSugestoesFuncao(){
+  const cargoAtual = form.cargo ? form.cargo.value : '';
+  const base = cargoAtual ? records.filter(r => r.cargo === cargoAtual) : records;
+  const funcoes = [...new Set(base.map(r => (r.funcao || '').trim()).filter(Boolean))].sort();
+  document.getElementById('funcaoList').innerHTML = funcoes.map(v => `<option value="${v.replace(/"/g,'&quot;')}">`).join('');
+}
+
+// --- Combobox de busca reutilizável (usado em Núcleo e Cargo) ---
+function criarComboBusca(prefixo, opcoes, placeholder, aoSelecionar){
+  const combo = document.getElementById(`${prefixo}Combo`);
+  const toggle = document.getElementById(`${prefixo}ComboToggle`);
+  const label = document.getElementById(`${prefixo}ComboLabel`);
+  const search = document.getElementById(`${prefixo}ComboSearch`);
+  const list = document.getElementById(`${prefixo}ComboList`);
+  const input = document.getElementById(`${prefixo}Input`);
+
+  function renderLista(filtro){
+    const q = (filtro || '').trim().toLowerCase();
+    const atual = input.value;
+    const filtradas = opcoes().filter(n => !q || n.toLowerCase().includes(q));
+    if(filtradas.length === 0){
+      list.innerHTML = '<div class="combo-option-empty">Nada encontrado</div>';
+      return;
+    }
+    list.innerHTML = filtradas.map(n =>
+      `<div class="combo-option${n === atual ? ' selected' : ''}" data-valor="${n.replace(/"/g,'&quot;')}">${n}</div>`
+    ).join('');
+  }
+
+  function setValor(valor){
+    input.value = valor || '';
+    if(valor){
+      label.textContent = valor;
+      label.classList.remove('placeholder');
+    }else{
+      label.textContent = placeholder;
+      label.classList.add('placeholder');
+    }
+  }
+
+  function abrir(){
+    combo.classList.add('open');
+    search.value = '';
+    renderLista('');
+    setTimeout(() => search.focus(), 0);
+  }
+
+  function fechar(){
+    combo.classList.remove('open');
+  }
+
+  toggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if(combo.classList.contains('open')) fechar();
+    else abrir();
+  });
+
+  search.addEventListener('input', () => renderLista(search.value));
+
+  list.addEventListener('click', (e) => {
+    const opt = e.target.closest('.combo-option');
+    if(!opt) return;
+    setValor(opt.dataset.valor);
+    fechar();
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+    if(aoSelecionar) aoSelecionar(opt.dataset.valor);
+  });
+
+  document.addEventListener('click', (e) => { if(!combo.contains(e.target)) fechar(); });
+  document.addEventListener('keydown', (e) => { if(e.key === 'Escape') fechar(); });
+
+  return { setValor };
+}
+
+const NUCLEO_OPCOES = Object.keys(NUCLEO_CONFIG);
+const nucleoComboApi = criarComboBusca('nucleo', () => NUCLEO_OPCOES, 'Selecione o núcleo...');
+function setNucleoComboValue(v){ nucleoComboApi.setValor(v); }
+
+const CARGO_OPCOES = ['AG. DE MANUTENÇÃO - ELETRICISTA','AG. DE MANUTENÇÃO - ENCANADOR','AG. DE MANUTENÇÃO - PINTOR','ASSISTENTE SOCIAL','AUXILIAR DE ADMINISTRAÇÃO','AUXILIAR DE SERVIÇOS GERAIS','CONTADOR (A)','MECÂNICO DE VEÍCULOS E MÁQUINAS','MOTORISTA DE VEÍCULOS LEVES','MOTORISTA DE VEÍCULOS PESADOS','NUTRICIONISTA','OPERADOR DE EMBARCAÇÃO','PROFESSOR (A)','PSICÓLOGO (A)','SECRETÁRIO (A) ESCOLAR','TÉCNICO-PEDAGÓGICO','VIGIA','TÉCNICO DE INFORMÁTICA'];
+const cargoComboApi = criarComboBusca('cargo', () => CARGO_OPCOES, 'Selecione o cargo...', () => atualizarSugestoesFuncao());
+function setCargoComboValue(v){ cargoComboApi.setValor(v); }
 
 // Salva um único registro no Firestore (criação ou atualização).
 // Cada usuário grava só o documento que mexeu — sem risco de sobrescrever
@@ -3088,6 +3207,9 @@ document.getElementById('newBtn').addEventListener('click', ()=>{
   editingId = null;
   form.reset();
   form.situacao.value = 'Ativo';
+  setNucleoComboValue('');
+  setCargoComboValue('');
+  atualizarSugestoesFuncao();
   updateDependentFields('', '');
   toggleSituacaoData();
   toggleAberturaContaExtra();
@@ -3099,7 +3221,10 @@ window.openEdit = function(id){
   const r = records.find(x=>x.id===id);
   if(!r) return;
   editingId = id;
-  fields.forEach(f => { if(f !== 'diretor' && f !== 'local' && form[f]) form[f].value = r[f] || ''; });
+  fields.forEach(f => { if(f !== 'diretor' && f !== 'local' && f !== 'cargo' && form[f]) form[f].value = r[f] || ''; });
+  setNucleoComboValue(r.nucleo || '');
+  setCargoComboValue(r.cargo || '');
+  atualizarSugestoesFuncao();
   updateDependentFields(r.diretor, r.local);
   toggleSituacaoData();
   if(form.situacaoData) form.situacaoData.value = r.situacaoData || '';
@@ -3110,6 +3235,7 @@ window.openEdit = function(id){
 
 form.nucleo.addEventListener('change', ()=> updateDependentFields('', ''));
 form.nucleo.addEventListener('input', ()=> updateDependentFields('', ''));
+form.cargo.addEventListener('change', atualizarSugestoesFuncao);
 form.situacao.addEventListener('change', toggleSituacaoData);
 form.situacao.addEventListener('change', toggleDistratoExtra);
 form.aberturaConta.addEventListener('change', toggleAberturaContaExtra);
