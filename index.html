@@ -3615,7 +3615,7 @@ document.getElementById('saveBtn').addEventListener('click', async ()=>{
       const ok = await salvarRegistro(data);
       if(ok){
         showSuccessFloat('Registro salvo com sucesso');
-        switchTab('registros');
+        abrirCadastroParaNovo();
       }
     }
   }finally{
