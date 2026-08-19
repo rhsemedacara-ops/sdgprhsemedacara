@@ -1988,6 +1988,11 @@ function dataExtenso(dateStr){
   return `${d.getDate()} de ${MESES_PT[d.getMonth()]} de ${d.getFullYear()}`;
 }
 
+function mesAnoExtenso(dateStr){
+  const d = dateStr ? new Date(dateStr+'T00:00:00') : new Date();
+  return `${MESES_PT[d.getMonth()]} de ${d.getFullYear()}`;
+}
+
 function fmtDataCurta(v){
   return v ? new Date(v+'T00:00:00').toLocaleDateString('pt-BR') : '_____/_____/2026';
 }
@@ -2297,7 +2302,7 @@ async function gerarAutorizacaoMailMerge(r){
     by = pdfParagraph(doc, [{ t: 'Diretoria Administrativa e Setorial' }], boxCenterX, by, boxTextW, { align: 'center', fontSize: 10 });
     by = pdfParagraph(doc, [{ t: 'PROTOCOLO DE RECEBIMENTO', b: true }], boxCenterX, by, boxTextW, { align: 'center', fontSize: 10 }); by += 5;
     by = pdfParagraph(doc, [{ t: 'Recebi em:' }], boxCenterX, by, boxTextW, { align: 'center', fontSize: 10 }); by += 5;
-    by = pdfParagraph(doc, [{ t: 'Data: _____ de agosto de 2026.' }], boxCenterX, by, boxTextW, { align: 'center', fontSize: 10 }); by += 5;
+    by = pdfParagraph(doc, [{ t: `Data: _____ de ${mesAnoExtenso(r.admissao)}.` }], boxCenterX, by, boxTextW, { align: 'center', fontSize: 10 }); by += 5;
     by = pdfParagraph(doc, [{ t: '___________________________' }], boxCenterX, by, boxTextW, { align: 'center', fontSize: 10 });
     const boxBottom = by + boxPad - 3;
     doc.setDrawColor(0, 0, 0);
