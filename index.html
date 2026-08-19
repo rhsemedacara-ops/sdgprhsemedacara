@@ -111,6 +111,9 @@
     width:100%;
     margin-top:24px;
     background:linear-gradient(155deg, var(--primary-dark), #0a3c38);
+    position:sticky;
+    bottom:0;
+    z-index:40;
   }
   .bottom-bar::before{
     content:'';
@@ -120,9 +123,15 @@
   }
   .bottom-bar footer.note{
     max-width:1600px;
+    width:100%;
     margin:0 auto;
-    padding:14px 32px;
+    padding:12px 32px;
     color:rgba(255,255,255,.75);
+    box-sizing:border-box;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
   }
   .top-brand-inner{
     max-width:1600px;
@@ -714,6 +723,34 @@
     box-shadow:var(--shadow);
   }
 
+  .pagination{
+    display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px;
+    padding:14px 18px;
+    border-top:1px solid var(--line);
+    background:#F7F6F0;
+  }
+  .pagination-info{font-size:12.5px; color:var(--muted); font-family:'IBM Plex Mono', monospace;}
+  .pagination-controls{display:flex; flex-wrap:wrap; gap:6px;}
+  .page-btn{
+    background:var(--surface);
+    color:var(--muted);
+    border:1.4px solid var(--line-strong);
+    border-radius:6px;
+    padding:6px 11px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    font-weight:600;
+    min-width:34px;
+    transition:all .12s ease;
+  }
+  .page-btn:hover:not(:disabled){border-color:var(--primary); color:var(--primary-dark);}
+  .page-btn.active{
+    background:var(--primary);
+    border-color:var(--primary);
+    color:#fff;
+  }
+  .page-btn:disabled{opacity:.4; cursor:default;}
+
   .empty-state{
     display:block;
     width:100%;
@@ -883,18 +920,18 @@
 
   /* Ícone flutuante de diagnóstico (estilo chat) */
   .diag-fab{
-    position:fixed; bottom:22px; right:22px; z-index:150;
-    width:52px; height:52px; border-radius:50%;
-    background:linear-gradient(160deg, var(--primary-light), var(--primary-dark)); color:#fff;
+    position:relative; flex:0 0 auto;
+    width:30px; height:30px; border-radius:50%;
+    padding:0;
+    background:rgba(255,255,255,.14); color:#fff;
     display:flex; align-items:center; justify-content:center;
-    box-shadow:0 6px 20px rgba(0,0,0,.28);
-    border:none;
-    transition:transform .15s ease, box-shadow .15s ease;
+    border:1px solid rgba(255,255,255,.3);
+    transition:transform .15s ease, background-color .15s ease;
   }
-  .diag-fab:hover{transform:translateY(-2px) scale(1.04); box-shadow:0 10px 26px rgba(0,0,0,.32);}
+  .diag-fab:hover{background:rgba(255,255,255,.26); transform:scale(1.06);}
 
   .diag-popup{
-    position:fixed; bottom:84px; right:22px; z-index:150;
+    position:fixed; bottom:60px; right:22px; z-index:150;
     width:320px; max-width:88vw;
     background:var(--surface);
     border:1px solid var(--line);
@@ -1104,10 +1141,6 @@
   </div>
   </div>
 
-  <button type="button" id="diagFab" class="diag-fab" aria-label="Diagnóstico do sistema">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-  </button>
-
   <div id="diagPopup" class="diag-popup">
     <div class="diag-popup-head">
       <span>Diagnóstico do sistema</span>
@@ -1286,7 +1319,12 @@
 </div>
 
 <div class="bottom-bar">
-  <footer class="note">© Todos os direitos reservados — Copyright © 2026-2026</footer>
+  <footer class="note">
+    <span>© Todos os direitos reservados — Copyright © 2026-2026</span>
+    <button type="button" id="diagFab" class="diag-fab" aria-label="Diagnóstico do sistema">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+    </button>
+  </footer>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1321,6 +1359,8 @@ let records = [];
 let editingId = null;
 let loaded = false;
 let activeTab = 'registros';
+const REGISTROS_POR_PAGINA = 7;
+let paginaRegistros = 1;
 let selectedAno = '';
 
 // --- Autenticação (login único compartilhado pela equipe) ---
@@ -2624,7 +2664,16 @@ function renderRegistros(){
     return;
   }
 
-  const rows = filtered.map(r => {
+  // Admissões mais recentes aparecem primeiro.
+  filtered.sort((a, b) => (b.admissao || '').localeCompare(a.admissao || ''));
+
+  const totalPaginas = Math.max(1, Math.ceil(filtered.length / REGISTROS_POR_PAGINA));
+  if(paginaRegistros > totalPaginas) paginaRegistros = totalPaginas;
+  if(paginaRegistros < 1) paginaRegistros = 1;
+  const inicio = (paginaRegistros - 1) * REGISTROS_POR_PAGINA;
+  const paginaAtualRegistros = filtered.slice(inicio, inicio + REGISTROS_POR_PAGINA);
+
+  const rows = paginaAtualRegistros.map(r => {
     const temMemo = !!(r.memo && r.memo.trim());
     const temOficio = !!(r.oficio && r.oficio.trim());
     const temAutorizacao = !!(r.autorizacao && r.autorizacao.trim());
@@ -2674,8 +2723,74 @@ function renderRegistros(){
         </tr></thead>
         <tbody>${rows}</tbody>
       </table>
+    </div>
+    ${renderPaginacaoRegistros(filtered.length, totalPaginas)}`;
+}
+
+function renderPaginacaoRegistros(totalRegistros, totalPaginas){
+  const inicioExibido = totalRegistros === 0 ? 0 : (paginaRegistros - 1) * REGISTROS_POR_PAGINA + 1;
+  const fimExibido = Math.min(paginaRegistros * REGISTROS_POR_PAGINA, totalRegistros);
+
+  const botoesNumeros = [];
+  for(let p = 1; p <= totalPaginas; p++){
+    botoesNumeros.push(`<button type="button" class="page-btn ${p === paginaRegistros ? 'active' : ''}" onclick="irParaPaginaRegistros(${p})">${p}</button>`);
+  }
+
+  return `
+    <div class="pagination">
+      <div class="pagination-info">Mostrando ${inicioExibido} até ${fimExibido} de ${totalRegistros} registro(s)</div>
+      <div class="pagination-controls">
+        <button type="button" class="page-btn" ${paginaRegistros === 1 ? 'disabled' : ''} onclick="irParaPaginaRegistros(1)">Primeiro</button>
+        <button type="button" class="page-btn" ${paginaRegistros === 1 ? 'disabled' : ''} onclick="irParaPaginaRegistros(${paginaRegistros - 1})">Anterior</button>
+        ${botoesNumeros.join('')}
+        <button type="button" class="page-btn" ${paginaRegistros === totalPaginas ? 'disabled' : ''} onclick="irParaPaginaRegistros(${paginaRegistros + 1})">Próximo</button>
+        <button type="button" class="page-btn" ${paginaRegistros === totalPaginas ? 'disabled' : ''} onclick="irParaPaginaRegistros(${totalPaginas})">Último</button>
+      </div>
     </div>`;
 }
+
+window.irParaPaginaRegistros = function(p){
+  paginaRegistros = p;
+  render();
+};
+
+// --- Paginação genérica (Abertura de Conta, Distrato, Período, Emissões, Indicações) ---
+const PAGINA_ESTADO = { contas: 1, distrato: 1, periodo: 1, emissoes: 1, indicacoes: 1 };
+const REGISTROS_POR_PAGINA_GERAL = 10;
+
+function paginar(lista, prefixo){
+  const totalPaginas = Math.max(1, Math.ceil(lista.length / REGISTROS_POR_PAGINA_GERAL));
+  if(PAGINA_ESTADO[prefixo] > totalPaginas) PAGINA_ESTADO[prefixo] = totalPaginas;
+  if(PAGINA_ESTADO[prefixo] < 1) PAGINA_ESTADO[prefixo] = 1;
+  const pagina = PAGINA_ESTADO[prefixo];
+  const inicio = (pagina - 1) * REGISTROS_POR_PAGINA_GERAL;
+  return { pagina, totalPaginas, itens: lista.slice(inicio, inicio + REGISTROS_POR_PAGINA_GERAL) };
+}
+
+function renderPaginacaoGeral(prefixo, totalRegistros, pagina, totalPaginas){
+  const inicioExibido = totalRegistros === 0 ? 0 : (pagina - 1) * REGISTROS_POR_PAGINA_GERAL + 1;
+  const fimExibido = Math.min(pagina * REGISTROS_POR_PAGINA_GERAL, totalRegistros);
+  const botoesNumeros = [];
+  for(let p = 1; p <= totalPaginas; p++){
+    botoesNumeros.push(`<button type="button" class="page-btn ${p === pagina ? 'active' : ''}" onclick="mudarPaginaGeral('${prefixo}', ${p})">${p}</button>`);
+  }
+  return `
+    <div class="pagination">
+      <div class="pagination-info">Mostrando ${inicioExibido} até ${fimExibido} de ${totalRegistros} registro(s)</div>
+      <div class="pagination-controls">
+        <button type="button" class="page-btn" ${pagina === 1 ? 'disabled' : ''} onclick="mudarPaginaGeral('${prefixo}', 1)">Primeiro</button>
+        <button type="button" class="page-btn" ${pagina === 1 ? 'disabled' : ''} onclick="mudarPaginaGeral('${prefixo}', ${pagina - 1})">Anterior</button>
+        ${botoesNumeros.join('')}
+        <button type="button" class="page-btn" ${pagina === totalPaginas ? 'disabled' : ''} onclick="mudarPaginaGeral('${prefixo}', ${pagina + 1})">Próximo</button>
+        <button type="button" class="page-btn" ${pagina === totalPaginas ? 'disabled' : ''} onclick="mudarPaginaGeral('${prefixo}', ${totalPaginas})">Último</button>
+      </div>
+    </div>`;
+}
+
+window.mudarPaginaGeral = function(prefixo, p){
+  PAGINA_ESTADO[prefixo] = p;
+  render();
+};
 
 function matchesText(r, q){
   const hay = [r.servidor, r.cargo, r.nucleo, r.cpf, r.contrato, r.indicacao].filter(Boolean).join(' ').toLowerCase();
@@ -2700,7 +2815,8 @@ function renderContas(){
     return;
   }
 
-  const rows = filtered.map(r => `
+  const { itens: pagItens, pagina, totalPaginas } = paginar(filtered, 'contas');
+  const rows = pagItens.map(r => `
     <tr data-id="${r.id}">
       <td>
         <div class="servidor-name">${r.servidor || '—'}</div>
@@ -2720,7 +2836,8 @@ function renderContas(){
         <thead><tr><th>Servidor</th><th>Cargo</th><th>CPF</th><th>Nº Ofício</th><th>Salário base</th><th>Banco</th><th>Endereço</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
-    </div>`;
+    </div>
+    ${renderPaginacaoGeral('contas', filtered.length, pagina, totalPaginas)}`;
 }
 
 function renderDistrato(){
@@ -2741,7 +2858,8 @@ function renderDistrato(){
     return;
   }
 
-  const rows = filtered.map(r => `
+  const { itens: pagItensD, pagina: paginaD, totalPaginas: totalPaginasD } = paginar(filtered, 'distrato');
+  const rows = pagItensD.map(r => `
     <tr data-id="${r.id}">
       <td>
         <div class="servidor-name">${r.servidor || '—'}</div>
@@ -2762,7 +2880,8 @@ function renderDistrato(){
         <thead><tr><th>Servidor</th><th>CPF</th><th>RG</th><th>Endereço</th><th>Bairro</th><th>Município</th><th>Data</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
-    </div>`;
+    </div>
+    ${renderPaginacaoGeral('distrato', filtered.length, paginaD, totalPaginasD)}`;
 }
 
 const MESES_ABREV = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
@@ -2813,8 +2932,9 @@ function renderPeriodo(){
   }
 
   const sorted = filtered.slice().sort((a,b) => (a.admissao||'').localeCompare(b.admissao||''));
+  const { itens: pagItensP, pagina: paginaP, totalPaginas: totalPaginasP } = paginar(sorted, 'periodo');
 
-  const rows = sorted.map(r => `
+  const rows = pagItensP.map(r => `
     <tr data-id="${r.id}">
       <td>${r.admissao ? new Date(r.admissao+'T00:00:00').toLocaleDateString('pt-BR') : '—'}</td>
       <td class="servidor-cell"><div class="servidor-name">${r.servidor || '—'}</div></td>
@@ -2836,11 +2956,13 @@ function renderPeriodo(){
         <thead><tr><th>Data</th><th>Servidor</th><th>Cargo/Função</th><th>Núcleo</th><th>Diretor</th><th>Local</th><th>CH</th><th>Observações</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
-    </div>`;
+    </div>
+    ${renderPaginacaoGeral('periodo', sorted.length, paginaP, totalPaginasP)}`;
 }
 
 window.selectMonth = function(idx){
   selectedMonth = idx;
+  PAGINA_ESTADO.periodo = 1;
   render();
 };
 
@@ -2897,7 +3019,9 @@ function renderEmissoes(){
     return;
   }
 
-  const rows = dados.map(d => `
+  const { itens: pagItensE, pagina: paginaE, totalPaginas: totalPaginasE } = paginar(dados, 'emissoes');
+
+  const rows = pagItensE.map(d => `
     <tr>
       <td class="mono">${d.numero}</td>
       <td>${d.tipo}</td>
@@ -2914,13 +3038,15 @@ function renderEmissoes(){
         <thead><tr><th>Nº</th><th>Tipo</th><th>Servidor</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
-    </div>`;
+    </div>
+    ${renderPaginacaoGeral('emissoes', dados.length, paginaE, totalPaginasE)}`;
 }
 
 document.getElementById('emissoesSubTabs').addEventListener('click', (e)=>{
   const btn = e.target.closest('.month-btn');
   if(!btn) return;
   selectedEmissaoTipo = btn.dataset.tipo;
+  PAGINA_ESTADO.emissoes = 1;
   render();
 });
 
@@ -2954,7 +3080,9 @@ function renderIndicacoes(){
     return;
   }
 
-  const rows = filtered.map(r => `
+  const { itens: pagItensI, pagina: paginaI, totalPaginas: totalPaginasI } = paginar(filtered, 'indicacoes');
+
+  const rows = pagItensI.map(r => `
     <tr data-id="${r.id}">
       <td class="wrap-cell">${r.indicacao || '—'}</td>
       <td class="servidor-cell"><div class="servidor-name">${r.servidor || '—'}</div></td>
@@ -2984,10 +3112,11 @@ function renderIndicacoes(){
         </tr></thead>
         <tbody>${rows}</tbody>
       </table>
-    </div>`;
+    </div>
+    ${renderPaginacaoGeral('indicacoes', filtered.length, paginaI, totalPaginasI)}`;
 }
 
-document.getElementById('indicacoesSearchInput').addEventListener('input', render);
+document.getElementById('indicacoesSearchInput').addEventListener('input', ()=>{ PAGINA_ESTADO.indicacoes = 1; render(); });
 
 // Gera um PDF com a RELAÇÃO GERAL de indicações (tabela), respeitando a busca ativa na tela.
 function gerarIndicacoesPDFGeral(){
@@ -3381,10 +3510,10 @@ window.deleteRecord = async function(id){
 };
 
 
-document.getElementById('searchInput').addEventListener('input', render);
-document.getElementById('contasSearchInput').addEventListener('input', render);
-document.getElementById('distratoSearchInput').addEventListener('input', render);
-document.getElementById('periodoSearchInput').addEventListener('input', render);
+document.getElementById('searchInput').addEventListener('input', ()=>{ paginaRegistros = 1; render(); });
+document.getElementById('contasSearchInput').addEventListener('input', ()=>{ PAGINA_ESTADO.contas = 1; render(); });
+document.getElementById('distratoSearchInput').addEventListener('input', ()=>{ PAGINA_ESTADO.distrato = 1; render(); });
+document.getElementById('periodoSearchInput').addEventListener('input', ()=>{ PAGINA_ESTADO.periodo = 1; render(); });
 
 const TABS = {
   registros:  { btn: 'tabRegistros',  toolbar: 'toolbarRegistros',  view: 'table' },
