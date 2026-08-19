@@ -338,6 +338,21 @@
   .combo-option:hover{background:#F2F0E6;}
   .combo-option.selected{background:var(--primary); color:#fff; font-weight:600;}
   .combo-option-empty{padding:12px; font-size:13px; color:var(--muted); text-align:center;}
+
+  .dup-warning{
+    display:none;
+    align-items:flex-start; gap:6px;
+    margin-top:6px;
+    padding:7px 10px;
+    background:#FBEAE7;
+    border:1px solid #E3B5B5;
+    border-radius:6px;
+    color:#8A2A2A;
+    font-size:12px;
+    line-height:1.4;
+  }
+  .dup-warning.show{display:flex;}
+  .field:has(.dup-warning.show) input{border-color:var(--stamp-red) !important;}
   .password-wrap input{padding-right:42px;}
   .toggle-password-btn{
     position:absolute; top:50%; right:5px; transform:translateY(-50%);
@@ -1108,9 +1123,21 @@
         <fieldset>
           <legend>01 · Processo</legend>
           <div class="grid cols-3">
-            <div class="field"><label>Nº Memo</label><input type="text" name="memo" maxlength="4" autocomplete="off"></div>
-            <div class="field"><label>Nº Ofício</label><input type="text" name="oficio" maxlength="4" autocomplete="off"></div>
-            <div class="field"><label>Nº Autorização</label><input type="text" name="autorizacao" maxlength="4" autocomplete="off"></div>
+            <div class="field">
+              <label>Nº Memo</label>
+              <input type="text" name="memo" id="memoInput" maxlength="4" autocomplete="off">
+              <div class="dup-warning" id="memoDupWarning"></div>
+            </div>
+            <div class="field">
+              <label>Nº Ofício</label>
+              <input type="text" name="oficio" id="oficioInput" maxlength="4" autocomplete="off">
+              <div class="dup-warning" id="oficioDupWarning"></div>
+            </div>
+            <div class="field">
+              <label>Nº Autorização</label>
+              <input type="text" name="autorizacao" id="autorizacaoInput" maxlength="4" autocomplete="off">
+              <div class="dup-warning" id="autorizacaoDupWarning"></div>
+            </div>
             <div class="field"><label>Nº Contrato</label><input type="text" name="contrato" id="regContratoInput" placeholder="0000/0000" maxlength="9" autocomplete="off"></div>
             <div class="field"><label>Cód. UO</label><input type="text" name="codUO" autocomplete="off"></div>
             <div class="field"><label>Cód. Local</label><input type="text" name="codLocal" autocomplete="off"></div>
@@ -3320,9 +3347,48 @@ function fecharPerfil(){
   perfilAbertoId = null;
 }
 
+// Avisa em tempo real, assim que a pessoa digita, se aquele número já está em uso
+// em outro registro do mesmo ano (sem precisar clicar em Salvar para descobrir).
+function verificarDuplicidadeAoVivo(inputEl, warningEl, camposParaChecar){
+  const valor = inputEl.value.trim();
+  if(!valor){ warningEl.classList.remove('show'); warningEl.textContent = ''; return; }
+
+  const recordsAnoAtual = recordsDoAno();
+  const duplicado = recordsAnoAtual.find(r =>
+    r.id !== editingId && camposParaChecar.some(campo => (r[campo] || '').trim() === valor)
+  );
+
+  if(duplicado){
+    warningEl.textContent = `⚠ Já existe um cadastro com esse número (${duplicado.servidor || 'sem nome'}).`;
+    warningEl.classList.add('show');
+  }else{
+    warningEl.classList.remove('show');
+    warningEl.textContent = '';
+  }
+}
+
+function configurarAvisoDuplicidade(inputId, warningId, camposParaChecar){
+  const inputEl = document.getElementById(inputId);
+  const warningEl = document.getElementById(warningId);
+  inputEl.addEventListener('input', () => verificarDuplicidadeAoVivo(inputEl, warningEl, camposParaChecar));
+}
+
+configurarAvisoDuplicidade('memoInput', 'memoDupWarning', ['memo']);
+configurarAvisoDuplicidade('oficioInput', 'oficioDupWarning', ['oficio', 'oficioAberturaConta']);
+configurarAvisoDuplicidade('autorizacaoInput', 'autorizacaoDupWarning', ['autorizacao']);
+
+function limparAvisosDuplicidade(){
+  ['memoDupWarning', 'oficioDupWarning', 'autorizacaoDupWarning'].forEach(id => {
+    const el = document.getElementById(id);
+    el.classList.remove('show');
+    el.textContent = '';
+  });
+}
+
 function abrirCadastroParaNovo(){
   editingId = null;
   form.reset();
+  limparAvisosDuplicidade();
   form.situacao.value = 'Ativo';
   setNucleoComboValue('');
   setCargoComboValue('');
@@ -3408,6 +3474,7 @@ window.abrirPerfil = function(id){
 function abrirCadastroParaEditar(id){
   const r = records.find(x=>x.id===id);
   if(!r) return;
+  limparAvisosDuplicidade();
   editingId = id;
   fields.forEach(f => { if(f !== 'diretor' && f !== 'local' && f !== 'cargo' && form[f]) form[f].value = r[f] || ''; });
   setNucleoComboValue(r.nucleo || '');
