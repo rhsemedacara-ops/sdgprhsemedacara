@@ -878,6 +878,37 @@
     background:#F7F6F0;
   }
 
+  .cadastro-foot{
+    display:flex; justify-content:flex-end; gap:10px;
+    margin-top:24px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+  }
+
+  .perfil-modal{max-width:820px;}
+  .perfil-grid{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:16px 28px;
+  }
+  .perfil-item{border-bottom:1px solid var(--line); padding-bottom:10px;}
+  .perfil-item .perfil-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px; letter-spacing:.06em; text-transform:uppercase;
+    color:var(--muted); margin-bottom:4px;
+  }
+  .perfil-item .perfil-value{font-size:14.5px; color:var(--ink); font-weight:600;}
+  .perfil-section-title{
+    grid-column:1 / -1;
+    font-family:'Fraunces', serif;
+    font-size:15px;
+    color:var(--primary-dark);
+    margin:6px 0 -4px;
+    padding-top:10px;
+    border-top:1.5px solid var(--line-strong);
+  }
+  .perfil-section-title:first-child{border-top:none; padding-top:0; margin-top:0;}
+
   .toast{
     position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
     background:var(--primary-dark); color:#fff;
@@ -1058,7 +1089,8 @@
   <div id="appContent">
   <div class="app-shell">
   <nav class="tabs" id="sideTabs">
-    <button class="tab-btn active" id="tabRegistros" type="button">Registros Servidores</button>
+    <button class="tab-btn" id="tabCadastro" type="button">Cadastro</button>
+    <button class="tab-btn active" id="tabRegistros" type="button">Controle Servidores</button>
     <button class="tab-btn" id="tabContas" type="button">Abertura de Conta</button>
     <button class="tab-btn" id="tabDistrato" type="button">Distrato</button>
     <button class="tab-btn" id="tabPeriodo" type="button">Contratações por Período</button>
@@ -1068,99 +1100,10 @@
   </nav>
 
   <div class="main-panel">
-  <div class="toolbar" id="toolbarRegistros">
-    <input type="search" id="searchInput" placeholder="Buscar por nome, CPF, cargo, núcleo, contrato...">
-    <span class="spacer"></span>
-    <span class="count-pill" id="countPill"></span>
-    <button class="btn-ghost" id="exportExcelBtn">Exportar Excel</button>
-    <button class="btn-primary" id="newBtn">+ Novo registro</button>
-  </div>
-
-  <div class="toolbar" id="toolbarContas" style="display:none;">
-    <input type="search" id="contasSearchInput" placeholder="Buscar por nome...">
-    <span class="spacer"></span>
-    <span class="count-pill" id="contasCountPill"></span>
-    <button class="btn-ghost" id="exportContasBtn">Exportar Excel</button>
-  </div>
-
-  <div class="toolbar" id="toolbarDistrato" style="display:none;">
-    <input type="search" id="distratoSearchInput" placeholder="Buscar por nome...">
-    <span class="spacer"></span>
-    <span class="count-pill" id="distratoCountPill"></span>
-    <button class="btn-ghost" id="exportDistratoBtn">Exportar Excel</button>
-  </div>
-
-  <div class="toolbar" id="toolbarPeriodo" style="display:none;">
-    <input type="search" id="periodoSearchInput" placeholder="Buscar por nome...">
-    <span class="spacer"></span>
-    <span class="count-pill" id="periodoCountPill"></span>
-    <button class="btn-ghost" id="exportPeriodoBtn">Exportar Excel</button>
-  </div>
-
-  <div class="table-card" id="tableCard">
-    <div id="tableArea"><div class="loading">Carregando registros…</div></div>
-  </div>
-
-  <div id="dashboardArea" style="display:none;"></div>
-
-  <div id="periodoArea" style="display:none;">
-    <div class="month-tabs" id="monthTabs"></div>
-    <div class="table-card">
-      <div id="periodoTableArea"></div>
-    </div>
-  </div>
-
-  <div class="toolbar" id="toolbarEmissoes" style="display:none;">
-    <span class="spacer"></span>
-    <span class="count-pill" id="emissoesCountPill"></span>
-    <button class="btn-ghost" id="exportEmissoesBtn">Exportar Excel</button>
-  </div>
-
-  <div id="emissoesArea" style="display:none;">
-    <div class="month-tabs" id="emissoesSubTabs" style="margin-top:4px;">
-      <button class="month-btn active" data-tipo="oficios" type="button">Ofícios</button>
-      <button class="month-btn" data-tipo="memorando" type="button">Memorando</button>
-      <button class="month-btn" data-tipo="autorizacao" type="button">Autorização</button>
-    </div>
-    <div class="table-card">
-      <div id="emissoesTableArea"></div>
-    </div>
-  </div>
-
-  <div class="toolbar" id="toolbarIndicacoes" style="display:none;">
-    <input type="search" id="indicacoesSearchInput" placeholder="Buscar pelo nome da indicação...">
-    <span class="spacer"></span>
-    <span class="count-pill" id="indicacoesCountPill"></span>
-    <button class="btn-ghost" id="exportIndicacoesPdfBtn">Baixar PDF</button>
-  </div>
-
-  <div class="table-card" id="tableCardIndicacoes" style="display:none;">
-    <div id="indicacoesTableArea"></div>
-  </div>
-  </div>
-  </div>
-  </div>
-
-  <div id="diagPopup" class="diag-popup">
-    <div class="diag-popup-head">
-      <span>Diagnóstico do sistema</span>
-      <button type="button" id="diagPopupClose" aria-label="Fechar">✕</button>
-    </div>
-    <div class="diag-popup-body">
-      <button type="button" id="diagBtn" class="btn-ghost" style="width:100%;">🔧 Testar conexão com o banco de dados</button>
-      <div id="diagResult"></div>
-    </div>
-  </div>
-</div>
-
-<div class="overlay" id="overlay">
-  <div class="modal">
-    <div class="modal-head">
-      <h2 id="modalTitle">Novo registro</h2>
-      <button class="modal-close" id="closeModal">&times;</button>
-    </div>
-    <div class="modal-body">
-      <form id="recordForm" autocomplete="off">
+  <div id="cadastroArea" style="display:none;">
+    <div class="table-card" style="padding:26px 28px;">
+      <h2 id="cadastroTitulo" style="font-family:'Fraunces',serif;font-size:22px;color:var(--primary-dark);margin:0 0 20px;">Novo registro</h2>
+            <form id="recordForm" autocomplete="off">
 
         <fieldset>
           <legend>01 · Processo</legend>
@@ -1297,12 +1240,111 @@
         </fieldset>
 
       </form>
+
+      <div class="cadastro-foot">
+        <button class="btn-ghost" type="button" id="cancelCadastroBtn">Cancelar</button>
+        <button class="btn-primary" type="button" id="saveBtn">Salvar registro</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toolbar" id="toolbarRegistros">
+    <input type="search" id="searchInput" placeholder="Buscar por nome, CPF, cargo, núcleo, contrato...">
+    <span class="spacer"></span>
+    <span class="count-pill" id="countPill"></span>
+    <button class="btn-ghost" id="exportExcelBtn">Exportar Excel</button>
+  </div>
+
+  <div class="toolbar" id="toolbarContas" style="display:none;">
+    <input type="search" id="contasSearchInput" placeholder="Buscar por nome...">
+    <span class="spacer"></span>
+    <span class="count-pill" id="contasCountPill"></span>
+    <button class="btn-ghost" id="exportContasBtn">Exportar Excel</button>
+  </div>
+
+  <div class="toolbar" id="toolbarDistrato" style="display:none;">
+    <input type="search" id="distratoSearchInput" placeholder="Buscar por nome...">
+    <span class="spacer"></span>
+    <span class="count-pill" id="distratoCountPill"></span>
+    <button class="btn-ghost" id="exportDistratoBtn">Exportar Excel</button>
+  </div>
+
+  <div class="toolbar" id="toolbarPeriodo" style="display:none;">
+    <input type="search" id="periodoSearchInput" placeholder="Buscar por nome...">
+    <span class="spacer"></span>
+    <span class="count-pill" id="periodoCountPill"></span>
+    <button class="btn-ghost" id="exportPeriodoBtn">Exportar Excel</button>
+  </div>
+
+  <div class="table-card" id="tableCard">
+    <div id="tableArea"><div class="loading">Carregando registros…</div></div>
+  </div>
+
+  <div id="dashboardArea" style="display:none;"></div>
+
+  <div id="periodoArea" style="display:none;">
+    <div class="month-tabs" id="monthTabs"></div>
+    <div class="table-card">
+      <div id="periodoTableArea"></div>
+    </div>
+  </div>
+
+  <div class="toolbar" id="toolbarEmissoes" style="display:none;">
+    <span class="spacer"></span>
+    <span class="count-pill" id="emissoesCountPill"></span>
+    <button class="btn-ghost" id="exportEmissoesBtn">Exportar Excel</button>
+  </div>
+
+  <div id="emissoesArea" style="display:none;">
+    <div class="month-tabs" id="emissoesSubTabs" style="margin-top:4px;">
+      <button class="month-btn active" data-tipo="oficios" type="button">Ofícios</button>
+      <button class="month-btn" data-tipo="memorando" type="button">Memorando</button>
+      <button class="month-btn" data-tipo="autorizacao" type="button">Autorização</button>
+    </div>
+    <div class="table-card">
+      <div id="emissoesTableArea"></div>
+    </div>
+  </div>
+
+  <div class="toolbar" id="toolbarIndicacoes" style="display:none;">
+    <input type="search" id="indicacoesSearchInput" placeholder="Buscar pelo nome da indicação...">
+    <span class="spacer"></span>
+    <span class="count-pill" id="indicacoesCountPill"></span>
+    <button class="btn-ghost" id="exportIndicacoesPdfBtn">Baixar PDF</button>
+  </div>
+
+  <div class="table-card" id="tableCardIndicacoes" style="display:none;">
+    <div id="indicacoesTableArea"></div>
+  </div>
+  </div>
+  </div>
+  </div>
+
+  <div id="diagPopup" class="diag-popup">
+    <div class="diag-popup-head">
+      <span>Diagnóstico do sistema</span>
+      <button type="button" id="diagPopupClose" aria-label="Fechar">✕</button>
+    </div>
+    <div class="diag-popup-body">
+      <button type="button" id="diagBtn" class="btn-ghost" style="width:100%;">🔧 Testar conexão com o banco de dados</button>
+      <div id="diagResult"></div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal perfil-modal">
+    <div class="modal-head">
+      <h2 id="modalTitle">Perfil do servidor</h2>
+      <button class="modal-close" id="closeModal">&times;</button>
+    </div>
+    <div class="modal-body" id="perfilBody">
     </div>
     <div class="modal-foot">
-      <button class="btn-danger" id="deleteBtn" type="button" style="display:none;">Excluir registro</button>
+      <button class="btn-danger" id="deleteBtn" type="button">Excluir registro</button>
       <span class="spacer"></span>
-      <button class="btn-ghost" type="button" id="cancelBtn">Cancelar</button>
-      <button class="btn-primary" type="button" id="saveBtn">Salvar registro</button>
+      <button class="btn-ghost" type="button" id="cancelBtn">Fechar</button>
+      <button class="btn-primary" type="button" id="editarViaPerfilBtn">Alterar dados</button>
     </div>
   </div>
 </div>
@@ -1357,6 +1399,7 @@ const auth = firebase.auth();
 const REGISTROS_COL = 'registros';
 let records = [];
 let editingId = null;
+let perfilAbertoId = null;
 let loaded = false;
 let activeTab = 'registros';
 const REGISTROS_POR_PAGINA = 7;
@@ -2704,7 +2747,7 @@ function renderRegistros(){
       <td>${r.ch || '—'}</td>
       <td><span class="status-chip ${statusClass(r.situacao)}">${r.situacao || 'Ativo'}</span></td>
       <td class="row-actions">
-        <button class="btn-ghost btn-small" onclick="openEdit('${r.id}')">Perfil</button>
+        <button class="btn-ghost btn-small" onclick="abrirPerfil('${r.id}')">Perfil</button>
       </td>
     </tr>
   `;
@@ -3286,15 +3329,112 @@ function renderDashboard(){
   `;
 }
 
-function openModal(title, showDelete){
-  document.getElementById('modalTitle').textContent = title;
-  document.getElementById('deleteBtn').style.display = showDelete ? 'inline-block' : 'none';
-  overlay.classList.add('open');
-}
-function closeModal(){
+function fecharPerfil(){
   overlay.classList.remove('open');
-  form.reset();
+  perfilAbertoId = null;
+}
+
+function abrirCadastroParaNovo(){
   editingId = null;
+  form.reset();
+  form.situacao.value = 'Ativo';
+  setNucleoComboValue('');
+  setCargoComboValue('');
+  atualizarSugestoesFuncao();
+  updateDependentFields('', '');
+  toggleSituacaoData();
+  toggleAberturaContaExtra();
+  toggleDistratoExtra();
+  document.getElementById('cadastroTitulo').textContent = 'Novo registro';
+  document.getElementById('saveBtn').textContent = 'Salvar registro';
+  switchTab('cadastro');
+}
+
+window.abrirPerfil = function(id){
+  const r = records.find(x=>x.id===id);
+  if(!r) return;
+  perfilAbertoId = id;
+
+  const fmtData = v => v ? new Date(v+'T00:00:00').toLocaleDateString('pt-BR') : '—';
+  const item = (label, valor) => `
+    <div class="perfil-item">
+      <div class="perfil-label">${label}</div>
+      <div class="perfil-value">${valor || '—'}</div>
+    </div>`;
+  const secao = (titulo) => `<div class="perfil-section-title">${titulo}</div>`;
+
+  let html = '';
+  html += secao('Servidor');
+  html += item('Nome', r.servidor);
+  html += item('CPF', fmtCPF(r.cpf));
+  html += item('Contato', r.contato);
+  html += item('E-mail', r.email);
+
+  html += secao('Cargo e lotação');
+  html += item('Cargo', r.cargo);
+  html += item('Função', r.funcao);
+  html += item('Turno', r.turno);
+  html += item('CH', r.ch);
+  html += item('Núcleo', r.nucleo);
+  html += item('Diretor', r.diretor);
+  html += item('Local', r.local);
+  html += item('Admissão', fmtData(r.admissao));
+
+  html += secao('Processo');
+  html += item('Nº Memo', r.memo);
+  html += item('Nº Ofício', r.oficio);
+  html += item('Nº Autorização', r.autorizacao);
+  html += item('Nº Contrato', r.contrato);
+  html += item('Indicação', r.indicacao);
+
+  html += secao('Situação');
+  html += item('Situação do contrato', r.situacao || 'Ativo');
+  if(SITUACOES_COM_DATA.includes(r.situacao)) html += item(SITUACAO_DATA_LABELS[r.situacao] || 'Data', fmtData(r.situacaoData));
+
+  if(r.aberturaConta === 'Sim'){
+    html += secao('Abertura de conta');
+    html += item('Nº Ofício Abert. Conta', r.oficioAberturaConta);
+    html += item('Salário base', r.salarioBaseAbertura);
+    html += item('Banco', r.bancoAbertura);
+    html += item('Endereço', r.enderecoAbertura);
+  }
+
+  if(r.situacao === 'Distratado(a)'){
+    html += secao('Dados do distrato');
+    html += item('RG', r.distratoRg);
+    html += item('Endereço', r.distratoEndereco);
+    html += item('Nº', r.distratoNumero);
+    html += item('Bairro', r.distratoBairro);
+    html += item('Município', r.distratoMunicipio);
+  }
+
+  if(r.obs){
+    html += secao('Observações');
+    html += `<div class="perfil-item" style="grid-column:1 / -1;"><div class="perfil-value" style="font-weight:400;">${r.obs}</div></div>`;
+  }
+
+  document.getElementById('modalTitle').textContent = r.servidor || 'Perfil do servidor';
+  document.getElementById('perfilBody').innerHTML = `<div class="perfil-grid">${html}</div>`;
+  overlay.classList.add('open');
+};
+
+
+function abrirCadastroParaEditar(id){
+  const r = records.find(x=>x.id===id);
+  if(!r) return;
+  editingId = id;
+  fields.forEach(f => { if(f !== 'diretor' && f !== 'local' && f !== 'cargo' && form[f]) form[f].value = r[f] || ''; });
+  setNucleoComboValue(r.nucleo || '');
+  setCargoComboValue(r.cargo || '');
+  atualizarSugestoesFuncao();
+  updateDependentFields(r.diretor, r.local);
+  toggleSituacaoData();
+  if(form.situacaoData) form.situacaoData.value = r.situacaoData || '';
+  toggleAberturaContaExtra();
+  toggleDistratoExtra();
+  document.getElementById('cadastroTitulo').textContent = 'Editar registro';
+  document.getElementById('saveBtn').textContent = 'Salvar Alterações';
+  switchTab('cadastro');
 }
 
 const SITUACOES_COM_DATA = ['Distratado(a)', 'Finalizado'];
@@ -3340,35 +3480,12 @@ function toggleDistratoExtra(){
   }
 }
 
-document.getElementById('newBtn').addEventListener('click', ()=>{
-  editingId = null;
-  form.reset();
-  form.situacao.value = 'Ativo';
-  setNucleoComboValue('');
-  setCargoComboValue('');
-  atualizarSugestoesFuncao();
-  updateDependentFields('', '');
-  toggleSituacaoData();
-  toggleAberturaContaExtra();
-  toggleDistratoExtra();
-  openModal('Novo registro', false);
-});
 
-window.openEdit = function(id){
-  const r = records.find(x=>x.id===id);
-  if(!r) return;
-  editingId = id;
-  fields.forEach(f => { if(f !== 'diretor' && f !== 'local' && f !== 'cargo' && form[f]) form[f].value = r[f] || ''; });
-  setNucleoComboValue(r.nucleo || '');
-  setCargoComboValue(r.cargo || '');
-  atualizarSugestoesFuncao();
-  updateDependentFields(r.diretor, r.local);
-  toggleSituacaoData();
-  if(form.situacaoData) form.situacaoData.value = r.situacaoData || '';
-  toggleAberturaContaExtra();
-  toggleDistratoExtra();
-  openModal('Editar registro', true);
-};
+document.getElementById('tabCadastro').addEventListener('click', () => {
+  // Só reseta para um registro em branco se não viermos do fluxo "Alterar dados" do Perfil
+  // (esse fluxo já chama abrirCadastroParaEditar diretamente, que também troca de aba).
+  if(!editingId) abrirCadastroParaNovo();
+});
 
 form.nucleo.addEventListener('change', ()=> updateDependentFields('', ''));
 form.nucleo.addEventListener('input', ()=> updateDependentFields('', ''));
@@ -3377,9 +3494,22 @@ form.situacao.addEventListener('change', toggleSituacaoData);
 form.situacao.addEventListener('change', toggleDistratoExtra);
 form.aberturaConta.addEventListener('change', toggleAberturaContaExtra);
 
-document.getElementById('closeModal').addEventListener('click', closeModal);
-document.getElementById('cancelBtn').addEventListener('click', closeModal);
-overlay.addEventListener('click', (e)=>{ if(e.target === overlay) closeModal(); });
+document.getElementById('closeModal').addEventListener('click', fecharPerfil);
+document.getElementById('cancelBtn').addEventListener('click', fecharPerfil);
+overlay.addEventListener('click', (e)=>{ if(e.target === overlay) fecharPerfil(); });
+
+document.getElementById('cancelCadastroBtn').addEventListener('click', () => {
+  editingId = null;
+  form.reset();
+  switchTab('registros');
+});
+
+document.getElementById('editarViaPerfilBtn').addEventListener('click', () => {
+  if(!perfilAbertoId) return;
+  const id = perfilAbertoId;
+  fecharPerfil();
+  abrirCadastroParaEditar(id);
+});
 
 document.getElementById('saveBtn').addEventListener('click', async ()=>{
   if(!form.servidor.value.trim()){
@@ -3476,15 +3606,16 @@ document.getElementById('saveBtn').addEventListener('click', async ()=>{
       data.id = editingId;
       const ok = await salvarRegistro(data);
       if(ok){
-        showSuccessFloat('Registro salvo com sucesso');
-        closeModal();
+        showSuccessFloat('Alterações salvas com sucesso');
+        editingId = null;
+        switchTab('registros');
       }
     }else{
       data.id = (crypto.randomUUID ? crypto.randomUUID() : 'id-' + Date.now() + '-' + Math.random().toString(16).slice(2));
       const ok = await salvarRegistro(data);
       if(ok){
         showSuccessFloat('Registro salvo com sucesso');
-        closeModal();
+        switchTab('registros');
       }
     }
   }finally{
@@ -3494,11 +3625,11 @@ document.getElementById('saveBtn').addEventListener('click', async ()=>{
 });
 
 document.getElementById('deleteBtn').addEventListener('click', async ()=>{
-  if(!editingId) return;
+  if(!perfilAbertoId) return;
   if(!confirm('Excluir este registro definitivamente?')) return;
-  const ok = await excluirRegistro(editingId);
+  const ok = await excluirRegistro(perfilAbertoId);
   if(ok) showToast('Registro excluído.');
-  closeModal();
+  fecharPerfil();
 });
 
 window.deleteRecord = async function(id){
@@ -3516,6 +3647,7 @@ document.getElementById('distratoSearchInput').addEventListener('input', ()=>{ P
 document.getElementById('periodoSearchInput').addEventListener('input', ()=>{ PAGINA_ESTADO.periodo = 1; render(); });
 
 const TABS = {
+  cadastro:   { btn: 'tabCadastro',   toolbar: null,                 view: 'cadastro' },
   registros:  { btn: 'tabRegistros',  toolbar: 'toolbarRegistros',  view: 'table' },
   contas:     { btn: 'tabContas',     toolbar: 'toolbarContas',     view: 'table' },
   distrato:   { btn: 'tabDistrato',   toolbar: 'toolbarDistrato',   view: 'table' },
@@ -3532,6 +3664,7 @@ function switchTab(tabKey){
     if(cfg.toolbar) document.getElementById(cfg.toolbar).style.display = (key === tabKey) ? 'flex' : 'none';
   });
   const cfg = TABS[tabKey];
+  document.getElementById('cadastroArea').style.display = cfg.view === 'cadastro' ? 'block' : 'none';
   document.getElementById('tableCard').style.display = cfg.view === 'table' ? 'block' : 'none';
   document.getElementById('dashboardArea').style.display = cfg.view === 'dashboard' ? 'block' : 'none';
   document.getElementById('periodoArea').style.display = cfg.view === 'periodo' ? 'block' : 'none';
