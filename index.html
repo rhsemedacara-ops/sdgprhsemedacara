@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SDGP Login</title>
+<meta name="description" content="SDGP - Sistema de Gestão Pessoal da Secretaria Municipal de Educação de Acará (SEMED Acará-PA). Controle de servidores temporários, memorandos, ofícios, autorizações e contratos.">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="SDGP RH SEMED - Sistema de Gestão Pessoal">
+<meta property="og:description" content="Sistema de Gestão Pessoal da Secretaria Municipal de Educação de Acará (SEMED Acará-PA).">
+<meta property="og:type" content="website">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTA0IiBoZWlnaHQ9IjEwNCIgdmlld0JveD0iMCAwIDEwNCAxMDQiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDQiIGhlaWdodD0iMTA0IiByeD0iMjQiIGZpbGw9InVybCgjZzIpIi8+CjxyZWN0IHg9IjIwIiB5PSIzMCIgd2lkdGg9IjI2IiBoZWlnaHQ9IjM0IiByeD0iNC41IiBmaWxsPSIjRjZGM0VDIiBvcGFjaXR5PSIuOSIgdHJhbnNmb3JtPSJyb3RhdGUoLTcgMzMgNDcpIi8+CjxyZWN0IHg9IjI1IiB5PSIzOCIgd2lkdGg9IjE1IiBoZWlnaHQ9IjIuNCIgcng9IjEuMiIgZmlsbD0iIzBCNEY0QSIgdHJhbnNmb3JtPSJyb3RhdGUoLTcgMzMgNDcpIi8+CjxyZWN0IHg9IjI1IiB5PSI0NCIgd2lkdGg9IjE1IiBoZWlnaHQ9IjIuNCIgcng9IjEuMiIgZmlsbD0iIzBCNEY0QSIgdHJhbnNmb3JtPSJyb3RhdGUoLTcgMzMgNDcpIi8+CjxyZWN0IHg9IjI1IiB5PSI1MCIgd2lkdGg9IjEwIiBoZWlnaHQ9IjIuNCIgcng9IjEuMiIgZmlsbD0iIzBCNEY0QSIgdHJhbnNmb3JtPSJyb3RhdGUoLTcgMzMgNDcpIi8+CjxjaXJjbGUgY3g9IjY4IiBjeT0iMzgiIHI9IjEwLjUiIGZpbGw9IiNGNkYzRUMiLz4KPHBhdGggZD0iTTQ4IDc2YzAtMTMuNSA5LTIxIDIwLTIxczIwIDcuNSAyMCAyMSIgc3Ryb2tlPSIjRjZGM0VDIiBzdHJva2Utd2lkdGg9IjgiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0ibm9uZSIvPgo8Y2lyY2xlIGN4PSIzMCIgY3k9IjcyIiByPSI5IiBmaWxsPSIjRDRBMDE3IiBzdHJva2U9IiMwQjRGNEEiIHN0cm9rZS13aWR0aD0iMi4yIi8+CjxwYXRoIGQ9Ik0yNiA3MmwyLjggMi44TDM0LjUgNjkiIHN0cm9rZT0iI0Y2RjNFQyIgc3Ryb2tlLXdpZHRoPSIyLjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZmlsbD0ibm9uZSIvPgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJnMiIgeDE9IjAiIHkxPSIwIiB4Mj0iMTA0IiB5Mj0iMTA0IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiMxMjY2NUYiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMEI0RjRBIi8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+Cg==">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -366,6 +371,60 @@
   }
   .toggle-password-btn:hover{color:var(--stamp-red); background:#FBEAE7;}
   .login-btn{width:100%; margin-top:10px; padding:12px; font-size:15px; letter-spacing:.02em;}
+  .login-link-btn{
+    width:100%; margin-top:12px; padding:8px;
+    background:transparent; border:none;
+    color:var(--muted); font-size:12.5px; font-weight:600;
+    text-decoration:underline;
+  }
+  .login-link-btn:hover{color:var(--stamp-red);}
+  .turnstile-widget{
+    background:#FAFAFA;
+    border:1px solid #D5D9DE;
+    border-radius:5px;
+    padding:14px 16px 10px;
+  }
+  .turnstile-row{display:flex; align-items:center; gap:12px;}
+  .turnstile-checkbox{
+    position:relative;
+    width:26px; height:26px; flex:0 0 auto;
+    cursor:pointer;
+  }
+  .turnstile-box{
+    position:absolute; inset:0;
+    border:2px solid #B4BBC4;
+    border-radius:4px;
+    background:#fff;
+    transition:border-color .15s ease, background-color .15s ease;
+  }
+  .turnstile-spinner{
+    position:absolute; inset:4px;
+    border:2.5px solid #E1E4E8;
+    border-top-color:#F38020;
+    border-radius:50%;
+    opacity:0;
+    animation:turnstileSpin .7s linear infinite;
+  }
+  .turnstile-check{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-size:15px; font-weight:700;
+    opacity:0;
+    transition:opacity .15s ease;
+  }
+  @keyframes turnstileSpin{ to{ transform:rotate(360deg); } }
+  .turnstile-checkbox.checking .turnstile-box{border-color:#F38020;}
+  .turnstile-checkbox.checking .turnstile-spinner{opacity:1;}
+  .turnstile-checkbox.verified .turnstile-box{background:#3EA855; border-color:#3EA855;}
+  .turnstile-checkbox.verified .turnstile-check{opacity:1;}
+  .turnstile-text{font-size:13.5px; color:#26282B; font-weight:500;}
+  .turnstile-footer{
+    margin-top:10px;
+    padding-top:8px;
+    border-top:1px solid #E5E8EC;
+    font-size:10px; color:#9AA1AA;
+    letter-spacing:.02em;
+  }
   .login-error{
     background:#FBEAEA;
     color:#8A2A2A;
@@ -1067,8 +1126,8 @@
     <h2>Acesso restrito</h2>
     <p class="login-sub">SDGP · RH SEMED ACARÁ</p>
     <div class="field">
-      <label>E-mail</label>
-      <input type="email" id="loginEmail" required autocomplete="off">
+      <label>Login (CPF ou e-mail)</label>
+      <input type="text" id="loginCpf" required autocomplete="off">
     </div>
     <div class="field">
       <label>Senha</label>
@@ -1079,9 +1138,50 @@
         </button>
       </div>
     </div>
+    <div class="turnstile-widget" id="turnstileWidget">
+      <div class="turnstile-row" id="turnstileRow">
+        <label class="turnstile-checkbox" id="turnstileCheckbox">
+          <span class="turnstile-box"></span>
+          <span class="turnstile-spinner"></span>
+          <span class="turnstile-check">✓</span>
+        </label>
+        <span class="turnstile-text" id="turnstileText">Verifique que você é humano</span>
+      </div>
+      <div class="turnstile-footer">Verificação de segurança</div>
+    </div>
     <div id="loginError" class="login-error" style="display:none;"></div>
     <button type="submit" class="btn-primary login-btn" id="loginSubmitBtn">Entrar</button>
+    <button type="button" class="login-link-btn" id="mostrarCadastroBtn">Ainda não tem login? Criar cadastro</button>
   </form>
+
+  <form id="signupForm" class="login-card" autocomplete="off" style="display:none;">
+    <h2>Criar cadastro</h2>
+    <p class="login-sub">Seu acesso só é liberado após aprovação</p>
+    <div class="field">
+      <label>Nome completo</label>
+      <input type="text" id="signupNome" required autocomplete="off">
+    </div>
+    <div class="field">
+      <label>CPF</label>
+      <input type="text" id="signupCpf" placeholder="000.000.000-00" maxlength="14" required autocomplete="off">
+    </div>
+    <div class="field">
+      <label>Senha</label>
+      <input type="password" id="signupSenha" required autocomplete="off" placeholder="mínimo 6 caracteres">
+    </div>
+    <div id="signupError" class="login-error" style="display:none;"></div>
+    <button type="submit" class="btn-primary login-btn" id="signupSubmitBtn">Criar cadastro</button>
+    <button type="button" class="login-link-btn" id="voltarLoginBtn">Já tenho login? Entrar</button>
+  </form>
+
+  <div id="pendenteScreen" class="login-card" style="display:none; text-align:center;">
+    <h2>Cadastro em análise</h2>
+    <p class="login-sub" style="margin-bottom:6px;">Seu acesso ainda não foi liberado</p>
+    <p style="font-size:13.5px; color:var(--muted); line-height:1.5; margin:14px 0 22px;">
+      Seu cadastro foi criado com sucesso, mas precisa ser autorizado pelo administrador do sistema antes que você possa entrar. Tente novamente mais tarde.
+    </p>
+    <button type="button" class="btn-ghost login-btn" id="sairPendenteBtn">Voltar para o login</button>
+  </div>
 </div>
 
 <div id="topBrandBar" class="top-brand-bar" style="display:none;">
@@ -1135,6 +1235,7 @@
     <a class="tab-btn" id="tabEmissoes" href="#emissoes">Acomp. Emi. Doc's</a>
     <a class="tab-btn" id="tabIndicacoes" href="#indicacoes">Indicações</a>
     <a class="tab-btn" id="tabDashboard" href="#dashboard">Dashboard Geral</a>
+    <a class="tab-btn" id="tabUsuarios" href="#usuarios">Usuários</a>
 
     <div class="session-info">
       <div class="session-info-item">
@@ -1195,7 +1296,11 @@
           </div>
 
           <div class="grid cols-3" id="aberturaContaExtra" style="display:none;margin-top:14px;">
-            <div class="field"><label>Nº Ofício Abert. Conta *</label><input type="text" name="oficioAberturaConta" maxlength="4" autocomplete="off"></div>
+            <div class="field">
+              <label>Nº Ofício Abert. Conta *</label>
+              <input type="text" name="oficioAberturaConta" id="oficioAberturaContaInput" maxlength="4" autocomplete="off">
+              <div class="dup-warning" id="oficioAberturaContaDupWarning"></div>
+            </div>
             <div class="field"><label>Salário base *</label><input type="text" name="salarioBaseAbertura" id="regSalarioAberturaInput" placeholder="0,00" inputmode="decimal" autocomplete="off"></div>
             <div class="field">
               <label>Banco *</label>
@@ -1307,7 +1412,7 @@
       </form>
 
       <div class="cadastro-foot">
-        <button class="btn-ghost" type="button" id="cancelCadastroBtn">Cancelar</button>
+        <button class="btn-ghost" type="button" id="cancelCadastroBtn">Limpar dados</button>
         <button class="btn-primary" type="button" id="saveBtn">Salvar registro</button>
       </div>
     </div>
@@ -1342,6 +1447,34 @@
   </div>
 
   <div id="dashboardArea" style="display:none;"></div>
+
+  <div id="usuariosArea" style="display:none;">
+    <div class="table-card" style="padding:26px 28px; margin-bottom:20px;">
+      <h2 style="font-family:'Fraunces',serif;font-size:20px;color:var(--primary-dark);margin:0 0 18px;">Criar novo usuário</h2>
+      <div class="grid" style="grid-template-columns:repeat(3, minmax(0,1fr));">
+        <div class="field"><label>Nome</label><input type="text" id="novoUsuarioNome" autocomplete="off"></div>
+        <div class="field"><label>CPF</label><input type="text" id="novoUsuarioCpf" placeholder="000.000.000-00" maxlength="14" autocomplete="off"></div>
+        <div class="field"><label>Senha</label><input type="text" id="novoUsuarioSenha" autocomplete="off" placeholder="mínimo 6 caracteres"></div>
+      </div>
+      <div style="margin-top:18px; display:flex; justify-content:flex-end;">
+        <button class="btn-primary" type="button" id="criarUsuarioBtn">Criar usuário</button>
+      </div>
+    </div>
+
+    <div class="table-card" style="margin-bottom:20px;">
+      <div style="padding:18px 22px 0;">
+        <h2 style="font-family:'Fraunces',serif;font-size:18px;color:var(--primary-dark);margin:0;">Usuários cadastrados</h2>
+      </div>
+      <div id="usuariosListaArea" style="padding:14px 22px 22px;"></div>
+    </div>
+
+    <div class="table-card">
+      <div style="padding:18px 22px 0;">
+        <h2 style="font-family:'Fraunces',serif;font-size:18px;color:var(--primary-dark);margin:0;">Histórico de acessos (últimos 50)</h2>
+      </div>
+      <div id="acessosListaArea" style="padding:14px 22px 22px;"></div>
+    </div>
+  </div>
 
   <div id="periodoArea" style="display:none;">
     <div class="month-tabs" id="monthTabs"></div>
@@ -1455,7 +1588,16 @@ try{
   console.error('Não foi possível ajustar as configurações de conexão do Firestore:', e);
 }
 const auth = firebase.auth();
+
+// App secundário do Firebase, usado SÓ para criar novos usuários sem derrubar a
+// sessão de quem está logado (criar um usuário normalmente troca a sessão ativa
+// para o usuário recém-criado — usando uma instância separada, isso não acontece).
+const secondaryApp = firebase.initializeApp(firebaseConfig, 'Secondary');
+const secondaryAuth = secondaryApp.auth();
+
 const REGISTROS_COL = 'registros';
+const USUARIOS_COL = 'usuarios';
+const ACESSOS_COL = 'acessos_log';
 let records = [];
 let editingId = null;
 let perfilAbertoId = null;
@@ -1497,6 +1639,7 @@ function resetarTimersInatividade(){
   inatividadeTimer = setTimeout(() => {
     esconderAvisoInatividade();
     localStorage.removeItem('sdgp_ano_sessao');
+    if(unsubscribeRecords){ unsubscribeRecords(); unsubscribeRecords = null; }
     auth.signOut();
   }, INATIVIDADE_LIMITE_MS);
 }
@@ -1524,7 +1667,12 @@ auth.onAuthStateChanged((user) => {
     }
     updateAppContentVisibility();
     atualizarPainelSessao();
+    document.getElementById('tabUsuarios').style.display = 'none';
     switchTab(tabPelaHash());
+    usuarioEhAdmin(user.uid).then(ehAdmin => {
+      document.getElementById('tabUsuarios').style.display = ehAdmin ? '' : 'none';
+      if(!ehAdmin && activeTab === 'usuarios') switchTab('registros');
+    });
     loadRecords();
     resetarTimersInatividade();
   }else{
@@ -1539,30 +1687,161 @@ auth.onAuthStateChanged((user) => {
   }
 });
 
+// Converte um CPF (só os números) num "e-mail" interno para o Firebase Auth aceitar,
+// já que o Firebase exige formato de e-mail — a pessoa nunca vê nem digita isso.
+function cpfParaEmailInterno(cpf){
+  const digitos = String(cpf || '').replace(/\D/g, '');
+  return `${digitos}@sdgprhsemedacara.login`;
+}
+
+// --- Verificação de humano no estilo Cloudflare Turnstile (visual parecido, checagem própria) ---
+let turnstileVerificado = false;
+function resetarTurnstile(){
+  turnstileVerificado = false;
+  const el = document.getElementById('turnstileCheckbox');
+  el.classList.remove('checking', 'verified');
+  document.getElementById('turnstileText').textContent = 'Verifique que você é humano';
+}
+document.getElementById('turnstileCheckbox').addEventListener('click', () => {
+  const el = document.getElementById('turnstileCheckbox');
+  if(el.classList.contains('checking') || el.classList.contains('verified')) return;
+  el.classList.add('checking');
+  document.getElementById('turnstileText').textContent = 'Verificando...';
+  setTimeout(() => {
+    el.classList.remove('checking');
+    el.classList.add('verified');
+    document.getElementById('turnstileText').textContent = 'Verificado';
+    turnstileVerificado = true;
+  }, 700 + Math.random() * 500);
+});
+resetarTurnstile();
+
+function alternarTelaLogin(tela){
+  loginForm.style.display = tela === 'login' ? 'block' : 'none';
+  document.getElementById('signupForm').style.display = tela === 'signup' ? 'block' : 'none';
+  document.getElementById('pendenteScreen').style.display = tela === 'pendente' ? 'block' : 'none';
+  if(tela === 'login') resetarTurnstile();
+}
+
+document.getElementById('mostrarCadastroBtn').addEventListener('click', () => alternarTelaLogin('signup'));
+document.getElementById('voltarLoginBtn').addEventListener('click', () => alternarTelaLogin('login'));
+document.getElementById('sairPendenteBtn').addEventListener('click', () => alternarTelaLogin('login'));
+
+attachMask(document.getElementById('signupCpf'), maskCPF);
+attachMask(document.getElementById('novoUsuarioCpf'), maskCPF);
+
 loginForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   loginError.style.display = 'none';
-  const email = document.getElementById('loginEmail').value.trim();
+
+  if(!turnstileVerificado){
+    loginError.textContent = 'Confirme a verificação de segurança antes de entrar.';
+    loginError.style.display = 'block';
+    return;
+  }
+
+  const loginDigitado = document.getElementById('loginCpf').value.trim();
   const password = document.getElementById('loginPassword').value;
+  // Aceita tanto CPF (login por conta individual) quanto um e-mail de verdade
+  // (mantém funcionando a conta original, criada direto no Firebase com e-mail real).
+  const emailInterno = loginDigitado.includes('@') ? loginDigitado : cpfParaEmailInterno(loginDigitado);
   loginSubmitBtn.disabled = true;
   loginSubmitBtn.textContent = 'Entrando...';
   try{
-    await auth.signInWithEmailAndPassword(email, password);
+    const cred = await auth.signInWithEmailAndPassword(emailInterno, password);
+    const autorizado = await usuarioEstaAutorizado(cred.user.uid);
+    if(!autorizado){
+      await auth.signOut();
+      alternarTelaLogin('pendente');
+      return;
+    }
+    registrarAcesso(cred.user);
   }catch(err){
-    let msg = 'Não foi possível entrar. Verifique e-mail e senha.';
+    let msg = 'Não foi possível entrar. Verifique o CPF e a senha.';
     if(err && (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found')){
-      msg = 'E-mail ou senha incorretos.';
+      msg = 'CPF ou senha incorretos.';
     }
     loginError.textContent = msg;
     loginError.style.display = 'block';
+    resetarTurnstile();
   }finally{
     loginSubmitBtn.disabled = false;
     loginSubmitBtn.textContent = 'Entrar';
   }
 });
 
+document.getElementById('signupForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const signupError = document.getElementById('signupError');
+  signupError.style.display = 'none';
+
+  const nome = document.getElementById('signupNome').value.trim();
+  const cpf = document.getElementById('signupCpf').value.trim();
+  const senha = document.getElementById('signupSenha').value;
+
+  if(!nome || !cpf || !senha){
+    signupError.textContent = 'Preencha nome, CPF e senha.';
+    signupError.style.display = 'block';
+    return;
+  }
+  if(senha.length < 6){
+    signupError.textContent = 'A senha precisa ter pelo menos 6 caracteres.';
+    signupError.style.display = 'block';
+    return;
+  }
+
+  const btn = document.getElementById('signupSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+  try{
+    const emailInterno = cpfParaEmailInterno(cpf);
+    const cred = await secondaryAuth.createUserWithEmailAndPassword(emailInterno, senha);
+    await secondaryAuth.signOut();
+    await db.collection(USUARIOS_COL).doc(cred.user.uid).set({
+      nome, cpf, email: emailInterno,
+      autorizado: false,
+      criadoEm: Date.now(),
+      criadoPor: 'autocadastro'
+    });
+    alternarTelaLogin('pendente');
+  }catch(err){
+    let msg = 'Não foi possível criar o cadastro.';
+    if(err && err.code === 'auth/email-already-in-use') msg = 'Já existe um cadastro com esse CPF.';
+    signupError.textContent = msg;
+    signupError.style.display = 'block';
+  }finally{
+    btn.disabled = false;
+    btn.textContent = 'Criar cadastro';
+  }
+});
+
+// Verifica se um usuário pode entrar. Contas sem documento em "usuarios" (criadas
+// direto no Firebase Console, como a conta original) são tratadas como já autorizadas.
+async function usuarioEstaAutorizado(uid){
+  try{
+    const doc = await db.collection(USUARIOS_COL).doc(uid).get();
+    if(!doc.exists) return true;
+    return doc.data().autorizado === true;
+  }catch(e){
+    console.error('Não foi possível verificar autorização:', e);
+    return true; // falha aberta pra não travar o admin fora do ar por causa de erro de rede
+  }
+}
+
+// Só quem NÃO tem documento em "usuarios" (conta criada direto no Firebase) é
+// considerado administrador, com acesso à aba "Usuários".
+async function usuarioEhAdmin(uid){
+  try{
+    const doc = await db.collection(USUARIOS_COL).doc(uid).get();
+    return !doc.exists;
+  }catch(e){
+    return false;
+  }
+}
+
 document.getElementById('logoutBtn').addEventListener('click', () => {
   localStorage.removeItem('sdgp_ano_sessao');
+  if(unsubscribeRecords){ unsubscribeRecords(); unsubscribeRecords = null; }
   auth.signOut();
 });
 
@@ -1573,6 +1852,47 @@ function anoEstaLiberado(ano){
   const hoje = new Date();
   const inicioDoAno = new Date(parseInt(ano, 10), 0, 1); // 1º de janeiro do ano, 00:00
   return hoje >= inicioDoAno;
+}
+
+// Registra no histórico cada vez que alguém efetivamente faz login (não conta
+// aberturas de novas guias com a sessão já ativa, só o login "de verdade").
+function registrarAcesso(user){
+  db.collection(USUARIOS_COL).doc(user.uid).get().then(doc => {
+    const nome = doc.exists ? (doc.data().nome || user.email) : (usuarioAtual && usuarioAtual.email === user.email ? 'Administrador' : user.email);
+    db.collection(ACESSOS_COL).add({
+      uid: user.uid,
+      email: user.email,
+      nome,
+      quando: Date.now(),
+      dataHora: new Date().toISOString()
+    }).catch(e => console.error('Não foi possível registrar o acesso:', e));
+  }).catch(() => {
+    db.collection(ACESSOS_COL).add({
+      uid: user.uid,
+      email: user.email,
+      nome: 'Administrador',
+      quando: Date.now(),
+      dataHora: new Date().toISOString()
+    }).catch(e => console.error('Não foi possível registrar o acesso:', e));
+  });
+}
+
+// Cria um novo usuário (login individual) sem derrubar a sessão de quem está criando,
+// usando uma instância separada do Firebase só para essa chamada.
+async function criarNovoUsuario(nome, cpf, senha){
+  const emailInterno = cpfParaEmailInterno(cpf);
+  const cred = await secondaryAuth.createUserWithEmailAndPassword(emailInterno, senha);
+  const uid = cred.user.uid;
+  await secondaryAuth.signOut();
+  await db.collection(USUARIOS_COL).doc(uid).set({
+    nome,
+    cpf,
+    email: emailInterno,
+    autorizado: true,
+    criadoEm: Date.now(),
+    criadoPor: usuarioAtual ? usuarioAtual.email : ''
+  });
+  return uid;
 }
 
 function atualizarPainelSessao(){
@@ -2754,6 +3074,7 @@ function render(){
   if(activeTab === 'emissoes') return renderEmissoes();
   if(activeTab === 'indicacoes') return renderIndicacoes();
   if(activeTab === 'dashboard') return renderDashboard();
+  if(activeTab === 'usuarios') return renderUsuarios();
   return renderRegistros();
 }
 
@@ -3408,6 +3729,100 @@ function renderDashboard(){
   `;
 }
 
+function renderUsuarios(){
+  const listaArea = document.getElementById('usuariosListaArea');
+  const acessosArea = document.getElementById('acessosListaArea');
+  listaArea.innerHTML = '<div class="loading">Carregando…</div>';
+  acessosArea.innerHTML = '<div class="loading">Carregando…</div>';
+
+  db.collection(USUARIOS_COL).orderBy('criadoEm', 'desc').get().then(snap => {
+    if(snap.empty){
+      listaArea.innerHTML = '<div class="empty-state">Nenhum usuário criado por aqui ainda.</div>';
+      return;
+    }
+    const rows = snap.docs.map(doc => {
+      const u = doc.data();
+      const autorizado = u.autorizado === true;
+      return `<tr>
+        <td><div class="servidor-name">${u.nome || '—'}</div></td>
+        <td class="mono">${u.cpf || '—'}</td>
+        <td>${u.criadoEm ? new Date(u.criadoEm).toLocaleString('pt-BR') : '—'}</td>
+        <td class="mono">${u.criadoPor || '—'}</td>
+        <td><span class="status-chip status-${autorizado ? 'Ativo' : 'Finalizado'}">${autorizado ? 'Autorizado' : 'Pendente'}</span></td>
+        <td class="row-actions">
+          <button class="btn-ghost btn-small" onclick="alternarAutorizacaoUsuario('${doc.id}', ${!autorizado})">${autorizado ? 'Revogar' : 'Autorizar'}</button>
+        </td>
+      </tr>`;
+    }).join('');
+    listaArea.innerHTML = `<div class="table-scroll"><table><thead><tr><th>Nome</th><th>CPF</th><th>Criado em</th><th>Criado por</th><th>Status</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  }).catch(e => {
+    console.error(e);
+    listaArea.innerHTML = '<div class="empty-state">Não foi possível carregar os usuários.</div>';
+  });
+
+  db.collection(ACESSOS_COL).orderBy('quando', 'desc').limit(50).get().then(snap => {
+    if(snap.empty){
+      acessosArea.innerHTML = '<div class="empty-state">Nenhum acesso registrado ainda.</div>';
+      return;
+    }
+    const rows = snap.docs.map(doc => {
+      const a = doc.data();
+      return `<tr>
+        <td class="mono">${a.nome || a.email || '—'}</td>
+        <td>${a.quando ? new Date(a.quando).toLocaleString('pt-BR') : '—'}</td>
+      </tr>`;
+    }).join('');
+    acessosArea.innerHTML = `<div class="table-scroll"><table><thead><tr><th>Quem acessou</th><th>Data/Hora do acesso</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  }).catch(e => {
+    console.error(e);
+    acessosArea.innerHTML = '<div class="empty-state">Não foi possível carregar o histórico de acessos.</div>';
+  });
+}
+
+window.alternarAutorizacaoUsuario = async function(uid, novoValor){
+  try{
+    await db.collection(USUARIOS_COL).doc(uid).update({ autorizado: novoValor });
+    showToast(novoValor ? 'Usuário autorizado.' : 'Acesso do usuário revogado.');
+    renderUsuarios();
+  }catch(e){
+    console.error(e);
+    showToast('Não foi possível atualizar a autorização.');
+  }
+};
+
+document.getElementById('criarUsuarioBtn').addEventListener('click', async () => {
+  const nome = document.getElementById('novoUsuarioNome').value.trim();
+  const cpf = document.getElementById('novoUsuarioCpf').value.trim();
+  const senha = document.getElementById('novoUsuarioSenha').value;
+
+  if(!nome || !cpf || !senha){ showToast('Preencha nome, CPF e senha.'); return; }
+  if(senha.length < 6){ showToast('A senha precisa ter pelo menos 6 caracteres.'); return; }
+
+  const btn = document.getElementById('criarUsuarioBtn');
+  btn.disabled = true;
+  const textoOriginal = btn.textContent;
+  btn.textContent = 'Criando...';
+
+  try{
+    await criarNovoUsuario(nome, cpf, senha);
+    showSuccessFloat('Usuário criado com sucesso');
+    document.getElementById('novoUsuarioNome').value = '';
+    document.getElementById('novoUsuarioCpf').value = '';
+    document.getElementById('novoUsuarioSenha').value = '';
+    renderUsuarios();
+  }catch(e){
+    console.error('Erro ao criar usuário:', e);
+    let msg = 'Erro ao criar usuário.';
+    if(e && e.code === 'auth/email-already-in-use') msg = 'Esse e-mail já está cadastrado.';
+    if(e && e.code === 'auth/invalid-email') msg = 'E-mail inválido.';
+    if(e && e.code === 'auth/weak-password') msg = 'Senha muito fraca (mínimo 6 caracteres).';
+    showToast(msg, 5000);
+  }finally{
+    btn.disabled = false;
+    btn.textContent = textoOriginal;
+  }
+});
+
 function fecharPerfil(){
   overlay.classList.remove('open');
   perfilAbertoId = null;
@@ -3442,9 +3857,10 @@ function configurarAvisoDuplicidade(inputId, warningId, camposParaChecar){
 configurarAvisoDuplicidade('memoInput', 'memoDupWarning', ['memo']);
 configurarAvisoDuplicidade('oficioInput', 'oficioDupWarning', ['oficio', 'oficioAberturaConta']);
 configurarAvisoDuplicidade('autorizacaoInput', 'autorizacaoDupWarning', ['autorizacao']);
+configurarAvisoDuplicidade('oficioAberturaContaInput', 'oficioAberturaContaDupWarning', ['oficio', 'oficioAberturaConta']);
 
 function limparAvisosDuplicidade(){
-  ['memoDupWarning', 'oficioDupWarning', 'autorizacaoDupWarning'].forEach(id => {
+  ['memoDupWarning', 'oficioDupWarning', 'autorizacaoDupWarning', 'oficioAberturaContaDupWarning'].forEach(id => {
     const el = document.getElementById(id);
     el.classList.remove('show');
     el.textContent = '';
@@ -3618,9 +4034,8 @@ document.getElementById('cancelBtn').addEventListener('click', fecharPerfil);
 overlay.addEventListener('click', (e)=>{ if(e.target === overlay) fecharPerfil(); });
 
 document.getElementById('cancelCadastroBtn').addEventListener('click', () => {
-  editingId = null;
-  form.reset();
-  switchTab('registros');
+  abrirCadastroParaNovo();
+  showToast('Dados do formulário limpos.');
 });
 
 document.getElementById('editarViaPerfilBtn').addEventListener('click', () => {
@@ -3773,7 +4188,8 @@ const TABS = {
   periodo:    { btn: 'tabPeriodo',    toolbar: 'toolbarPeriodo',    view: 'periodo' },
   emissoes:   { btn: 'tabEmissoes',   toolbar: 'toolbarEmissoes',   view: 'emissoes' },
   indicacoes: { btn: 'tabIndicacoes', toolbar: 'toolbarIndicacoes', view: 'indicacoes' },
-  dashboard:  { btn: 'tabDashboard',  toolbar: null,                 view: 'dashboard' }
+  dashboard:  { btn: 'tabDashboard',  toolbar: null,                 view: 'dashboard' },
+  usuarios:   { btn: 'tabUsuarios',   toolbar: null,                 view: 'usuarios' }
 };
 
 function switchTab(tabKey){
@@ -3789,6 +4205,7 @@ function switchTab(tabKey){
   document.getElementById('periodoArea').style.display = cfg.view === 'periodo' ? 'block' : 'none';
   document.getElementById('emissoesArea').style.display = cfg.view === 'emissoes' ? 'block' : 'none';
   document.getElementById('tableCardIndicacoes').style.display = cfg.view === 'indicacoes' ? 'block' : 'none';
+  document.getElementById('usuariosArea').style.display = cfg.view === 'usuarios' ? 'block' : 'none';
   if(location.hash !== '#' + tabKey){
     history.replaceState(null, '', '#' + tabKey);
   }
