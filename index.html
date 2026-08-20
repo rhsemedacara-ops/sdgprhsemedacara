@@ -1846,7 +1846,17 @@ async function criarNovoUsuario(nome, cpf, senha){
 function atualizarPainelSessao(){
   const elUsuario = document.getElementById('sessaoUsuario');
   if(!elUsuario) return;
-  elUsuario.textContent = usuarioAtual ? usuarioAtual.email : '—';
+
+  if(usuarioAtual){
+    elUsuario.textContent = 'Carregando...';
+    db.collection(USUARIOS_COL).doc(usuarioAtual.uid).get().then(doc => {
+      elUsuario.textContent = doc.exists && doc.data().nome ? doc.data().nome : 'Administrador';
+    }).catch(() => {
+      elUsuario.textContent = usuarioAtual.email || '—';
+    });
+  }else{
+    elUsuario.textContent = '—';
+  }
 
   const elUltimoLogin = document.getElementById('sessaoUltimoLogin');
   const lastSignIn = usuarioAtual && usuarioAtual.metadata && usuarioAtual.metadata.lastSignInTime;
