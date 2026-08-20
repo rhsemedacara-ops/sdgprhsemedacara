@@ -13,6 +13,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <style>
   :root{
     --paper:#F2F2F2;
@@ -378,53 +379,6 @@
     text-decoration:underline;
   }
   .login-link-btn:hover{color:var(--stamp-red);}
-  .turnstile-widget{
-    background:#FAFAFA;
-    border:1px solid #D5D9DE;
-    border-radius:5px;
-    padding:14px 16px 10px;
-  }
-  .turnstile-row{display:flex; align-items:center; gap:12px;}
-  .turnstile-checkbox{
-    position:relative;
-    width:26px; height:26px; flex:0 0 auto;
-    cursor:pointer;
-  }
-  .turnstile-box{
-    position:absolute; inset:0;
-    border:2px solid #B4BBC4;
-    border-radius:4px;
-    background:#fff;
-    transition:border-color .15s ease, background-color .15s ease;
-  }
-  .turnstile-spinner{
-    position:absolute; inset:4px;
-    border:2.5px solid #E1E4E8;
-    border-top-color:#F38020;
-    border-radius:50%;
-    opacity:0;
-    animation:turnstileSpin .7s linear infinite;
-  }
-  .turnstile-check{
-    position:absolute; inset:0;
-    display:flex; align-items:center; justify-content:center;
-    color:#fff; font-size:15px; font-weight:700;
-    opacity:0;
-    transition:opacity .15s ease;
-  }
-  @keyframes turnstileSpin{ to{ transform:rotate(360deg); } }
-  .turnstile-checkbox.checking .turnstile-box{border-color:#F38020;}
-  .turnstile-checkbox.checking .turnstile-spinner{opacity:1;}
-  .turnstile-checkbox.verified .turnstile-box{background:#3EA855; border-color:#3EA855;}
-  .turnstile-checkbox.verified .turnstile-check{opacity:1;}
-  .turnstile-text{font-size:13.5px; color:#26282B; font-weight:500;}
-  .turnstile-footer{
-    margin-top:10px;
-    padding-top:8px;
-    border-top:1px solid #E5E8EC;
-    font-size:10px; color:#9AA1AA;
-    letter-spacing:.02em;
-  }
   .login-error{
     background:#FBEAEA;
     color:#8A2A2A;
@@ -1138,16 +1092,8 @@
         </button>
       </div>
     </div>
-    <div class="turnstile-widget" id="turnstileWidget">
-      <div class="turnstile-row" id="turnstileRow">
-        <label class="turnstile-checkbox" id="turnstileCheckbox">
-          <span class="turnstile-box"></span>
-          <span class="turnstile-spinner"></span>
-          <span class="turnstile-check">✓</span>
-        </label>
-        <span class="turnstile-text" id="turnstileText">Verifique que você é humano</span>
-      </div>
-      <div class="turnstile-footer">Verificação de segurança</div>
+    <div id="turnstileContainer" style="margin:4px 0;">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAEW6rCsOSVmCF1lR" data-callback="onTurnstileSuccess" data-expired-callback="onTurnstileExpired" data-error-callback="onTurnstileExpired"></div>
     </div>
     <div id="loginError" class="login-error" style="display:none;"></div>
     <button type="submit" class="btn-primary login-btn" id="loginSubmitBtn">Entrar</button>
@@ -1694,27 +1640,27 @@ function cpfParaEmailInterno(cpf){
   return `${digitos}@sdgprhsemedacara.login`;
 }
 
-// --- Verificação de humano no estilo Cloudflare Turnstile (visual parecido, checagem própria) ---
+// --- Cloudflare Turnstile de verdade (o widget se desenha sozinho via data-sitekey) ---
 let turnstileVerificado = false;
+let turnstileToken = null;
+
+// Chamadas pelo próprio script do Cloudflare quando o desafio é resolvido/expira.
+window.onTurnstileSuccess = function(token){
+  turnstileVerificado = true;
+  turnstileToken = token;
+};
+window.onTurnstileExpired = function(){
+  turnstileVerificado = false;
+  turnstileToken = null;
+};
+
 function resetarTurnstile(){
   turnstileVerificado = false;
-  const el = document.getElementById('turnstileCheckbox');
-  el.classList.remove('checking', 'verified');
-  document.getElementById('turnstileText').textContent = 'Verifique que você é humano';
+  turnstileToken = null;
+  if(window.turnstile){
+    try{ window.turnstile.reset(); }catch(e){ /* widget ainda não carregou, sem problema */ }
+  }
 }
-document.getElementById('turnstileCheckbox').addEventListener('click', () => {
-  const el = document.getElementById('turnstileCheckbox');
-  if(el.classList.contains('checking') || el.classList.contains('verified')) return;
-  el.classList.add('checking');
-  document.getElementById('turnstileText').textContent = 'Verificando...';
-  setTimeout(() => {
-    el.classList.remove('checking');
-    el.classList.add('verified');
-    document.getElementById('turnstileText').textContent = 'Verificado';
-    turnstileVerificado = true;
-  }, 700 + Math.random() * 500);
-});
-resetarTurnstile();
 
 function alternarTelaLogin(tela){
   loginForm.style.display = tela === 'login' ? 'block' : 'none';
