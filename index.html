@@ -1548,6 +1548,7 @@ let records = [];
 let editingId = null;
 let perfilAbertoId = null;
 let usuarioAtual = null;
+let souAdminAtual = false;
 let loaded = false;
 let activeTab = 'registros';
 const REGISTROS_POR_PAGINA = 7;
@@ -1616,6 +1617,7 @@ auth.onAuthStateChanged((user) => {
     document.getElementById('tabUsuarios').style.display = 'none';
     switchTab(tabPelaHash());
     usuarioEhAdmin(user.uid).then(ehAdmin => {
+      souAdminAtual = ehAdmin;
       document.getElementById('tabUsuarios').style.display = ehAdmin ? '' : 'none';
       if(!ehAdmin && activeTab === 'usuarios') switchTab('registros');
     });
@@ -4139,6 +4141,7 @@ const TABS = {
 };
 
 function switchTab(tabKey){
+  if(tabKey === 'usuarios' && !souAdminAtual) tabKey = 'registros';
   activeTab = tabKey;
   Object.entries(TABS).forEach(([key, cfg])=>{
     document.getElementById(cfg.btn).classList.toggle('active', key === tabKey);
