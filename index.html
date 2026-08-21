@@ -412,6 +412,22 @@
     grid-template-columns:repeat(auto-fill, minmax(210px, 1fr));
     gap:10px 20px;
   }
+  .historico-pessoa-bloco{
+    border:1px solid var(--line);
+    border-radius:var(--r-md);
+    margin-bottom:16px;
+    overflow:hidden;
+  }
+  .historico-pessoa-bloco:last-child{margin-bottom:0;}
+  .historico-pessoa-nome{
+    font-family:'Fraunces', serif;
+    font-size:14.5px;
+    color:var(--primary-dark);
+    background:#F7F6F0;
+    padding:10px 16px;
+    border-bottom:1px solid var(--line);
+    display:flex; align-items:center;
+  }
   .perm-toggle-row{display:flex; align-items:center; gap:10px; cursor:pointer;}
   .perm-toggle-label{font-size:13px; color:var(--ink);}
   .toggle-switch{
@@ -4112,39 +4128,51 @@ function renderUsuarios(){
     listaArea.innerHTML = '<div class="empty-state">Não foi possível carregar os usuários.</div>';
   });
 
-  db.collection(ACESSOS_COL).orderBy('quando', 'desc').limit(50).get().then(snap => {
+  db.collection(ACESSOS_COL).orderBy('quando', 'desc').limit(200).get().then(snap => {
     if(snap.empty){
       acessosArea.innerHTML = '<div class="empty-state">Nenhum acesso registrado ainda.</div>';
       return;
     }
-    const rows = snap.docs.map(doc => {
+    const porPessoa = new Map();
+    snap.docs.forEach(doc => {
       const a = doc.data();
-      return `<tr>
-        <td class="mono">${a.nome || a.email || '—'}</td>
-        <td>${a.quando ? new Date(a.quando).toLocaleString('pt-BR') : '—'}</td>
-      </tr>`;
-    }).join('');
-    acessosArea.innerHTML = `<div class="table-scroll"><table><thead><tr><th>Quem acessou</th><th>Data/Hora do acesso</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+      const chave = a.nome || a.email || '—';
+      if(!porPessoa.has(chave)) porPessoa.set(chave, []);
+      porPessoa.get(chave).push(a);
+    });
+    acessosArea.innerHTML = [...porPessoa.entries()].map(([nome, lista]) => `
+      <div class="historico-pessoa-bloco">
+        <div class="historico-pessoa-nome">${nome} <span class="count-pill" style="margin-left:6px;">${lista.length}</span></div>
+        <div class="table-scroll">
+          <table><thead><tr><th>Data/Hora do acesso</th></tr></thead>
+          <tbody>${lista.map(a => `<tr><td>${a.quando ? new Date(a.quando).toLocaleString('pt-BR') : '—'}</td></tr>`).join('')}</tbody></table>
+        </div>
+      </div>`).join('');
   }).catch(e => {
     console.error(e);
     acessosArea.innerHTML = '<div class="empty-state">Não foi possível carregar o histórico de acessos.</div>';
   });
 
-  db.collection(ATIVIDADES_COL).orderBy('quando', 'desc').limit(80).get().then(snap => {
+  db.collection(ATIVIDADES_COL).orderBy('quando', 'desc').limit(300).get().then(snap => {
     if(snap.empty){
       atividadesArea.innerHTML = '<div class="empty-state">Nenhuma atividade registrada ainda.</div>';
       return;
     }
-    const rows = snap.docs.map(doc => {
+    const porPessoa = new Map();
+    snap.docs.forEach(doc => {
       const a = doc.data();
-      return `<tr>
-        <td class="mono">${a.nome || '—'}</td>
-        <td>${a.acao || '—'}</td>
-        <td class="wrap-cell">${a.detalhe || '—'}</td>
-        <td>${a.quando ? new Date(a.quando).toLocaleString('pt-BR') : '—'}</td>
-      </tr>`;
-    }).join('');
-    atividadesArea.innerHTML = `<div class="table-scroll"><table><thead><tr><th>Quem</th><th>Ação</th><th>Registro afetado</th><th>Quando</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+      const chave = a.nome || '—';
+      if(!porPessoa.has(chave)) porPessoa.set(chave, []);
+      porPessoa.get(chave).push(a);
+    });
+    atividadesArea.innerHTML = [...porPessoa.entries()].map(([nome, lista]) => `
+      <div class="historico-pessoa-bloco">
+        <div class="historico-pessoa-nome">${nome} <span class="count-pill" style="margin-left:6px;">${lista.length}</span></div>
+        <div class="table-scroll">
+          <table><thead><tr><th>Ação</th><th>Registro afetado</th><th>Quando</th></tr></thead>
+          <tbody>${lista.map(a => `<tr><td>${a.acao || '—'}</td><td class="wrap-cell">${a.detalhe || '—'}</td><td>${a.quando ? new Date(a.quando).toLocaleString('pt-BR') : '—'}</td></tr>`).join('')}</tbody></table>
+        </div>
+      </div>`).join('');
   }).catch(e => {
     console.error(e);
     atividadesArea.innerHTML = '<div class="empty-state">Não foi possível carregar o histórico de atividades.</div>';
@@ -4316,6 +4344,18 @@ window.abrirPerfil = function(id){
   html += item('Diretor', r.diretor);
   html += item('Local', r.local);
   html += item('Admissão', fmtData(r.admissao));
+
+  const VINCULO_LABELS = { TEMPORARIO: 'Temporário', CONCURSADO: 'Concursado', EFETIVO: 'Efetivo', ESTAVEL: 'Estável', NOMEADO: 'Nomeado' };
+  if(r.vinculo){
+    html += secao('Vínculo');
+    html += item('Tipo de vínculo', VINCULO_LABELS[r.vinculo] || r.vinculo);
+    if(r.vinculo === 'CONCURSADO') html += item('Concurso', r.vinculoConcurso);
+    if(r.vinculo === 'ESTAVEL') html += item('Situação de estabilidade', r.vinculoEstavel);
+    if(r.vinculo === 'EFETIVO' || r.vinculo === 'NOMEADO'){
+      html += item('Portaria Nº', r.vinculoPortariaNumero);
+      html += item('Data da portaria', fmtData(r.vinculoPortariaData));
+    }
+  }
 
   html += secao('Processo');
   html += item('Nº Memo', r.memo);
