@@ -413,6 +413,18 @@
     grid-template-columns:repeat(auto-fill, minmax(210px, 1fr));
     gap:10px 20px;
   }
+  .pre-card{
+    display:flex; align-items:center; gap:14px;
+    padding:12px 14px;
+    border:1px solid var(--line);
+    border-radius:var(--r-md);
+    margin-bottom:10px;
+    background:var(--surface);
+  }
+  .pre-card:last-child{margin-bottom:0;}
+  .pre-card-info{flex:1; min-width:0;}
+  .pre-card-detalhe{font-size:12px; color:var(--muted); margin-top:2px;}
+
   .historico-pessoa-bloco{
     border:1px solid var(--line);
     border-radius:var(--r-md);
@@ -1318,6 +1330,7 @@
   <div class="app-shell">
   <nav class="tabs" id="sideTabs">
     <a class="tab-btn" id="tabCadastro" href="#cadastro">Cadastro</a>
+    <a class="tab-btn" id="tabPrecadastro" href="#precadastro">Pré-cadastro</a>
     <a class="tab-btn active" id="tabRegistros" href="#registros">Controle Servidores</a>
     <a class="tab-btn" id="tabContas" href="#contas">Abertura de Conta</a>
     <a class="tab-btn" id="tabDistrato" href="#distrato">Distrato</a>
@@ -1586,6 +1599,50 @@
     </div>
   </div>
 
+  <div id="precadastroArea" style="display:none;">
+    <div class="table-card" style="padding:26px 28px; margin-bottom:20px;">
+      <h2 style="font-family:'Fraunces',serif;font-size:22px;color:var(--primary-dark);margin:0 0 6px;">Novo pré-cadastro</h2>
+      <p style="font-size:13px;color:var(--muted);margin:0 0 20px;">Preenchido durante a entrevista. Depois, alguém da equipe completa o restante das informações e dá andamento à contratação.</p>
+      <div class="grid" style="grid-template-columns:repeat(2, minmax(0,1fr));">
+        <div class="field full"><label>Nome completo *</label><input type="text" id="preNome" autocomplete="off"></div>
+        <div class="field combo-field">
+          <label>Núcleo *</label>
+          <div class="combo" id="preNucleoCombo">
+            <button type="button" class="combo-toggle" id="preNucleoComboToggle">
+              <span id="preNucleoComboLabel" class="combo-toggle-label placeholder">Selecione o núcleo...</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <input type="hidden" id="preNucleoInput">
+            <div class="combo-panel" id="preNucleoComboPanel">
+              <input type="text" class="combo-search" id="preNucleoComboSearch" placeholder="Buscar núcleo..." autocomplete="off">
+              <div class="combo-list" id="preNucleoComboList"></div>
+            </div>
+          </div>
+        </div>
+        <div class="field"><label>Local *</label><input type="text" id="preLocal" autocomplete="off"></div>
+        <div class="field"><label>Data de admissão *</label><input type="date" id="preAdmissao" autocomplete="off"></div>
+        <div class="field full">
+          <label>Foto</label>
+          <input type="file" id="preFoto" accept="image/*" capture="environment">
+          <div id="preFotoPreviewWrap" style="display:none; margin-top:10px;">
+            <img id="preFotoPreview" style="width:96px; height:96px; object-fit:cover; border-radius:10px; border:1px solid var(--line-strong);">
+          </div>
+        </div>
+      </div>
+      <div class="cadastro-foot">
+        <button class="btn-primary" type="button" id="salvarPrecadastroBtn">Enviar pré-cadastro</button>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div style="padding:18px 22px 0;">
+        <h2 style="font-family:'Fraunces',serif;font-size:18px;color:var(--primary-dark);margin:0;">Pré-cadastros pendentes</h2>
+        <p style="font-size:12.5px;color:var(--muted);margin:6px 0 0;">Aguardando alguém completar o cadastro e dar andamento ao processo.</p>
+      </div>
+      <div id="precadastrosListaArea" style="padding:14px 22px 22px;"></div>
+    </div>
+  </div>
+
   <div class="toolbar" id="toolbarRegistros">
     <input type="search" id="searchInput" placeholder="Buscar por nome, CPF, cargo, núcleo, contrato...">
     <span class="spacer"></span>
@@ -1793,6 +1850,7 @@ const REGISTROS_COL = 'registros';
 const USUARIOS_COL = 'usuarios';
 const ACESSOS_COL = 'acessos_log';
 const ATIVIDADES_COL = 'atividades_log';
+const PRECADASTROS_COL = 'pre_cadastros';
 let records = [];
 let editingId = null;
 let perfilAbertoId = null;
@@ -1800,7 +1858,7 @@ let usuarioAtual = null;
 let souAdminAtual = false;
 let loaded = false;
 let activeTab = 'registros';
-const TODAS_ABAS_PERMISSAO = ['cadastro', 'registros', 'contas', 'distrato', 'periodo', 'emissoes', 'indicacoes', 'dashboard'];
+const TODAS_ABAS_PERMISSAO = ['cadastro', 'precadastro', 'registros', 'contas', 'distrato', 'periodo', 'emissoes', 'indicacoes', 'dashboard'];
 const REGISTROS_POR_PAGINA = 7;
 let paginaRegistros = 1;
 let selectedAno = '';
@@ -2733,6 +2791,8 @@ const NUCLEO_OPCOES = Object.keys(NUCLEO_CONFIG);
 const nucleoComboApi = criarComboBusca('nucleo', () => NUCLEO_OPCOES, 'Selecione o núcleo...');
 function setNucleoComboValue(v){ nucleoComboApi.setValor(v); }
 
+const preNucleoComboApi = criarComboBusca('preNucleo', () => NUCLEO_OPCOES, 'Selecione o núcleo...');
+
 const CARGO_OPCOES = ['AG. DE MANUTENÇÃO - ELETRICISTA','AG. DE MANUTENÇÃO - ENCANADOR','AG. DE MANUTENÇÃO - PINTOR','ASSISTENTE SOCIAL','AUXILIAR DE ADMINISTRAÇÃO','AUXILIAR DE SERVIÇOS GERAIS','CONTADOR (A)','MECÂNICO DE VEÍCULOS E MÁQUINAS','MOTORISTA DE VEÍCULOS LEVES','MOTORISTA DE VEÍCULOS PESADOS','NUTRICIONISTA','OPERADOR DE EMBARCAÇÃO','PROFESSOR (A)','PSICÓLOGO (A)','SECRETÁRIO (A) ESCOLAR','TÉCNICO-PEDAGÓGICO','VIGIA','TÉCNICO DE INFORMÁTICA'];
 const cargoComboApi = criarComboBusca('cargo', () => CARGO_OPCOES, 'Selecione o cargo...', () => atualizarSugestoesFuncao());
 function setCargoComboValue(v){ cargoComboApi.setValor(v); }
@@ -3485,6 +3545,7 @@ function render(){
   if(activeTab === 'indicacoes') return renderIndicacoes();
   if(activeTab === 'dashboard') return renderDashboard();
   if(activeTab === 'usuarios') return renderUsuarios();
+  if(activeTab === 'precadastro') return renderPrecadastros();
   return renderRegistros();
 }
 
@@ -4176,6 +4237,7 @@ function renderUsuarios(){
     }
     const TABS_PERMISSAO = [
       { chave: 'cadastro', nome: 'Cadastro' },
+      { chave: 'precadastro', nome: 'Pré-cadastro' },
       { chave: 'registros', nome: 'Controle Servidores' },
       { chave: 'contas', nome: 'Abertura de Conta' },
       { chave: 'distrato', nome: 'Distrato' },
@@ -4409,6 +4471,136 @@ function limparAvisosDuplicidade(){
     el.textContent = '';
   });
 }
+
+// --- Pré-cadastro (formulário simples preenchido na entrevista) ---
+let preFotoBase64 = null;
+
+function comprimirFoto(file, callback){
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      const maxLado = 360;
+      let w = img.width, h = img.height;
+      if(w > h && w > maxLado){ h = h * (maxLado / w); w = maxLado; }
+      else if(h > maxLado){ w = w * (maxLado / h); h = maxLado; }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      callback(canvas.toDataURL('image/jpeg', 0.7));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+document.getElementById('preFoto').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if(!file) return;
+  comprimirFoto(file, (base64) => {
+    preFotoBase64 = base64;
+    document.getElementById('preFotoPreview').src = base64;
+    document.getElementById('preFotoPreviewWrap').style.display = 'block';
+  });
+});
+
+function limparFormPrecadastro(){
+  document.getElementById('preNome').value = '';
+  preNucleoComboApi.setValor('');
+  document.getElementById('preLocal').value = '';
+  document.getElementById('preAdmissao').value = '';
+  document.getElementById('preFoto').value = '';
+  document.getElementById('preFotoPreviewWrap').style.display = 'none';
+  preFotoBase64 = null;
+}
+
+document.getElementById('salvarPrecadastroBtn').addEventListener('click', async () => {
+  const nome = document.getElementById('preNome').value.trim();
+  const nucleo = document.getElementById('preNucleoInput').value;
+  const local = document.getElementById('preLocal').value.trim();
+  const admissao = document.getElementById('preAdmissao').value;
+
+  if(!nome || !nucleo || !local || !admissao){
+    showToast('Preencha nome, núcleo, local e data de admissão.');
+    return;
+  }
+
+  const btn = document.getElementById('salvarPrecadastroBtn');
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+  try{
+    await db.collection(PRECADASTROS_COL).add({
+      nome, nucleo, local, admissao,
+      foto: preFotoBase64 || null,
+      status: 'pendente',
+      enviadoPor: usuarioAtual ? usuarioAtual.uid : '',
+      enviadoPorNome: document.getElementById('sessaoUsuario') ? document.getElementById('sessaoUsuario').textContent : '',
+      criadoEm: Date.now(),
+      ano: selectedAno
+    });
+    showSuccessFloat(`Pré-cadastro de ${nome} enviado com sucesso`);
+    limparFormPrecadastro();
+    renderPrecadastros();
+  }catch(e){
+    console.error(e);
+    showToast('Não foi possível enviar o pré-cadastro.');
+  }finally{
+    btn.disabled = false;
+    btn.textContent = 'Enviar pré-cadastro';
+  }
+});
+
+function renderPrecadastros(){
+  const area = document.getElementById('precadastrosListaArea');
+  if(!area) return;
+  area.innerHTML = '<div class="loading">Carregando…</div>';
+  db.collection(PRECADASTROS_COL).where('status', '==', 'pendente').orderBy('criadoEm', 'desc').get().then(snap => {
+    if(snap.empty){
+      area.innerHTML = '<div class="empty-state">Nenhum pré-cadastro pendente no momento.</div>';
+      return;
+    }
+    const cards = snap.docs.map(doc => {
+      const p = doc.data();
+      const fotoHtml = p.foto
+        ? `<img src="${p.foto}" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid var(--line-strong);">`
+        : `<div style="width:56px;height:56px;border-radius:8px;background:#EFEEE7;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:10px;text-align:center;">Sem foto</div>`;
+      return `
+        <div class="pre-card">
+          ${fotoHtml}
+          <div class="pre-card-info">
+            <div class="servidor-name">${p.nome}</div>
+            <div class="pre-card-detalhe">${p.nucleo || '—'} · ${p.local || '—'} · Admissão: ${p.admissao ? new Date(p.admissao+'T00:00:00').toLocaleDateString('pt-BR') : '—'}</div>
+            <div class="pre-card-detalhe" style="opacity:.7;">Enviado por ${p.enviadoPorNome || '—'}</div>
+          </div>
+          <button class="btn-primary btn-small" onclick="darAndamentoPrecadastro('${doc.id}')">Dar andamento</button>
+        </div>`;
+    }).join('');
+    area.innerHTML = cards;
+  }).catch(e => {
+    console.error(e);
+    area.innerHTML = '<div class="empty-state">Não foi possível carregar os pré-cadastros.</div>';
+  });
+}
+
+window.darAndamentoPrecadastro = async function(id){
+  try{
+    const doc = await db.collection(PRECADASTROS_COL).doc(id).get();
+    if(!doc.exists) return;
+    const p = doc.data();
+    abrirCadastroParaNovo();
+    form.servidor.value = p.nome || '';
+    setNucleoComboValue(p.nucleo || '');
+    updateDependentFields('', '');
+    form.local.value = p.local || '';
+    form.admissao.value = p.admissao || '';
+    await db.collection(PRECADASTROS_COL).doc(id).update({ status: 'processado' });
+    showToast('Continue preenchendo o restante dos dados e clique em Salvar registro.');
+    renderPrecadastros();
+  }catch(e){
+    console.error(e);
+    showToast('Não foi possível abrir esse pré-cadastro.');
+  }
+};
 
 function abrirCadastroParaNovo(){
   editingId = null;
@@ -4780,15 +4972,16 @@ document.getElementById('distratoSearchInput').addEventListener('input', ()=>{ P
 document.getElementById('periodoSearchInput').addEventListener('input', ()=>{ PAGINA_ESTADO.periodo = 1; render(); });
 
 const TABS = {
-  cadastro:   { btn: 'tabCadastro',   toolbar: null,                 view: 'cadastro' },
-  registros:  { btn: 'tabRegistros',  toolbar: 'toolbarRegistros',  view: 'table' },
-  contas:     { btn: 'tabContas',     toolbar: 'toolbarContas',     view: 'table' },
-  distrato:   { btn: 'tabDistrato',   toolbar: 'toolbarDistrato',   view: 'table' },
-  periodo:    { btn: 'tabPeriodo',    toolbar: 'toolbarPeriodo',    view: 'periodo' },
-  emissoes:   { btn: 'tabEmissoes',   toolbar: 'toolbarEmissoes',   view: 'emissoes' },
-  indicacoes: { btn: 'tabIndicacoes', toolbar: 'toolbarIndicacoes', view: 'indicacoes' },
-  dashboard:  { btn: 'tabDashboard',  toolbar: null,                 view: 'dashboard' },
-  usuarios:   { btn: 'tabUsuarios',   toolbar: null,                 view: 'usuarios' }
+  cadastro:     { btn: 'tabCadastro',     toolbar: null,                 view: 'cadastro' },
+  precadastro:  { btn: 'tabPrecadastro',  toolbar: null,                 view: 'precadastro' },
+  registros:    { btn: 'tabRegistros',    toolbar: 'toolbarRegistros',  view: 'table' },
+  contas:       { btn: 'tabContas',       toolbar: 'toolbarContas',     view: 'table' },
+  distrato:     { btn: 'tabDistrato',     toolbar: 'toolbarDistrato',   view: 'table' },
+  periodo:      { btn: 'tabPeriodo',      toolbar: 'toolbarPeriodo',    view: 'periodo' },
+  emissoes:     { btn: 'tabEmissoes',     toolbar: 'toolbarEmissoes',   view: 'emissoes' },
+  indicacoes:   { btn: 'tabIndicacoes',   toolbar: 'toolbarIndicacoes', view: 'indicacoes' },
+  dashboard:    { btn: 'tabDashboard',    toolbar: null,                 view: 'dashboard' },
+  usuarios:     { btn: 'tabUsuarios',     toolbar: null,                 view: 'usuarios' }
 };
 
 function switchTab(tabKey){
@@ -4800,6 +4993,7 @@ function switchTab(tabKey){
   });
   const cfg = TABS[tabKey];
   document.getElementById('cadastroArea').style.display = cfg.view === 'cadastro' ? 'block' : 'none';
+  document.getElementById('precadastroArea').style.display = cfg.view === 'precadastro' ? 'block' : 'none';
   document.getElementById('tableCard').style.display = cfg.view === 'table' ? 'block' : 'none';
   document.getElementById('dashboardArea').style.display = cfg.view === 'dashboard' ? 'block' : 'none';
   document.getElementById('periodoArea').style.display = cfg.view === 'periodo' ? 'block' : 'none';
