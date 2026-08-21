@@ -2760,13 +2760,21 @@ function gerarNumerosDisponiveis(max, camposParaChecar){
 const memoComboApi = criarComboBusca('memo', () => gerarNumerosDisponiveis(600, ['memo']), 'Selecione o nº memo...');
 function setMemoComboValue(v){ memoComboApi.setValor(v); }
 
-const oficioComboApi = criarComboBusca('oficio', () => gerarNumerosDisponiveis(1500, ['oficio', 'oficioAberturaConta']), 'Selecione o nº ofício...');
+const oficioComboApi = criarComboBusca('oficio', () => {
+  const disponiveis = gerarNumerosDisponiveis(1500, ['oficio', 'oficioAberturaConta']);
+  const valorIrmao = form.oficioAberturaConta.value;
+  return valorIrmao ? disponiveis.filter(n => n !== valorIrmao) : disponiveis;
+}, 'Selecione o nº ofício...');
 function setOficioComboValue(v){ oficioComboApi.setValor(v); }
 
 const autorizacaoComboApi = criarComboBusca('autorizacao', () => gerarNumerosDisponiveis(1500, ['autorizacao']), 'Selecione o nº autorização...');
 function setAutorizacaoComboValue(v){ autorizacaoComboApi.setValor(v); }
 
-const oficioAberturaContaComboApi = criarComboBusca('oficioAberturaConta', () => gerarNumerosDisponiveis(1500, ['oficio', 'oficioAberturaConta']), 'Selecione o nº ofício...');
+const oficioAberturaContaComboApi = criarComboBusca('oficioAberturaConta', () => {
+  const disponiveis = gerarNumerosDisponiveis(1500, ['oficio', 'oficioAberturaConta']);
+  const valorIrmao = form.oficio.value;
+  return valorIrmao ? disponiveis.filter(n => n !== valorIrmao) : disponiveis;
+}, 'Selecione o nº ofício...');
 function setOficioAberturaContaComboValue(v){ oficioAberturaContaComboApi.setValor(v); }
 
 // Salva um único registro no Firestore (criação ou atualização).
