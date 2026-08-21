@@ -814,6 +814,18 @@
   tbody tr:last-child td{border-bottom:none;}
   .mono{font-family:'IBM Plex Mono', monospace; font-size:12.5px; color:var(--muted); white-space:nowrap;}
   .servidor-name{font-weight:600; color:var(--ink);}
+  .servidor-name-wrap{display:flex; align-items:center; gap:8px;}
+  .eye-btn{
+    flex:0 0 auto;
+    display:flex; align-items:center; justify-content:center;
+    width:26px; height:26px;
+    padding:0;
+    border-radius:6px;
+    background:transparent;
+    border:1px solid var(--line-strong);
+    color:var(--muted);
+  }
+  .eye-btn:hover{background:#F2F0E6; border-color:var(--primary); color:var(--primary-dark);}
   .servidor-cargo{font-size:12px; color:var(--muted);}
 
   .status-chip{
@@ -3435,7 +3447,12 @@ function renderRegistros(){
       ${pdfCell(temAberturaConta, 'Baixar Ofício de Abertura de Conta (PDF)', `gerarPDF('${r.id}','aberturaConta')`, 'pdf-cell-narrow')}
       ${pdfCell(temDistrato, 'Baixar documento de Distrato (PDF)', `gerarPDF('${r.id}','distrato')`)}
       <td class="servidor-cell">
-        <div class="servidor-name">${r.servidor || '—'}</div>
+        <div class="servidor-name-wrap">
+          <button class="eye-btn" title="Ver perfil" onclick="abrirPerfil('${r.id}')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+          <div class="servidor-name">${r.servidor || '—'}</div>
+        </div>
       </td>
       <td class="wrap-cell">${[r.cargo, r.funcao].filter(Boolean).join(' / ') || '—'}</td>
       <td class="wrap-cell">${r.nucleo || '—'}</td>
@@ -3444,9 +3461,6 @@ function renderRegistros(){
       <td>${r.admissao ? new Date(r.admissao+'T00:00:00').toLocaleDateString('pt-BR') : '—'}</td>
       <td>${r.ch || '—'}</td>
       <td><span class="status-chip ${statusClass(r.situacao)}">${r.situacao || 'Ativo'}</span></td>
-      <td class="row-actions">
-        <button class="btn-ghost btn-small" onclick="abrirPerfil('${r.id}')">Perfil</button>
-      </td>
     </tr>
   `;
   }).join('');
@@ -3456,11 +3470,11 @@ function renderRegistros(){
       <table class="tbl-fixed">
         <colgroup>
           <col style="width:58px"><col style="width:58px"><col style="width:58px"><col style="width:58px"><col style="width:70px">
-          <col style="width:140px"><col style="width:130px"><col style="width:130px"><col style="width:120px"><col style="width:120px">
-          <col style="width:90px"><col style="width:50px"><col style="width:100px"><col style="width:76px">
+          <col style="width:160px"><col style="width:130px"><col style="width:130px"><col style="width:120px"><col style="width:120px">
+          <col style="width:90px"><col style="width:50px"><col style="width:100px">
         </colgroup>
         <thead><tr>
-          <th class="pdf-cell pdf-cell-narrow">Enc. MEMO</th><th class="pdf-cell pdf-cell-narrow">Enc. OFÍCIO</th><th class="pdf-cell pdf-cell-narrow">AUTORIZAÇÃO</th><th class="pdf-cell pdf-cell-narrow">DOC. ABERT. CONTA</th><th class="pdf-cell">DISTRATO</th><th>Servidor</th><th>Cargo/Função</th><th>Núcleo</th><th>Diretor</th><th>Local</th><th>Admissão</th><th>CH</th><th>Situação</th><th></th>
+          <th class="pdf-cell pdf-cell-narrow">Enc. MEMO</th><th class="pdf-cell pdf-cell-narrow">Enc. OFÍCIO</th><th class="pdf-cell pdf-cell-narrow">AUTORIZAÇÃO</th><th class="pdf-cell pdf-cell-narrow">DOC. ABERT. CONTA</th><th class="pdf-cell">DISTRATO</th><th>Servidor</th><th>Cargo/Função</th><th>Núcleo</th><th>Diretor</th><th>Local</th><th>Admissão</th><th>CH</th><th>Situação</th>
         </tr></thead>
         <tbody>${rows}</tbody>
       </table>
