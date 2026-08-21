@@ -413,6 +413,21 @@
     grid-template-columns:repeat(auto-fill, minmax(210px, 1fr));
     gap:10px 20px;
   }
+  .foto-remove-btn{
+    position:absolute; top:-8px; right:-8px;
+    width:22px; height:22px;
+    border-radius:50%;
+    background:var(--stamp-red);
+    color:#fff;
+    border:2px solid #fff;
+    font-size:14px;
+    line-height:1;
+    display:flex; align-items:center; justify-content:center;
+    padding:0;
+    box-shadow:0 1px 3px rgba(0,0,0,.3);
+  }
+  .foto-remove-btn:hover{background:#8A2A2A;}
+
   .pre-card{
     display:flex; align-items:center; gap:14px;
     padding:12px 14px;
@@ -1329,8 +1344,8 @@
   <div id="appContent">
   <div class="app-shell">
   <nav class="tabs" id="sideTabs">
-    <a class="tab-btn" id="tabCadastro" href="#cadastro">Cadastro</a>
     <a class="tab-btn" id="tabPrecadastro" href="#precadastro">Pré-cadastro</a>
+    <a class="tab-btn" id="tabCadastro" href="#cadastro">Cadastro</a>
     <a class="tab-btn active" id="tabRegistros" href="#registros">Controle Servidores</a>
     <a class="tab-btn" id="tabContas" href="#contas">Abertura de Conta</a>
     <a class="tab-btn" id="tabDistrato" href="#distrato">Distrato</a>
@@ -1499,6 +1514,13 @@
           <legend>02 · Servidor</legend>
           <div class="grid">
             <div class="field full"><label>Nome do servidor *</label><input type="text" name="servidor" required autocomplete="off"></div>
+            <div class="field full" id="fotoServidorField" style="display:none;">
+              <label>Foto (recebida do pré-cadastro)</label>
+              <div style="position:relative; width:96px;">
+                <img id="fotoServidorPreview" style="width:96px; height:96px; object-fit:cover; border-radius:10px; border:1px solid var(--line-strong); display:block;">
+                <button type="button" id="removerFotoServidorBtn" class="foto-remove-btn" aria-label="Remover foto">×</button>
+              </div>
+            </div>
             <div class="field"><label>CPF</label><input type="text" name="cpf" id="regCpfInput" placeholder="000.000.000-00" maxlength="14" autocomplete="off"></div>
             <div class="field"><label>Contato</label><input type="tel" name="contato" id="regContatoInput" placeholder="(00) 00000-0000" maxlength="15" autocomplete="off"></div>
             <div class="field full"><label>E-mail</label><input type="email" name="email" autocomplete="off"></div>
@@ -1619,13 +1641,15 @@
             </div>
           </div>
         </div>
-        <div class="field"><label>Local *</label><input type="text" id="preLocal" autocomplete="off"></div>
+        <div class="field" id="preLocalField"><label>Local *</label><input type="text" id="preLocal" autocomplete="off"></div>
         <div class="field"><label>Data de admissão *</label><input type="date" id="preAdmissao" autocomplete="off"></div>
+        <div class="field"><label>CH (carga horária)</label><input type="text" id="preCh" placeholder="ex: 40h" maxlength="3" autocomplete="off"></div>
         <div class="field full">
           <label>Foto</label>
           <input type="file" id="preFoto" accept="image/*" capture="environment">
-          <div id="preFotoPreviewWrap" style="display:none; margin-top:10px;">
-            <img id="preFotoPreview" style="width:96px; height:96px; object-fit:cover; border-radius:10px; border:1px solid var(--line-strong);">
+          <div id="preFotoPreviewWrap" style="display:none; margin-top:10px; position:relative; width:96px;">
+            <img id="preFotoPreview" style="width:96px; height:96px; object-fit:cover; border-radius:10px; border:1px solid var(--line-strong); display:block;">
+            <button type="button" id="removerPreFotoBtn" class="foto-remove-btn" aria-label="Remover foto">×</button>
           </div>
         </div>
       </div>
@@ -1853,6 +1877,7 @@ const ATIVIDADES_COL = 'atividades_log';
 const PRECADASTROS_COL = 'pre_cadastros';
 let records = [];
 let editingId = null;
+let fotoServidorAtual = null; // guarda a foto (base64) entre o pré-cadastro e o registro final
 let perfilAbertoId = null;
 let usuarioAtual = null;
 let souAdminAtual = false;
@@ -2791,7 +2816,20 @@ const NUCLEO_OPCOES = Object.keys(NUCLEO_CONFIG);
 const nucleoComboApi = criarComboBusca('nucleo', () => NUCLEO_OPCOES, 'Selecione o núcleo...');
 function setNucleoComboValue(v){ nucleoComboApi.setValor(v); }
 
-const preNucleoComboApi = criarComboBusca('preNucleo', () => NUCLEO_OPCOES, 'Selecione o núcleo...');
+function atualizarPreLocal(){
+  const nucleoVal = document.getElementById('preNucleoInput').value;
+  const config = NUCLEO_CONFIG[nucleoVal];
+  const container = document.getElementById('preLocalField');
+  const opcoes = config ? config.local : null;
+  if(opcoes && opcoes.length){
+    const opts = ['<option value="">—</option>'].concat(opcoes.map(o => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`)).join('');
+    container.innerHTML = `<label>Local *</label><select id="preLocal">${opts}</select>`;
+  }else{
+    container.innerHTML = `<label>Local *</label><input type="text" id="preLocal" autocomplete="off">`;
+  }
+}
+
+const preNucleoComboApi = criarComboBusca('preNucleo', () => NUCLEO_OPCOES, 'Selecione o núcleo...', atualizarPreLocal);
 
 const CARGO_OPCOES = ['AG. DE MANUTENÇÃO - ELETRICISTA','AG. DE MANUTENÇÃO - ENCANADOR','AG. DE MANUTENÇÃO - PINTOR','ASSISTENTE SOCIAL','AUXILIAR DE ADMINISTRAÇÃO','AUXILIAR DE SERVIÇOS GERAIS','CONTADOR (A)','MECÂNICO DE VEÍCULOS E MÁQUINAS','MOTORISTA DE VEÍCULOS LEVES','MOTORISTA DE VEÍCULOS PESADOS','NUTRICIONISTA','OPERADOR DE EMBARCAÇÃO','PROFESSOR (A)','PSICÓLOGO (A)','SECRETÁRIO (A) ESCOLAR','TÉCNICO-PEDAGÓGICO','VIGIA','TÉCNICO DE INFORMÁTICA'];
 const cargoComboApi = criarComboBusca('cargo', () => CARGO_OPCOES, 'Selecione o cargo...', () => atualizarSugestoesFuncao());
@@ -4504,11 +4542,18 @@ document.getElementById('preFoto').addEventListener('change', (e) => {
   });
 });
 
+document.getElementById('removerPreFotoBtn').addEventListener('click', () => {
+  preFotoBase64 = null;
+  document.getElementById('preFoto').value = '';
+  document.getElementById('preFotoPreviewWrap').style.display = 'none';
+});
+
 function limparFormPrecadastro(){
   document.getElementById('preNome').value = '';
   preNucleoComboApi.setValor('');
-  document.getElementById('preLocal').value = '';
+  document.getElementById('preLocalField').innerHTML = '<label>Local *</label><input type="text" id="preLocal" autocomplete="off">';
   document.getElementById('preAdmissao').value = '';
+  document.getElementById('preCh').value = '';
   document.getElementById('preFoto').value = '';
   document.getElementById('preFotoPreviewWrap').style.display = 'none';
   preFotoBase64 = null;
@@ -4519,6 +4564,7 @@ document.getElementById('salvarPrecadastroBtn').addEventListener('click', async 
   const nucleo = document.getElementById('preNucleoInput').value;
   const local = document.getElementById('preLocal').value.trim();
   const admissao = document.getElementById('preAdmissao').value;
+  const ch = document.getElementById('preCh').value.trim();
 
   if(!nome || !nucleo || !local || !admissao){
     showToast('Preencha nome, núcleo, local e data de admissão.');
@@ -4530,7 +4576,7 @@ document.getElementById('salvarPrecadastroBtn').addEventListener('click', async 
   btn.textContent = 'Enviando...';
   try{
     await db.collection(PRECADASTROS_COL).add({
-      nome, nucleo, local, admissao,
+      nome, nucleo, local, admissao, ch,
       foto: preFotoBase64 || null,
       status: 'pendente',
       enviadoPor: usuarioAtual ? usuarioAtual.uid : '',
@@ -4573,6 +4619,7 @@ function renderPrecadastros(){
             <div class="pre-card-detalhe" style="opacity:.7;">Enviado por ${p.enviadoPorNome || '—'}</div>
           </div>
           <button class="btn-primary btn-small" onclick="darAndamentoPrecadastro('${doc.id}')">Dar andamento</button>
+          <button class="btn-danger btn-small" onclick="excluirPrecadastro('${doc.id}', '${(p.nome || '').replace(/'/g, "\\'")}')">Excluir</button>
         </div>`;
     }).join('');
     area.innerHTML = cards;
@@ -4593,6 +4640,9 @@ window.darAndamentoPrecadastro = async function(id){
     updateDependentFields('', '');
     form.local.value = p.local || '';
     form.admissao.value = p.admissao || '';
+    form.ch.value = p.ch || '';
+    fotoServidorAtual = p.foto || null;
+    atualizarPreviewFotoCadastro();
     await db.collection(PRECADASTROS_COL).doc(id).update({ status: 'processado' });
     showToast('Continue preenchendo o restante dos dados e clique em Salvar registro.');
     renderPrecadastros();
@@ -4602,11 +4652,40 @@ window.darAndamentoPrecadastro = async function(id){
   }
 };
 
+window.excluirPrecadastro = async function(id, nome){
+  if(!confirm(`Excluir o pré-cadastro de "${nome}"?`)) return;
+  try{
+    await db.collection(PRECADASTROS_COL).doc(id).delete();
+    showToast('Pré-cadastro excluído.');
+    renderPrecadastros();
+  }catch(e){
+    console.error(e);
+    showToast('Não foi possível excluir o pré-cadastro.');
+  }
+};
+
+function atualizarPreviewFotoCadastro(){
+  const wrap = document.getElementById('fotoServidorField');
+  if(fotoServidorAtual){
+    document.getElementById('fotoServidorPreview').src = fotoServidorAtual;
+    wrap.style.display = 'block';
+  }else{
+    wrap.style.display = 'none';
+  }
+}
+
+document.getElementById('removerFotoServidorBtn').addEventListener('click', () => {
+  fotoServidorAtual = null;
+  atualizarPreviewFotoCadastro();
+});
+
 function abrirCadastroParaNovo(){
   editingId = null;
   form.reset();
   limparAvisosDuplicidade();
   form.situacao.value = 'Ativo';
+  fotoServidorAtual = null;
+  atualizarPreviewFotoCadastro();
   setNucleoComboValue('');
   setCargoComboValue('');
   setMemoComboValue('');
@@ -4697,7 +4776,12 @@ window.abrirPerfil = function(id){
   }
 
   document.getElementById('modalTitle').textContent = r.servidor || 'Perfil do servidor';
-  document.getElementById('perfilBody').innerHTML = `<div class="perfil-grid">${html}</div>`;
+  const fotoHtml = r.foto
+    ? `<img src="${r.foto}" style="width:100px;height:100px;object-fit:cover;border-radius:12px;border:1px solid var(--line-strong);">`
+    : `<div style="width:100px;height:100px;border-radius:12px;background:#EFEEE7;border:1px solid var(--line-strong);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:10.5px;text-align:center;padding:4px;">Sem foto</div>`;
+  document.getElementById('perfilBody').innerHTML = `
+    <div style="display:flex; justify-content:center; margin-bottom:18px;">${fotoHtml}</div>
+    <div class="perfil-grid">${html}</div>`;
   overlay.classList.add('open');
 };
 
@@ -4707,6 +4791,8 @@ function abrirCadastroParaEditar(id){
   if(!r) return;
   limparAvisosDuplicidade();
   editingId = id;
+  fotoServidorAtual = r.foto || null;
+  atualizarPreviewFotoCadastro();
   fields.forEach(f => { if(!['diretor','local','cargo','memo','oficio','autorizacao','oficioAberturaConta'].includes(f) && form[f]) form[f].value = r[f] || ''; });
   setNucleoComboValue(r.nucleo || '');
   setCargoComboValue(r.cargo || '');
@@ -4910,6 +4996,7 @@ document.getElementById('saveBtn').addEventListener('click', async ()=>{
 
   const data = {};
   fields.forEach(f => data[f] = form[f] ? form[f].value.trim() : '');
+  data.foto = fotoServidorAtual || null;
   if(!editingId){
     data.ano = selectedAno;
     data.criadoEm = Date.now();
