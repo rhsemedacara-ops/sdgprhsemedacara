@@ -1128,7 +1128,12 @@
     </div>
     <div class="field">
       <label>Senha</label>
-      <input type="password" id="signupSenha" required autocomplete="off" placeholder="mínimo 6 caracteres">
+      <div class="password-wrap">
+        <input type="password" id="signupSenha" required autocomplete="off" placeholder="mínimo 6 caracteres">
+        <button type="button" id="toggleSignupSenhaBtn" class="toggle-password-btn" aria-label="Mostrar senha">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
     </div>
     <div id="signupError" class="login-error" style="display:none;"></div>
     <button type="submit" class="btn-primary login-btn" id="signupSubmitBtn">Criar cadastro</button>
@@ -2014,6 +2019,15 @@ document.getElementById('togglePasswordBtn').addEventListener('click', () => {
 document.getElementById('toggleNovoUsuarioSenhaBtn').addEventListener('click', () => {
   const pwd = document.getElementById('novoUsuarioSenha');
   const btn = document.getElementById('toggleNovoUsuarioSenhaBtn');
+  const showing = pwd.type === 'text';
+  pwd.type = showing ? 'password' : 'text';
+  btn.innerHTML = showing ? EYE_OPEN_SVG : EYE_OFF_SVG;
+  btn.setAttribute('aria-label', showing ? 'Mostrar senha' : 'Ocultar senha');
+});
+
+document.getElementById('toggleSignupSenhaBtn').addEventListener('click', () => {
+  const pwd = document.getElementById('signupSenha');
+  const btn = document.getElementById('toggleSignupSenhaBtn');
   const showing = pwd.type === 'text';
   pwd.type = showing ? 'password' : 'text';
   btn.innerHTML = showing ? EYE_OPEN_SVG : EYE_OFF_SVG;
