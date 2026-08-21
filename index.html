@@ -1351,8 +1351,8 @@
               </select>
             </div>
             <div class="field">
-              <label>Vínculo</label>
-              <select name="vinculo" id="vinculoInput" autocomplete="off">
+              <label>Vínculo *</label>
+              <select name="vinculo" id="vinculoInput" required autocomplete="off">
                 <option value="">—</option>
                 <option value="TEMPORARIO">TEMPORÁRIO</option>
                 <option value="CONCURSADO">CONCURSADO</option>
@@ -4464,6 +4464,11 @@ document.getElementById('saveBtn').addEventListener('click', async ()=>{
   if(!form.servidor.value.trim()){
     showToast('Informe o nome do servidor.');
     form.servidor.focus();
+    return;
+  }
+  if(!form.vinculo.value){
+    showToast('Selecione o "Vínculo".');
+    form.vinculo.focus();
     return;
   }
   if(form.aberturaConta.value === 'Sim'){
