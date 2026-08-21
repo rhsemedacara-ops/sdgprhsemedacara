@@ -390,6 +390,48 @@
     line-height:1.4;
   }
   .dup-warning.show{display:flex;}
+
+  /* Painel de permissões por aba (aba Usuários) */
+  .perm-panel-row{display:none;}
+  .perm-panel-row.show{display:table-row;}
+  .perm-panel{
+    background:#F7F6F0;
+    border:1px solid var(--line);
+    border-radius:var(--r-md);
+    padding:16px 18px;
+    margin:6px 0;
+  }
+  .perm-panel-title{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px; letter-spacing:.05em; text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:12px;
+  }
+  .perm-toggle-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(210px, 1fr));
+    gap:10px 20px;
+  }
+  .perm-toggle-row{display:flex; align-items:center; gap:10px; cursor:pointer;}
+  .perm-toggle-label{font-size:13px; color:var(--ink);}
+  .toggle-switch{
+    position:relative;
+    width:38px; height:21px; flex:0 0 auto;
+    background:#CFC9B7;
+    border-radius:20px;
+    cursor:pointer;
+    transition:background-color .15s ease;
+  }
+  .toggle-switch.on{background:var(--primary);}
+  .toggle-knob{
+    position:absolute; top:2px; left:2px;
+    width:17px; height:17px;
+    background:#fff;
+    border-radius:50%;
+    box-shadow:0 1px 2px rgba(0,0,0,.25);
+    transition:transform .15s ease;
+  }
+  .toggle-switch.on .toggle-knob{transform:translateX(17px);}
   .field:has(.dup-warning.show) input{border-color:var(--stamp-red) !important;}
   .password-wrap input{padding-right:42px;}
   .toggle-password-btn{
@@ -1645,6 +1687,7 @@ let usuarioAtual = null;
 let souAdminAtual = false;
 let loaded = false;
 let activeTab = 'registros';
+const TODAS_ABAS_PERMISSAO = ['cadastro', 'registros', 'contas', 'distrato', 'periodo', 'emissoes', 'indicacoes', 'dashboard'];
 const REGISTROS_POR_PAGINA = 7;
 let paginaRegistros = 1;
 let selectedAno = '';
@@ -1715,6 +1758,7 @@ auth.onAuthStateChanged((user) => {
       document.getElementById('tabUsuarios').style.display = ehAdmin ? '' : 'none';
       if(!ehAdmin && activeTab === 'usuarios') switchTab('registros');
     });
+    aplicarPermissoesDeAbas(user.uid);
     loadRecords();
     resetarTimersInatividade();
   }else{
@@ -1982,6 +2026,28 @@ async function usuarioEhAdmin(uid){
     return !doc.exists;
   }catch(e){
     return false;
+  }
+}
+
+// Esconde na barra lateral as abas que este usuário específico não tem permissão de ver
+// (definido pelo administrador na aba Usuários → Permissões). Contas sem doc em "usuarios"
+// (a conta original) sempre veem tudo.
+async function aplicarPermissoesDeAbas(uid){
+  try{
+    const doc = await db.collection(USUARIOS_COL).doc(uid).get();
+    if(!doc.exists) return; // conta original/admin: sem restrição
+    const abasPermitidas = Array.isArray(doc.data().abasPermitidas) ? doc.data().abasPermitidas : TODAS_ABAS_PERMISSAO;
+    Object.entries(TABS).forEach(([key, cfg]) => {
+      if(key === 'usuarios') return; // já tratado pela checagem de admin
+      const btn = document.getElementById(cfg.btn);
+      if(btn) btn.style.display = abasPermitidas.includes(key) ? '' : 'none';
+    });
+    if(!abasPermitidas.includes(activeTab) && activeTab !== 'usuarios'){
+      const primeiraPermitida = TODAS_ABAS_PERMISSAO.find(k => abasPermitidas.includes(k)) || 'registros';
+      switchTab(primeiraPermitida);
+    }
+  }catch(e){
+    console.error('Não foi possível aplicar as permissões de abas:', e);
   }
 }
 
@@ -3944,9 +4010,28 @@ function renderUsuarios(){
       listaArea.innerHTML = '<div class="empty-state">Nenhum usuário criado por aqui ainda.</div>';
       return;
     }
+    const TABS_PERMISSAO = [
+      { chave: 'cadastro', nome: 'Cadastro' },
+      { chave: 'registros', nome: 'Controle Servidores' },
+      { chave: 'contas', nome: 'Abertura de Conta' },
+      { chave: 'distrato', nome: 'Distrato' },
+      { chave: 'periodo', nome: 'Contratações por Período' },
+      { chave: 'emissoes', nome: "Acomp. Emi. Doc's" },
+      { chave: 'indicacoes', nome: 'Indicações' },
+      { chave: 'dashboard', nome: 'Dashboard Geral' }
+    ];
+
     const rows = docsVisiveis.map(doc => {
       const u = doc.data();
       const autorizado = u.autorizado === true;
+      const abasPermitidas = Array.isArray(u.abasPermitidas) ? u.abasPermitidas : TABS_PERMISSAO.map(t => t.chave);
+      const togglesHtml = TABS_PERMISSAO.map(t => {
+        const ligado = abasPermitidas.includes(t.chave);
+        return `<label class="perm-toggle-row">
+          <span class="toggle-switch ${ligado ? 'on' : ''}" id="toggle-${doc.id}-${t.chave}" onclick="alternarPermissaoAba('${doc.id}', '${t.chave}', this)"><span class="toggle-knob"></span></span>
+          <span class="perm-toggle-label">${t.nome}</span>
+        </label>`;
+      }).join('');
       return `<tr>
         <td><div class="servidor-name">${u.nome || '—'}</div></td>
         <td class="mono">${u.cpf || '—'}</td>
@@ -3955,7 +4040,16 @@ function renderUsuarios(){
         <td><span class="status-chip status-${autorizado ? 'Ativo' : 'Finalizado'}">${autorizado ? 'Autorizado' : 'Pendente'}</span></td>
         <td class="row-actions">
           <button class="btn-ghost btn-small" onclick="alternarAutorizacaoUsuario('${doc.id}', ${!autorizado})">${autorizado ? 'Revogar' : 'Autorizar'}</button>
+          <button class="btn-ghost btn-small" onclick="document.getElementById('perm-${doc.id}').classList.toggle('show')">Permissões</button>
           <button class="btn-danger btn-small" onclick="excluirCadastroUsuario('${doc.id}', '${(u.nome || 'esse usuário').replace(/'/g, "\\'")}')">Excluir</button>
+        </td>
+      </tr>
+      <tr id="perm-${doc.id}" class="perm-panel-row">
+        <td colspan="6">
+          <div class="perm-panel">
+            <div class="perm-panel-title">Abas que ${u.nome || 'esse usuário'} pode ver</div>
+            <div class="perm-toggle-grid">${togglesHtml}</div>
+          </div>
         </td>
       </tr>`;
     }).join('');
@@ -4024,6 +4118,22 @@ window.excluirCadastroUsuario = async function(uid, nome){
   }catch(e){
     console.error(e);
     showToast('Não foi possível excluir o cadastro.');
+  }
+};
+
+window.alternarPermissaoAba = async function(uid, aba, switchEl){
+  const ligar = !switchEl.classList.contains('on');
+  switchEl.classList.toggle('on', ligar);
+  try{
+    const ref = db.collection(USUARIOS_COL).doc(uid);
+    const doc = await ref.get();
+    const atuais = doc.exists && Array.isArray(doc.data().abasPermitidas) ? doc.data().abasPermitidas : TODAS_ABAS_PERMISSAO.slice();
+    const novas = ligar ? [...new Set([...atuais, aba])] : atuais.filter(a => a !== aba);
+    await ref.update({ abasPermitidas: novas });
+  }catch(e){
+    console.error(e);
+    switchEl.classList.toggle('on', !ligar);
+    showToast('Não foi possível atualizar a permissão.');
   }
 };
 
