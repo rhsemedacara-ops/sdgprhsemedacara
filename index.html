@@ -1350,6 +1350,44 @@
                 <option value="Não">Não</option>
               </select>
             </div>
+            <div class="field">
+              <label>Vínculo</label>
+              <select name="vinculo" id="vinculoInput" autocomplete="off">
+                <option value="">—</option>
+                <option value="TEMPORARIO">TEMPORÁRIO</option>
+                <option value="CONCURSADO">CONCURSADO</option>
+                <option value="EFETIVO">EFETIVO</option>
+                <option value="ESTAVEL">ESTÁVEL</option>
+                <option value="NOMEADO">NOMEADO</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid cols-3" id="vinculoConcursadoArea" style="display:none;margin-top:14px;">
+            <div class="field">
+              <label>Concurso</label>
+              <select name="vinculoConcurso" autocomplete="off">
+                <option value="">—</option>
+                <option value="CMPA 001/2005">CMPA 001/2005</option>
+                <option value="CMPA 001/2012">CMPA 001/2012</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid cols-3" id="vinculoEstavelArea" style="display:none;margin-top:14px;">
+            <div class="field">
+              <label>Situação de estabilidade</label>
+              <select name="vinculoEstavel" autocomplete="off">
+                <option value="">—</option>
+                <option value="CPMA ESTÁVEL - ADCT">CPMA ESTÁVEL - ADCT</option>
+                <option value="CPMA ESTÁVEL - MUNICIPALIZADO">CPMA ESTÁVEL - MUNICIPALIZADO</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid cols-3" id="vinculoPortariaArea" style="display:none;margin-top:14px;">
+            <div class="field"><label>Portaria Nº</label><input type="text" name="vinculoPortariaNumero" autocomplete="off"></div>
+            <div class="field"><label>Data</label><input type="date" name="vinculoPortariaData" autocomplete="off"></div>
           </div>
 
           <div class="grid cols-3" id="aberturaContaExtra" style="display:none;margin-top:14px;">
@@ -2266,6 +2304,7 @@ document.getElementById('diagBtn').addEventListener('click', async () => {
 });
 
 const fields = ['memo','oficio','autorizacao','contrato','codUO','codLocal','indicacao','aberturaConta','oficioAberturaConta','salarioBaseAbertura','bancoAbertura','enderecoAbertura',
+  'vinculo','vinculoConcurso','vinculoEstavel','vinculoPortariaNumero','vinculoPortariaData',
   'servidor','cpf','contato','email','cargo','funcao','turno','admissao','nucleo','diretor','local','ch','obs','situacao','situacaoData',
   'distratoRg','distratoEndereco','distratoNumero','distratoBairro','distratoMunicipio'];
 
@@ -4227,6 +4266,7 @@ function abrirCadastroParaNovo(){
   updateDependentFields('', '');
   toggleSituacaoData();
   toggleAberturaContaExtra();
+  toggleVinculoExtra();
   toggleDistratoExtra();
   document.getElementById('cadastroTitulo').textContent = 'Novo registro';
   document.getElementById('saveBtn').textContent = 'Salvar registro';
@@ -4315,6 +4355,7 @@ function abrirCadastroParaEditar(id){
   toggleSituacaoData();
   if(form.situacaoData) form.situacaoData.value = r.situacaoData || '';
   toggleAberturaContaExtra();
+  toggleVinculoExtra();
   toggleDistratoExtra();
   document.getElementById('cadastroTitulo').textContent = 'Editar registro';
   document.getElementById('saveBtn').textContent = 'Salvar Alterações';
@@ -4351,6 +4392,30 @@ function toggleAberturaContaExtra(){
   }
 }
 
+function toggleVinculoExtra(){
+  const vinculo = form.vinculo.value;
+  const areaConcursado = document.getElementById('vinculoConcursadoArea');
+  const areaEstavel = document.getElementById('vinculoEstavelArea');
+  const areaPortaria = document.getElementById('vinculoPortariaArea');
+
+  areaConcursado.style.display = vinculo === 'CONCURSADO' ? 'grid' : 'none';
+  form.vinculoConcurso.required = vinculo === 'CONCURSADO';
+  if(vinculo !== 'CONCURSADO') form.vinculoConcurso.value = '';
+
+  areaEstavel.style.display = vinculo === 'ESTAVEL' ? 'grid' : 'none';
+  form.vinculoEstavel.required = vinculo === 'ESTAVEL';
+  if(vinculo !== 'ESTAVEL') form.vinculoEstavel.value = '';
+
+  const precisaPortaria = vinculo === 'EFETIVO' || vinculo === 'NOMEADO';
+  areaPortaria.style.display = precisaPortaria ? 'grid' : 'none';
+  form.vinculoPortariaNumero.required = precisaPortaria;
+  form.vinculoPortariaData.required = precisaPortaria;
+  if(!precisaPortaria){
+    form.vinculoPortariaNumero.value = '';
+    form.vinculoPortariaData.value = '';
+  }
+}
+
 function toggleDistratoExtra(){
   const container = document.getElementById('distratoExtra');
   const camposObrigatorios = [form.distratoRg, form.distratoEndereco, form.distratoBairro, form.distratoMunicipio];
@@ -4377,6 +4442,7 @@ form.cargo.addEventListener('change', atualizarSugestoesFuncao);
 form.situacao.addEventListener('change', toggleSituacaoData);
 form.situacao.addEventListener('change', toggleDistratoExtra);
 form.aberturaConta.addEventListener('change', toggleAberturaContaExtra);
+form.vinculo.addEventListener('change', toggleVinculoExtra);
 
 document.getElementById('closeModal').addEventListener('click', fecharPerfil);
 document.getElementById('cancelBtn').addEventListener('click', fecharPerfil);
