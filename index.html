@@ -219,6 +219,7 @@
       radial-gradient(circle at 84% 78%, rgba(162,58,44,0.08), transparent 45%),
       #F4F4F1;
   }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
   @keyframes loginCardIn{
     from{opacity:0; transform:translateY(10px) scale(.98);}
     to{opacity:1; transform:translateY(0) scale(1);}
@@ -1168,7 +1169,11 @@
   <div class="bg-watermark"></div>
 </div>
 
-<div id="loginScreen" class="login-screen">
+<div id="authLoadingScreen" class="login-screen">
+  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color:var(--primary); animation:spin 1s linear infinite;"><circle cx="12" cy="12" r="9" stroke-opacity=".25"/><path d="M21 12a9 9 0 0 0-9-9"/></svg>
+</div>
+
+<div id="loginScreen" class="login-screen" style="display:none;">
   <form id="loginForm" class="login-card" autocomplete="off">
     <div class="login-logo-lockup">
       <svg width="64" height="64" viewBox="0 0 104 104" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1801,6 +1806,8 @@ function resetarTimersInatividade(){
 });
 
 auth.onAuthStateChanged((user) => {
+  const authLoadingScreen = document.getElementById('authLoadingScreen');
+  if(authLoadingScreen) authLoadingScreen.style.display = 'none';
   if(user){
     document.title = 'SDGP RH SEMED';
     usuarioAtual = user;
