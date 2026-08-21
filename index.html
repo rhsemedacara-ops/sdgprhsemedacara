@@ -12,7 +12,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTA0IiBoZWlnaHQ9IjEwNCIgdmlld0JveD0iMCAwIDEwNCAxMDQiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDQiIGhlaWdodD0iMTA0IiByeD0iMjQiIGZpbGw9InVybCgjZzIpIi8+CjxyZWN0IHg9IjIwIiB5PSIzMCIgd2lkdGg9IjI2IiBoZWlnaHQ9IjM0IiByeD0iNC41IiBmaWxsPSIjRjZGM0VDIiBvcGFjaXR5PSIuOSIgdHJhbnNmb3JtPSJyb3RhdGUoLTcgMzMgNDcpIi8+CjxyZWN0IHg9IjI1IiB5PSIzOCIgd2lkdGg9IjE1IiBoZWlnaHQ9IjIuNCIgcng9IjEuMiIgZmlsbD0iIzBCNEY0QSIgdHJhbnNmb3JtPSJyb3RhdGUoLTcgMzMgNDcpIi8+CjxyZWN0IHg9IjI1IiB5PSI0NCIgd2lkdGg9IjE1IiBoZWlnaHQ9IjIuNCIgcng9IjEuMiIgZmlsbD0iIzBCNEY0QSIgdHJhbnNmb3JtPSJyb3RhdGUoLTcgMzMgNDcpIi8+CjxyZWN0IHg9IjI1IiB5PSI1MCIgd2lkdGg9IjEwIiBoZWlnaHQ9IjIuNCIgcng9IjEuMiIgZmlsbD0iIzBCNEY0QSIgdHJhbnNmb3JtPSJyb3RhdGUoLTcgMzMgNDcpIi8+CjxjaXJjbGUgY3g9IjY4IiBjeT0iMzgiIHI9IjEwLjUiIGZpbGw9IiNGNkYzRUMiLz4KPHBhdGggZD0iTTQ4IDc2YzAtMTMuNSA5LTIxIDIwLTIxczIwIDcuNSAyMCAyMSIgc3Ryb2tlPSIjRjZGM0VDIiBzdHJva2Utd2lkdGg9IjgiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0ibm9uZSIvPgo8Y2lyY2xlIGN4PSIzMCIgY3k9IjcyIiByPSI5IiBmaWxsPSIjRDRBMDE3IiBzdHJva2U9IiMwQjRGNEEiIHN0cm9rZS13aWR0aD0iMi4yIi8+CjxwYXRoIGQ9Ik0yNiA3MmwyLjggMi44TDM0LjUgNjkiIHN0cm9rZT0iI0Y2RjNFQyIgc3Ryb2tlLXdpZHRoPSIyLjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZmlsbD0ibm9uZSIvPgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJnMiIgeDE9IjAiIHkxPSIwIiB4Mj0iMTA0IiB5Mj0iMTA0IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiMxMjY2NUYiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMEI0RjRBIi8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+Cg==">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <style>
   :root{
@@ -246,6 +246,38 @@
     display:flex; align-items:center; justify-content:center;
   }
   .login-seal img{width:100%; height:100%; object-fit:contain;}
+  .login-logo-lockup{
+    display:flex; align-items:center; gap:14px;
+    justify-content:center;
+    margin:2px 0 22px;
+  }
+  .login-logo-word{display:flex; flex-direction:column; text-align:left;}
+  .login-logo-sdgp{
+    font-family:'Space Grotesk', 'Fraunces', serif;
+    font-weight:700;
+    font-size:28px;
+    letter-spacing:.01em;
+    color:var(--primary-dark);
+    line-height:1;
+  }
+  .login-logo-sub1{
+    font-family:'IBM Plex Sans', sans-serif;
+    font-weight:700;
+    font-size:10.5px;
+    letter-spacing:.09em;
+    text-transform:uppercase;
+    color:var(--ink);
+    margin-top:6px;
+  }
+  .login-logo-sub2{
+    font-family:'IBM Plex Sans', sans-serif;
+    font-weight:600;
+    font-size:9.5px;
+    letter-spacing:.07em;
+    text-transform:uppercase;
+    color:var(--primary-light);
+    margin-top:2px;
+  }
   .login-card h2{
     font-family:'Fraunces', serif;
     font-size:22px;
@@ -1068,8 +1100,8 @@
 
 <div id="loginScreen" class="login-screen">
   <form id="loginForm" class="login-card" autocomplete="off">
-    <div class="login-seal">
-      <svg width="100%" height="100%" viewBox="0 0 104 104" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <div class="login-logo-lockup">
+      <svg width="64" height="64" viewBox="0 0 104 104" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect width="104" height="104" rx="24" fill="url(#gLoginSeal)"/>
         <rect x="20" y="30" width="26" height="34" rx="4.5" fill="#F6F3EC" opacity=".9" transform="rotate(-7 33 47)"/>
         <rect x="25" y="38" width="15" height="2.4" rx="1.2" fill="#0B4F4A" transform="rotate(-7 33 47)"/>
@@ -1086,9 +1118,12 @@
           </linearGradient>
         </defs>
       </svg>
+      <div class="login-logo-word">
+        <span class="login-logo-sdgp">SDGP</span>
+        <span class="login-logo-sub1">Sistema de Gestão Pessoal</span>
+        <span class="login-logo-sub2">RH · SEMED Acará — PA</span>
+      </div>
     </div>
-    <h2>Acesso restrito</h2>
-    <p class="login-sub">SDGP · RH SEMED ACARÁ</p>
     <div class="field">
       <label>Login (CPF ou e-mail)</label>
       <input type="text" id="loginCpf" required autocomplete="off">
@@ -1121,6 +1156,7 @@
     <div class="field">
       <label>CPF</label>
       <input type="text" id="signupCpf" placeholder="000.000.000-00" maxlength="14" required autocomplete="off">
+      <div class="dup-warning" id="signupCpfDupWarning"></div>
     </div>
     <div class="field">
       <label>E-mail (para recuperar senha, se precisar)</label>
@@ -1462,6 +1498,14 @@
       </div>
       <div id="acessosListaArea" style="padding:14px 22px 22px;"></div>
     </div>
+
+    <div class="table-card" style="margin-top:20px;">
+      <div style="padding:18px 22px 0;">
+        <h2 style="font-family:'Fraunces',serif;font-size:18px;color:var(--primary-dark);margin:0;">Histórico de atividades (últimas 80)</h2>
+        <p style="font-size:12.5px;color:var(--muted);margin:6px 0 0;">O que cada colaborador criou, editou ou excluiu no sistema.</p>
+      </div>
+      <div id="atividadesListaArea" style="padding:14px 22px 22px;"></div>
+    </div>
   </div>
 
   <div id="periodoArea" style="display:none;">
@@ -1586,6 +1630,7 @@ const secondaryAuth = secondaryApp.auth();
 const REGISTROS_COL = 'registros';
 const USUARIOS_COL = 'usuarios';
 const ACESSOS_COL = 'acessos_log';
+const ATIVIDADES_COL = 'atividades_log';
 let records = [];
 let editingId = null;
 let perfilAbertoId = null;
@@ -1729,6 +1774,32 @@ document.getElementById('mostrarEsqueciSenhaBtn').addEventListener('click', () =
 document.getElementById('voltarLoginDeEsqueciBtn').addEventListener('click', () => alternarTelaLogin('login'));
 
 attachMask(document.getElementById('signupCpf'), maskCPF);
+
+let signupCpfCheckTimeout = null;
+let signupCpfDuplicado = false;
+document.getElementById('signupCpf').addEventListener('input', (e) => {
+  clearTimeout(signupCpfCheckTimeout);
+  const warningEl = document.getElementById('signupCpfDupWarning');
+  const cpfDigitado = e.target.value;
+  const digitos = cpfSoDigitos(cpfDigitado);
+  signupCpfDuplicado = false;
+  warningEl.classList.remove('show');
+  warningEl.textContent = '';
+  if(digitos.length !== 11) return;
+  signupCpfCheckTimeout = setTimeout(async () => {
+    try{
+      const jaExiste = await buscarEmailPorCpf(cpfDigitado);
+      if(jaExiste){
+        signupCpfDuplicado = true;
+        warningEl.textContent = '⚠ Já existe um cadastro com esse CPF. Use "Esqueci minha senha" se for você mesmo.';
+        warningEl.classList.add('show');
+      }
+    }catch(err){
+      console.error('Não foi possível checar duplicidade de CPF:', err);
+    }
+  }, 400);
+});
+
 attachMask(document.getElementById('novoUsuarioCpf'), maskCPF);
 
 loginForm.addEventListener('submit', async (e) => {
@@ -1795,6 +1866,11 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
 
   if(!nome || !cpf || !emailReal || !senha){
     signupError.textContent = 'Preencha nome, CPF, e-mail e senha.';
+    signupError.style.display = 'block';
+    return;
+  }
+  if(signupCpfDuplicado){
+    signupError.textContent = 'Já existe um cadastro com esse CPF. Não é possível continuar.';
     signupError.style.display = 'block';
     return;
   }
@@ -1919,6 +1995,20 @@ function anoEstaLiberado(ano){
 
 // Registra no histórico cada vez que alguém efetivamente faz login (não conta
 // aberturas de novas guias com a sessão já ativa, só o login "de verdade").
+// Registra uma ação de alguém no sistema (criou/editou/excluiu um registro), para
+// acompanhar o fluxo de produtividade de cada colaborador.
+function registrarAtividade(acao, detalhe){
+  if(!usuarioAtual) return;
+  const nomeExibicao = document.getElementById('sessaoUsuario') ? document.getElementById('sessaoUsuario').textContent : usuarioAtual.email;
+  db.collection(ATIVIDADES_COL).add({
+    uid: usuarioAtual.uid,
+    nome: nomeExibicao,
+    acao,
+    detalhe: detalhe || '',
+    quando: Date.now()
+  }).catch(e => console.error('Não foi possível registrar a atividade:', e));
+}
+
 function registrarAcesso(user){
   db.collection(USUARIOS_COL).doc(user.uid).get().then(doc => {
     const nome = doc.exists ? (doc.data().nome || user.email) : (usuarioAtual && usuarioAtual.email === user.email ? 'Administrador' : user.email);
@@ -3823,8 +3913,10 @@ function renderDashboard(){
 function renderUsuarios(){
   const listaArea = document.getElementById('usuariosListaArea');
   const acessosArea = document.getElementById('acessosListaArea');
+  const atividadesArea = document.getElementById('atividadesListaArea');
   listaArea.innerHTML = '<div class="loading">Carregando…</div>';
   acessosArea.innerHTML = '<div class="loading">Carregando…</div>';
+  atividadesArea.innerHTML = '<div class="loading">Carregando…</div>';
 
   db.collection(USUARIOS_COL).orderBy('criadoEm', 'desc').get().then(snap => {
     const docsVisiveis = snap.docs.filter(doc => doc.data().excluido !== true);
@@ -3870,6 +3962,26 @@ function renderUsuarios(){
     console.error(e);
     acessosArea.innerHTML = '<div class="empty-state">Não foi possível carregar o histórico de acessos.</div>';
   });
+
+  db.collection(ATIVIDADES_COL).orderBy('quando', 'desc').limit(80).get().then(snap => {
+    if(snap.empty){
+      atividadesArea.innerHTML = '<div class="empty-state">Nenhuma atividade registrada ainda.</div>';
+      return;
+    }
+    const rows = snap.docs.map(doc => {
+      const a = doc.data();
+      return `<tr>
+        <td class="mono">${a.nome || '—'}</td>
+        <td>${a.acao || '—'}</td>
+        <td class="wrap-cell">${a.detalhe || '—'}</td>
+        <td>${a.quando ? new Date(a.quando).toLocaleString('pt-BR') : '—'}</td>
+      </tr>`;
+    }).join('');
+    atividadesArea.innerHTML = `<div class="table-scroll"><table><thead><tr><th>Quem</th><th>Ação</th><th>Registro afetado</th><th>Quando</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  }).catch(e => {
+    console.error(e);
+    atividadesArea.innerHTML = '<div class="empty-state">Não foi possível carregar o histórico de atividades.</div>';
+  });
 }
 
 window.alternarAutorizacaoUsuario = async function(uid, novoValor){
@@ -3880,6 +3992,18 @@ window.alternarAutorizacaoUsuario = async function(uid, novoValor){
   }catch(e){
     console.error(e);
     showToast('Não foi possível atualizar a autorização.');
+  }
+};
+
+window.excluirCadastroUsuario = async function(uid, nome){
+  if(!confirm(`Excluir o cadastro de "${nome}"? A pessoa não vai mais conseguir acessar o sistema.`)) return;
+  try{
+    await db.collection(USUARIOS_COL).doc(uid).update({ excluido: true, autorizado: false });
+    showToast('Cadastro excluído.');
+    renderUsuarios();
+  }catch(e){
+    console.error(e);
+    showToast('Não foi possível excluir o cadastro.');
   }
 };
 
@@ -4236,6 +4360,7 @@ document.getElementById('saveBtn').addEventListener('click', async ()=>{
       const ok = await salvarRegistro(data);
       if(ok){
         showSuccessFloat('Alterações salvas com sucesso');
+        registrarAtividade('Editou registro', data.servidor || '');
         editingId = null;
         switchTab('registros');
       }
@@ -4244,6 +4369,7 @@ document.getElementById('saveBtn').addEventListener('click', async ()=>{
       const ok = await salvarRegistro(data);
       if(ok){
         showSuccessFloat('Registro salvo com sucesso');
+        registrarAtividade('Criou registro', data.servidor || '');
         abrirCadastroParaNovo();
       }
     }
@@ -4256,8 +4382,12 @@ document.getElementById('saveBtn').addEventListener('click', async ()=>{
 document.getElementById('deleteBtn').addEventListener('click', async ()=>{
   if(!perfilAbertoId) return;
   if(!confirm('Excluir este registro definitivamente?')) return;
+  const registroExcluido = records.find(x => x.id === perfilAbertoId);
   const ok = await excluirRegistro(perfilAbertoId);
-  if(ok) showToast('Registro excluído.');
+  if(ok){
+    showToast('Registro excluído.');
+    registrarAtividade('Excluiu registro', registroExcluido ? registroExcluido.servidor : '');
+  }
   fecharPerfil();
 });
 
