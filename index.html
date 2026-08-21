@@ -1464,7 +1464,14 @@
   <div id="dashboardArea" style="display:none;"></div>
 
   <div id="usuariosArea" style="display:none;">
-    <div class="table-card" style="padding:26px 28px; margin-bottom:20px;">
+    <div class="month-tabs" id="usuariosSubTabs" style="margin-bottom:16px;">
+      <button class="month-btn active" data-secao="criar" type="button">Criar novo usuário</button>
+      <button class="month-btn" data-secao="lista" type="button">Usuários cadastrados</button>
+      <button class="month-btn" data-secao="acessos" type="button">Histórico de acessos (últimos 50)</button>
+      <button class="month-btn" data-secao="atividades" type="button">Histórico de atividades (últimas 80)</button>
+    </div>
+
+    <div id="usuariosSecaoCriar" class="table-card" style="padding:26px 28px;">
       <h2 style="font-family:'Fraunces',serif;font-size:20px;color:var(--primary-dark);margin:0 0 18px;">Criar novo usuário</h2>
       <div class="grid" style="grid-template-columns:repeat(2, minmax(0,1fr));">
         <div class="field"><label>Nome</label><input type="text" id="novoUsuarioNome" autocomplete="off"></div>
@@ -1485,21 +1492,21 @@
       </div>
     </div>
 
-    <div class="table-card" style="margin-bottom:20px;">
+    <div id="usuariosSecaoLista" class="table-card" style="display:none;">
       <div style="padding:18px 22px 0;">
         <h2 style="font-family:'Fraunces',serif;font-size:18px;color:var(--primary-dark);margin:0;">Usuários cadastrados</h2>
       </div>
       <div id="usuariosListaArea" style="padding:14px 22px 22px;"></div>
     </div>
 
-    <div class="table-card">
+    <div id="usuariosSecaoAcessos" class="table-card" style="display:none;">
       <div style="padding:18px 22px 0;">
         <h2 style="font-family:'Fraunces',serif;font-size:18px;color:var(--primary-dark);margin:0;">Histórico de acessos (últimos 50)</h2>
       </div>
       <div id="acessosListaArea" style="padding:14px 22px 22px;"></div>
     </div>
 
-    <div class="table-card" style="margin-top:20px;">
+    <div id="usuariosSecaoAtividades" class="table-card" style="display:none;">
       <div style="padding:18px 22px 0;">
         <h2 style="font-family:'Fraunces',serif;font-size:18px;color:var(--primary-dark);margin:0;">Histórico de atividades (últimas 80)</h2>
         <p style="font-size:12.5px;color:var(--muted);margin:6px 0 0;">O que cada colaborador criou, editou ou excluiu no sistema.</p>
@@ -3673,6 +3680,19 @@ document.getElementById('emissoesSubTabs').addEventListener('click', (e)=>{
   selectedEmissaoTipo = btn.dataset.tipo;
   PAGINA_ESTADO.emissoes = 1;
   render();
+});
+
+document.getElementById('usuariosSubTabs').addEventListener('click', (e) => {
+  const btn = e.target.closest('.month-btn');
+  if(!btn) return;
+  const secao = btn.dataset.secao;
+
+  document.querySelectorAll('#usuariosSubTabs .month-btn').forEach(b => b.classList.toggle('active', b === btn));
+
+  document.getElementById('usuariosSecaoCriar').style.display = secao === 'criar' ? 'block' : 'none';
+  document.getElementById('usuariosSecaoLista').style.display = secao === 'lista' ? 'block' : 'none';
+  document.getElementById('usuariosSecaoAcessos').style.display = secao === 'acessos' ? 'block' : 'none';
+  document.getElementById('usuariosSecaoAtividades').style.display = secao === 'atividades' ? 'block' : 'none';
 });
 
 document.getElementById('exportEmissoesBtn').addEventListener('click', ()=>{
