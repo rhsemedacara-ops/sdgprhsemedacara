@@ -3062,7 +3062,7 @@ async function gerarOficioMailMerge(r){
     y = pdfParagraph(doc, [{ t: 'A (o). Sr. (a)' }], PDF_X0, y, PDF_W);
     y = pdfParagraph(doc, [{ t: diretor }], PDF_X0, y, PDF_W);
     y = pdfParagraph(doc, [{ t: `DIRETOR (A) DA ${nucleo}` }], PDF_X0, y, PDF_W); y += 5;
-    y = pdfParagraph(doc, [{ t: `Assunto: Encaminhamento de Servidor Temporário - ${servidor}.`, b: true }], PDF_X0, y, PDF_W); y += 10;
+    y = pdfParagraph(doc, [{ t: `Assunto: Encaminhamento de Servidor Temporário - ${servidor}.`, b: true }], PDF_X0, y, PDF_W, { align: 'justify' }); y += 10;
     y = pdfParagraph(doc, [{ t: 'Senhor (a) Diretor (a),' }], PDF_X0, y, PDF_W, { firstIndent: 30 }); y += 10;
     y = pdfParagraph(doc, [{ t: `Cumprimentando-o (a) e, considerando as necessidades dos serviços dessa escola e, tendo em vista ainda o número insuficiente de servidores ocupantes do Cargo de ${cargo} no quadro de efetivos desta secretaria, para atuar na função de ${funcao}, encaminho o (a) servidor (a) abaixo mencionado (a), para exercer suas atribuições, em caráter temporário, nessa instituição:` }], PDF_X0, y, PDF_W, { align: 'justify', firstIndent: 30, lineHeight: 7.5 }); y += 5;
 
@@ -3121,7 +3121,7 @@ async function gerarMemoMailMerge(r){
     y = pdfParagraph(doc, [{ t: 'A (o). Sr. (a)' }], PDF_X0, y, PDF_W);
     y = pdfParagraph(doc, [{ t: diretor }], PDF_X0, y, PDF_W);
     y = pdfParagraph(doc, [{ t: nucleo }], PDF_X0, y, PDF_W); y += 5;
-    y = pdfParagraph(doc, [{ t: `Assunto: Encaminhamento de Servidor Temporário - ${servidor}.`, b: true }], PDF_X0, y, PDF_W); y += 10;
+    y = pdfParagraph(doc, [{ t: `Assunto: Encaminhamento de Servidor Temporário - ${servidor}.`, b: true }], PDF_X0, y, PDF_W, { align: 'justify' }); y += 10;
     y = pdfParagraph(doc, [{ t: 'Senhor (a) Diretor (a),' }], PDF_X0, y, PDF_W, { firstIndent: 30 }); y += 10;
     y = pdfParagraph(doc, [{ t: `Cumprimentando-o (a) e, considerando as necessidades dos serviços dessa diretoria e, tendo em vista ainda o número insuficiente de servidores ocupantes do Cargo/Função de ${funcao} no quadro de efetivos desta secretaria, encaminho o (a) servidor (a) abaixo mencionado (a), para exercer suas atribuições, em caráter temporário, nesse setor:` }], PDF_X0, y, PDF_W, { align: 'justify', firstIndent: 30, lineHeight: 7.5 }); y += 5;
 
@@ -3937,7 +3937,10 @@ function renderIndicacoes(){
   if(!loaded){ area.innerHTML = '<div class="loading">Carregando registros…</div>'; return; }
 
   const q = document.getElementById('indicacoesSearchInput').value.trim();
-  const base = recordsDoAno().slice().sort((a,b)=> (b.criadoEm||0) - (a.criadoEm||0));
+  const base = recordsDoAno()
+    .filter(r => r.situacao !== 'Finalizado')
+    .slice()
+    .sort((a,b)=> (b.criadoEm||0) - (a.criadoEm||0));
   const filtered = base.filter(r => !q || (r.indicacao || '').toLowerCase().includes(q.toLowerCase()));
 
 
@@ -3994,6 +3997,7 @@ function gerarIndicacoesPDFGeral(){
 
   const q = document.getElementById('indicacoesSearchInput').value.trim();
   const dados = recordsDoAno()
+    .filter(r => r.situacao !== 'Finalizado')
     .slice()
     .sort((a,b)=> (b.criadoEm||0) - (a.criadoEm||0))
     .filter(r => !q || (r.indicacao || '').toLowerCase().includes(q.toLowerCase()));
