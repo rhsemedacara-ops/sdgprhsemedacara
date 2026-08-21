@@ -4649,7 +4649,7 @@ document.getElementById('saveBtn').addEventListener('click', async ()=>{
       data.id = (crypto.randomUUID ? crypto.randomUUID() : 'id-' + Date.now() + '-' + Math.random().toString(16).slice(2));
       const ok = await salvarRegistro(data);
       if(ok){
-        showSuccessFloat('Registro salvo com sucesso');
+        showSuccessFloat(`Servidor (a) ${data.servidor || ''} cadastrado com sucesso`);
         registrarAtividade('Criou registro', data.servidor || '');
         abrirCadastroParaNovo();
       }
