@@ -1520,9 +1520,10 @@
           <legend>02 · Servidor</legend>
           <div class="grid">
             <div class="field full"><label>Nome do servidor *</label><input type="text" name="servidor" required autocomplete="off"></div>
-            <div class="field full" id="fotoServidorField" style="display:none;">
-              <label>Foto (recebida do pré-cadastro)</label>
-              <div style="position:relative; width:96px;">
+            <div class="field full" id="fotoServidorField">
+              <label>Foto</label>
+              <input type="file" id="fotoServidorInput" accept="image/*" capture="environment">
+              <div id="fotoServidorPreviewWrap" style="display:none; margin-top:10px; position:relative; width:96px;">
                 <img id="fotoServidorPreview" style="width:96px; height:96px; object-fit:cover; border-radius:10px; border:1px solid var(--line-strong); display:block;">
                 <button type="button" id="removerFotoServidorBtn" class="foto-remove-btn" aria-label="Remover foto">×</button>
               </div>
@@ -4134,20 +4135,21 @@ function gerarIndicacoesPDFGeral(){
   const marginX = 12;
   const marginTop = 16;
   const marginBottom = 14;
-  const rowH = 7;
+  const rowH = 12;
 
   const cols = [
-    { label: 'Indicação', key: 'indicacao', w: 32 },
-    { label: 'Servidor',  key: 'servidor',  w: 44 },
-    { label: 'Telefone',  key: 'contato',   w: 24 },
-    { label: 'Cargo',     key: 'cargo',     w: 32 },
-    { label: 'Função',    key: 'funcao',    w: 30 },
-    { label: 'Turno',     key: 'turno',     w: 20 },
-    { label: 'Adm',       key: '__adm',     w: 18 },
-    { label: 'Núcleo',    key: 'nucleo',    w: 36 },
-    { label: 'Diretor',   key: 'diretor',   w: 32 },
-    { label: 'Local',     key: 'local',     w: 28 },
-    { label: 'CH',        key: 'ch',        w: 14 }
+    { label: 'Foto',      key: '__foto',    w: 14 },
+    { label: 'Indicação', key: 'indicacao', w: 24 },
+    { label: 'Servidor',  key: 'servidor',  w: 38 },
+    { label: 'Telefone',  key: 'contato',   w: 22 },
+    { label: 'Cargo',     key: 'cargo',     w: 26 },
+    { label: 'Função',    key: 'funcao',    w: 24 },
+    { label: 'Turno',     key: 'turno',     w: 16 },
+    { label: 'Adm',       key: '__adm',     w: 16 },
+    { label: 'Núcleo',    key: 'nucleo',    w: 30 },
+    { label: 'Diretor',   key: 'diretor',   w: 26 },
+    { label: 'Local',     key: 'local',     w: 23 },
+    { label: 'CH',        key: 'ch',        w: 12 }
   ];
 
   function desenhaCabecalho(y){
@@ -4198,6 +4200,16 @@ function gerarIndicacoesPDFGeral(){
 
     let x = marginX;
     cols.forEach(c => {
+      if(c.key === '__foto'){
+        if(r.foto){
+          try{
+            const imgSize = rowH - 3;
+            doc.addImage(r.foto, 'JPEG', x + (c.w - imgSize) / 2, y + 1.5, imgSize, imgSize);
+          }catch(e){ /* segue sem a foto se der algum erro de formato */ }
+        }
+        x += c.w;
+        return;
+      }
       let valor;
       if(c.key === '__adm'){
         valor = r.admissao ? new Date(r.admissao+'T00:00:00').toLocaleDateString('pt-BR') : '—';
@@ -4615,6 +4627,7 @@ document.getElementById('salvarPrecadastroBtn').addEventListener('click', async 
       ano: selectedAno
     });
     showSuccessFloat(`Pré-cadastro de ${nome} enviado com sucesso`);
+    registrarAtividade('Enviou pré-cadastro', nome);
     limparFormPrecadastro();
   }catch(e){
     console.error(e);
@@ -4685,6 +4698,7 @@ window.darAndamentoPrecadastro = async function(id){
     fotoServidorAtual = p.foto || null;
     atualizarPreviewFotoCadastro();
     await db.collection(PRECADASTROS_COL).doc(id).update({ status: 'processado' });
+    registrarAtividade('Deu andamento ao pré-cadastro', p.nome || '');
     irParaSubAbaCadastro('form');
     showToast('Continue preenchendo o restante dos dados e clique em Salvar registro.');
     atualizarBadgePendentes();
@@ -4699,6 +4713,7 @@ window.excluirPrecadastro = async function(id, nome){
   try{
     await db.collection(PRECADASTROS_COL).doc(id).delete();
     showToast('Pré-cadastro excluído.');
+    registrarAtividade('Excluiu pré-cadastro', nome);
     renderPrecadastros();
     atualizarBadgePendentes();
   }catch(e){
@@ -4708,14 +4723,25 @@ window.excluirPrecadastro = async function(id, nome){
 };
 
 function atualizarPreviewFotoCadastro(){
-  const wrap = document.getElementById('fotoServidorField');
+  const wrap = document.getElementById('fotoServidorPreviewWrap');
   if(fotoServidorAtual){
     document.getElementById('fotoServidorPreview').src = fotoServidorAtual;
     wrap.style.display = 'block';
   }else{
     wrap.style.display = 'none';
   }
+  document.getElementById('fotoServidorInput').value = '';
 }
+
+document.getElementById('fotoServidorInput').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if(!file) return;
+  comprimirFoto(file, (base64) => {
+    fotoServidorAtual = base64;
+    document.getElementById('fotoServidorPreview').src = base64;
+    document.getElementById('fotoServidorPreviewWrap').style.display = 'block';
+  });
+});
 
 document.getElementById('removerFotoServidorBtn').addEventListener('click', () => {
   fotoServidorAtual = null;
