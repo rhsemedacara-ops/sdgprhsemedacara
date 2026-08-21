@@ -4346,16 +4346,6 @@ window.abrirPerfil = function(id){
   html += item('Admissão', fmtData(r.admissao));
 
   const VINCULO_LABELS = { TEMPORARIO: 'Temporário', CONCURSADO: 'Concursado', EFETIVO: 'Efetivo', ESTAVEL: 'Estável', NOMEADO: 'Nomeado' };
-  if(r.vinculo){
-    html += secao('Vínculo');
-    html += item('Tipo de vínculo', VINCULO_LABELS[r.vinculo] || r.vinculo);
-    if(r.vinculo === 'CONCURSADO') html += item('Concurso', r.vinculoConcurso);
-    if(r.vinculo === 'ESTAVEL') html += item('Situação de estabilidade', r.vinculoEstavel);
-    if(r.vinculo === 'EFETIVO' || r.vinculo === 'NOMEADO'){
-      html += item('Portaria Nº', r.vinculoPortariaNumero);
-      html += item('Data da portaria', fmtData(r.vinculoPortariaData));
-    }
-  }
 
   html += secao('Processo');
   html += item('Nº Memo', r.memo);
@@ -4363,6 +4353,13 @@ window.abrirPerfil = function(id){
   html += item('Nº Autorização', r.autorizacao);
   html += item('Nº Contrato', r.contrato);
   html += item('Indicação', r.indicacao);
+  html += item('Tipo de vínculo', VINCULO_LABELS[r.vinculo] || '—');
+  if(r.vinculo === 'CONCURSADO') html += item('Concurso', r.vinculoConcurso);
+  if(r.vinculo === 'ESTAVEL') html += item('Situação de estabilidade', r.vinculoEstavel);
+  if(r.vinculo === 'EFETIVO' || r.vinculo === 'NOMEADO'){
+    html += item('Portaria Nº', r.vinculoPortariaNumero);
+    html += item('Data da portaria', fmtData(r.vinculoPortariaData));
+  }
 
   html += secao('Situação');
   html += item('Situação do contrato', r.situacao || 'Ativo');
