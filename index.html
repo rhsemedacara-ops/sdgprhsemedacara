@@ -1373,6 +1373,12 @@
 
   <div class="main-panel">
   <div id="cadastroArea" style="display:none;">
+    <div class="month-tabs" id="cadastroSubTabs" style="margin-bottom:16px;">
+      <button class="month-btn active" data-secao="form" type="button">Novo registro</button>
+      <button class="month-btn" data-secao="pendentes" type="button">Pré-cadastros pendentes<span class="month-count" id="pendentesCountBadge">0</span></button>
+    </div>
+
+    <div id="cadastroSecaoForm">
     <div class="table-card" style="padding:26px 28px;">
       <h2 id="cadastroTitulo" style="font-family:'Fraunces',serif;font-size:22px;color:var(--primary-dark);margin:0 0 20px;">Novo registro</h2>
             <form id="recordForm" autocomplete="off">
@@ -1619,10 +1625,21 @@
         <button class="btn-primary" type="button" id="saveBtn">Salvar registro</button>
       </div>
     </div>
+    </div>
+
+    <div id="cadastroSecaoPendentes" style="display:none;">
+      <div class="table-card">
+        <div style="padding:18px 22px 0;">
+          <h2 style="font-family:'Fraunces',serif;font-size:18px;color:var(--primary-dark);margin:0;">Pré-cadastros pendentes</h2>
+          <p style="font-size:12.5px;color:var(--muted);margin:6px 0 0;">Aguardando alguém completar o cadastro e dar andamento ao processo.</p>
+        </div>
+        <div id="precadastrosListaArea" style="padding:14px 22px 22px;"></div>
+      </div>
+    </div>
   </div>
 
   <div id="precadastroArea" style="display:none;">
-    <div class="table-card" style="padding:26px 28px; margin-bottom:20px;">
+    <div class="table-card" style="padding:26px 28px;">
       <h2 style="font-family:'Fraunces',serif;font-size:22px;color:var(--primary-dark);margin:0 0 6px;">Novo pré-cadastro</h2>
       <p style="font-size:13px;color:var(--muted);margin:0 0 20px;">Preenchido durante a entrevista. Depois, alguém da equipe completa o restante das informações e dá andamento à contratação.</p>
       <div class="grid" style="grid-template-columns:repeat(2, minmax(0,1fr));">
@@ -1652,18 +1669,13 @@
             <button type="button" id="removerPreFotoBtn" class="foto-remove-btn" aria-label="Remover foto">×</button>
           </div>
         </div>
+        <div class="field"><label>Indicação</label><input type="text" id="preIndicacao" autocomplete="off"></div>
+        <div class="field"><label>Contato</label><input type="tel" id="preContato" placeholder="(00) 00000-0000" maxlength="15" autocomplete="off"></div>
+        <div class="field full"><label>Observação</label><textarea id="preObs" autocomplete="off"></textarea></div>
       </div>
       <div class="cadastro-foot">
         <button class="btn-primary" type="button" id="salvarPrecadastroBtn">Enviar pré-cadastro</button>
       </div>
-    </div>
-
-    <div class="table-card">
-      <div style="padding:18px 22px 0;">
-        <h2 style="font-family:'Fraunces',serif;font-size:18px;color:var(--primary-dark);margin:0;">Pré-cadastros pendentes</h2>
-        <p style="font-size:12.5px;color:var(--muted);margin:6px 0 0;">Aguardando alguém completar o cadastro e dar andamento ao processo.</p>
-      </div>
-      <div id="precadastrosListaArea" style="padding:14px 22px 22px;"></div>
     </div>
   </div>
 
@@ -3583,7 +3595,6 @@ function render(){
   if(activeTab === 'indicacoes') return renderIndicacoes();
   if(activeTab === 'dashboard') return renderDashboard();
   if(activeTab === 'usuarios') return renderUsuarios();
-  if(activeTab === 'precadastro') return renderPrecadastros();
   return renderRegistros();
 }
 
@@ -4019,6 +4030,19 @@ document.getElementById('usuariosSubTabs').addEventListener('click', (e) => {
   document.getElementById('usuariosSecaoAcessos').style.display = secao === 'acessos' ? 'block' : 'none';
   document.getElementById('usuariosSecaoAtividades').style.display = secao === 'atividades' ? 'block' : 'none';
 });
+
+document.getElementById('cadastroSubTabs').addEventListener('click', (e) => {
+  const btn = e.target.closest('.month-btn');
+  if(!btn) return;
+  irParaSubAbaCadastro(btn.dataset.secao);
+});
+
+function irParaSubAbaCadastro(secao){
+  document.querySelectorAll('#cadastroSubTabs .month-btn').forEach(b => b.classList.toggle('active', b.dataset.secao === secao));
+  document.getElementById('cadastroSecaoForm').style.display = secao === 'form' ? 'block' : 'none';
+  document.getElementById('cadastroSecaoPendentes').style.display = secao === 'pendentes' ? 'block' : 'none';
+  if(secao === 'pendentes') renderPrecadastros();
+}
 
 document.getElementById('exportEmissoesBtn').addEventListener('click', ()=>{
   if(!window.XLSX){ showToast('Não foi possível carregar o exportador de Excel.'); return; }
@@ -4554,6 +4578,9 @@ function limparFormPrecadastro(){
   document.getElementById('preLocalField').innerHTML = '<label>Local *</label><input type="text" id="preLocal" autocomplete="off">';
   document.getElementById('preAdmissao').value = '';
   document.getElementById('preCh').value = '';
+  document.getElementById('preIndicacao').value = '';
+  document.getElementById('preContato').value = '';
+  document.getElementById('preObs').value = '';
   document.getElementById('preFoto').value = '';
   document.getElementById('preFotoPreviewWrap').style.display = 'none';
   preFotoBase64 = null;
@@ -4565,6 +4592,9 @@ document.getElementById('salvarPrecadastroBtn').addEventListener('click', async 
   const local = document.getElementById('preLocal').value.trim();
   const admissao = document.getElementById('preAdmissao').value;
   const ch = document.getElementById('preCh').value.trim();
+  const indicacao = document.getElementById('preIndicacao').value.trim();
+  const contato = document.getElementById('preContato').value.trim();
+  const obs = document.getElementById('preObs').value.trim();
 
   if(!nome || !nucleo || !local || !admissao){
     showToast('Preencha nome, núcleo, local e data de admissão.');
@@ -4576,7 +4606,7 @@ document.getElementById('salvarPrecadastroBtn').addEventListener('click', async 
   btn.textContent = 'Enviando...';
   try{
     await db.collection(PRECADASTROS_COL).add({
-      nome, nucleo, local, admissao, ch,
+      nome, nucleo, local, admissao, ch, indicacao, contato, obs,
       foto: preFotoBase64 || null,
       status: 'pendente',
       enviadoPor: usuarioAtual ? usuarioAtual.uid : '',
@@ -4586,7 +4616,6 @@ document.getElementById('salvarPrecadastroBtn').addEventListener('click', async 
     });
     showSuccessFloat(`Pré-cadastro de ${nome} enviado com sucesso`);
     limparFormPrecadastro();
-    renderPrecadastros();
   }catch(e){
     console.error(e);
     showToast('Não foi possível enviar o pré-cadastro.');
@@ -4595,6 +4624,14 @@ document.getElementById('salvarPrecadastroBtn').addEventListener('click', async 
     btn.textContent = 'Enviar pré-cadastro';
   }
 });
+
+function atualizarBadgePendentes(){
+  const badge = document.getElementById('pendentesCountBadge');
+  if(!badge) return;
+  db.collection(PRECADASTROS_COL).where('status', '==', 'pendente').get().then(snap => {
+    badge.textContent = snap.size;
+  }).catch(() => {});
+}
 
 function renderPrecadastros(){
   const area = document.getElementById('precadastrosListaArea');
@@ -4641,11 +4678,15 @@ window.darAndamentoPrecadastro = async function(id){
     form.local.value = p.local || '';
     form.admissao.value = p.admissao || '';
     form.ch.value = p.ch || '';
+    form.obs.value = p.obs || '';
+    form.indicacao.value = p.indicacao || '';
+    form.contato.value = p.contato || '';
     fotoServidorAtual = p.foto || null;
     atualizarPreviewFotoCadastro();
     await db.collection(PRECADASTROS_COL).doc(id).update({ status: 'processado' });
+    irParaSubAbaCadastro('form');
     showToast('Continue preenchendo o restante dos dados e clique em Salvar registro.');
-    renderPrecadastros();
+    atualizarBadgePendentes();
   }catch(e){
     console.error(e);
     showToast('Não foi possível abrir esse pré-cadastro.');
@@ -4658,6 +4699,7 @@ window.excluirPrecadastro = async function(id, nome){
     await db.collection(PRECADASTROS_COL).doc(id).delete();
     showToast('Pré-cadastro excluído.');
     renderPrecadastros();
+    atualizarBadgePendentes();
   }catch(e){
     console.error(e);
     showToast('Não foi possível excluir o pré-cadastro.');
@@ -5080,6 +5122,7 @@ function switchTab(tabKey){
   });
   const cfg = TABS[tabKey];
   document.getElementById('cadastroArea').style.display = cfg.view === 'cadastro' ? 'block' : 'none';
+  if(cfg.view === 'cadastro') atualizarBadgePendentes();
   document.getElementById('precadastroArea').style.display = cfg.view === 'precadastro' ? 'block' : 'none';
   document.getElementById('tableCard').style.display = cfg.view === 'table' ? 'block' : 'none';
   document.getElementById('dashboardArea').style.display = cfg.view === 'dashboard' ? 'block' : 'none';
@@ -5215,6 +5258,7 @@ document.getElementById('exportPeriodoBtn').addEventListener('click', ()=>{
 
 attachMask(document.getElementById('regCpfInput'), maskCPF);
 attachMask(document.getElementById('regContatoInput'), maskTelefone);
+attachMask(document.getElementById('preContato'), maskTelefone);
 attachMask(document.getElementById('regSalarioAberturaInput'), maskMoeda);
 attachMask(document.getElementById('regContratoInput'), maskContrato);
 </script>
