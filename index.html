@@ -389,6 +389,16 @@
     margin-bottom:14px;
     text-align:left;
   }
+  .login-sucesso{
+    background:#E8F3EC;
+    color:#1F6B3A;
+    border:1px solid #B7DCC3;
+    border-radius:var(--r-sm);
+    padding:9px 11px;
+    font-size:12.5px;
+    margin-bottom:14px;
+    text-align:left;
+  }
   .eyebrow{
     font-family:'IBM Plex Mono', monospace;
     font-size:11.5px;
@@ -1098,6 +1108,7 @@
     <div id="loginError" class="login-error" style="display:none;"></div>
     <button type="submit" class="btn-primary login-btn" id="loginSubmitBtn">Entrar</button>
     <button type="button" class="login-link-btn" id="mostrarCadastroBtn">Ainda não tem login? Criar cadastro</button>
+    <button type="button" class="login-link-btn" id="mostrarEsqueciSenhaBtn">Esqueci minha senha</button>
   </form>
 
   <form id="signupForm" class="login-card" autocomplete="off" style="display:none;">
@@ -1112,12 +1123,29 @@
       <input type="text" id="signupCpf" placeholder="000.000.000-00" maxlength="14" required autocomplete="off">
     </div>
     <div class="field">
+      <label>E-mail (para recuperar senha, se precisar)</label>
+      <input type="email" id="signupEmail" required autocomplete="off">
+    </div>
+    <div class="field">
       <label>Senha</label>
       <input type="password" id="signupSenha" required autocomplete="off" placeholder="mínimo 6 caracteres">
     </div>
     <div id="signupError" class="login-error" style="display:none;"></div>
     <button type="submit" class="btn-primary login-btn" id="signupSubmitBtn">Criar cadastro</button>
     <button type="button" class="login-link-btn" id="voltarLoginBtn">Já tenho login? Entrar</button>
+  </form>
+
+  <form id="esqueciSenhaForm" class="login-card" autocomplete="off" style="display:none;">
+    <h2>Esqueci minha senha</h2>
+    <p class="login-sub">Enviaremos um link de redefinição para o seu e-mail</p>
+    <div class="field">
+      <label>CPF ou e-mail cadastrado</label>
+      <input type="text" id="esqueciSenhaLogin" required autocomplete="off">
+    </div>
+    <div id="esqueciSenhaError" class="login-error" style="display:none;"></div>
+    <div id="esqueciSenhaSucesso" class="login-sucesso" style="display:none;"></div>
+    <button type="submit" class="btn-primary login-btn" id="esqueciSenhaSubmitBtn">Enviar link de redefinição</button>
+    <button type="button" class="login-link-btn" id="voltarLoginDeEsqueciBtn">Voltar para o login</button>
   </form>
 
   <div id="pendenteScreen" class="login-card" style="display:none; text-align:center;">
@@ -1397,10 +1425,19 @@
   <div id="usuariosArea" style="display:none;">
     <div class="table-card" style="padding:26px 28px; margin-bottom:20px;">
       <h2 style="font-family:'Fraunces',serif;font-size:20px;color:var(--primary-dark);margin:0 0 18px;">Criar novo usuário</h2>
-      <div class="grid" style="grid-template-columns:repeat(3, minmax(0,1fr));">
+      <div class="grid" style="grid-template-columns:repeat(2, minmax(0,1fr));">
         <div class="field"><label>Nome</label><input type="text" id="novoUsuarioNome" autocomplete="off"></div>
         <div class="field"><label>CPF</label><input type="text" id="novoUsuarioCpf" placeholder="000.000.000-00" maxlength="14" autocomplete="off"></div>
-        <div class="field"><label>Senha</label><input type="text" id="novoUsuarioSenha" autocomplete="off" placeholder="mínimo 6 caracteres"></div>
+        <div class="field"><label>E-mail</label><input type="email" id="novoUsuarioEmail" autocomplete="off"></div>
+        <div class="field">
+          <label>Senha</label>
+          <div class="password-wrap">
+            <input type="password" id="novoUsuarioSenha" autocomplete="off" placeholder="mínimo 6 caracteres">
+            <button type="button" id="toggleNovoUsuarioSenhaBtn" class="toggle-password-btn" aria-label="Mostrar senha">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
       </div>
       <div style="margin-top:18px; display:flex; justify-content:flex-end;">
         <button class="btn-primary" type="button" id="criarUsuarioBtn">Criar usuário</button>
@@ -1637,9 +1674,17 @@ auth.onAuthStateChanged((user) => {
 
 // Converte um CPF (só os números) num "e-mail" interno para o Firebase Auth aceitar,
 // já que o Firebase exige formato de e-mail — a pessoa nunca vê nem digita isso.
-function cpfParaEmailInterno(cpf){
-  const digitos = String(cpf || '').replace(/\D/g, '');
-  return `${digitos}@sdgprhsemedacara.login`;
+const CPF_LOOKUP_COL = 'cpf_lookup';
+
+function cpfSoDigitos(cpf){
+  return String(cpf || '').replace(/\D/g, '');
+}
+
+// Descobre o e-mail real associado a um CPF (consulta pública e mínima — só
+// guarda CPF → e-mail, nada de nome/senha/dados sensíveis nessa coleção).
+async function buscarEmailPorCpf(cpf){
+  const doc = await db.collection(CPF_LOOKUP_COL).doc(cpfSoDigitos(cpf)).get();
+  return doc.exists ? doc.data().email : null;
 }
 
 // --- Cloudflare Turnstile de verdade (o widget se desenha sozinho via data-sitekey) ---
@@ -1667,6 +1712,7 @@ function resetarTurnstile(){
 function alternarTelaLogin(tela){
   loginForm.style.display = tela === 'login' ? 'block' : 'none';
   document.getElementById('signupForm').style.display = tela === 'signup' ? 'block' : 'none';
+  document.getElementById('esqueciSenhaForm').style.display = tela === 'esqueci' ? 'block' : 'none';
   document.getElementById('pendenteScreen').style.display = tela === 'pendente' ? 'block' : 'none';
   if(tela === 'login') resetarTurnstile();
 }
@@ -1674,6 +1720,8 @@ function alternarTelaLogin(tela){
 document.getElementById('mostrarCadastroBtn').addEventListener('click', () => alternarTelaLogin('signup'));
 document.getElementById('voltarLoginBtn').addEventListener('click', () => alternarTelaLogin('login'));
 document.getElementById('sairPendenteBtn').addEventListener('click', () => alternarTelaLogin('login'));
+document.getElementById('mostrarEsqueciSenhaBtn').addEventListener('click', () => alternarTelaLogin('esqueci'));
+document.getElementById('voltarLoginDeEsqueciBtn').addEventListener('click', () => alternarTelaLogin('login'));
 
 attachMask(document.getElementById('signupCpf'), maskCPF);
 attachMask(document.getElementById('novoUsuarioCpf'), maskCPF);
@@ -1690,13 +1738,25 @@ loginForm.addEventListener('submit', async (e) => {
 
   const loginDigitado = document.getElementById('loginCpf').value.trim();
   const password = document.getElementById('loginPassword').value;
-  // Aceita tanto CPF (login por conta individual) quanto um e-mail de verdade
-  // (mantém funcionando a conta original, criada direto no Firebase com e-mail real).
-  const emailInterno = loginDigitado.includes('@') ? loginDigitado : cpfParaEmailInterno(loginDigitado);
   loginSubmitBtn.disabled = true;
   loginSubmitBtn.textContent = 'Entrando...';
   try{
-    const cred = await auth.signInWithEmailAndPassword(emailInterno, password);
+    // Aceita tanto CPF (busca o e-mail real vinculado) quanto um e-mail digitado direto
+    // (mantém funcionando a conta original, criada direto no Firebase com e-mail real).
+    let emailParaLogin = loginDigitado;
+    if(!loginDigitado.includes('@')){
+      const emailEncontrado = await buscarEmailPorCpf(loginDigitado);
+      if(!emailEncontrado){
+        loginError.textContent = 'CPF ou senha incorretos.';
+        loginError.style.display = 'block';
+        resetarTurnstile();
+        loginSubmitBtn.disabled = false;
+        loginSubmitBtn.textContent = 'Entrar';
+        return;
+      }
+      emailParaLogin = emailEncontrado;
+    }
+    const cred = await auth.signInWithEmailAndPassword(emailParaLogin, password);
     const autorizado = await usuarioEstaAutorizado(cred.user.uid);
     if(!autorizado){
       await auth.signOut();
@@ -1725,10 +1785,11 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
 
   const nome = document.getElementById('signupNome').value.trim();
   const cpf = document.getElementById('signupCpf').value.trim();
+  const emailReal = document.getElementById('signupEmail').value.trim();
   const senha = document.getElementById('signupSenha').value;
 
-  if(!nome || !cpf || !senha){
-    signupError.textContent = 'Preencha nome, CPF e senha.';
+  if(!nome || !cpf || !emailReal || !senha){
+    signupError.textContent = 'Preencha nome, CPF, e-mail e senha.';
     signupError.style.display = 'block';
     return;
   }
@@ -1742,19 +1803,26 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
   btn.disabled = true;
   btn.textContent = 'Enviando...';
   try{
-    const emailInterno = cpfParaEmailInterno(cpf);
-    const cred = await secondaryAuth.createUserWithEmailAndPassword(emailInterno, senha);
+    const cpfDigitos = cpfSoDigitos(cpf);
+    const existente = await buscarEmailPorCpf(cpf);
+    if(existente){
+      signupError.textContent = 'Já existe um cadastro com esse CPF.';
+      signupError.style.display = 'block';
+      return;
+    }
+    const cred = await secondaryAuth.createUserWithEmailAndPassword(emailReal, senha);
     await secondaryAuth.signOut();
     await db.collection(USUARIOS_COL).doc(cred.user.uid).set({
-      nome, cpf, email: emailInterno,
+      nome, cpf, email: emailReal,
       autorizado: false,
       criadoEm: Date.now(),
       criadoPor: 'autocadastro'
     });
+    await db.collection(CPF_LOOKUP_COL).doc(cpfDigitos).set({ email: emailReal });
     alternarTelaLogin('pendente');
   }catch(err){
     let msg = 'Não foi possível criar o cadastro.';
-    if(err && err.code === 'auth/email-already-in-use') msg = 'Já existe um cadastro com esse CPF.';
+    if(err && err.code === 'auth/email-already-in-use') msg = 'Já existe um cadastro com esse e-mail.';
     signupError.textContent = msg;
     signupError.style.display = 'block';
   }finally{
@@ -1765,6 +1833,48 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
 
 // Verifica se um usuário pode entrar. Contas sem documento em "usuarios" (criadas
 // direto no Firebase Console, como a conta original) são tratadas como já autorizadas.
+document.getElementById('esqueciSenhaForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const erroEl = document.getElementById('esqueciSenhaError');
+  const sucessoEl = document.getElementById('esqueciSenhaSucesso');
+  erroEl.style.display = 'none';
+  sucessoEl.style.display = 'none';
+
+  const digitado = document.getElementById('esqueciSenhaLogin').value.trim();
+  if(!digitado){
+    erroEl.textContent = 'Digite seu CPF ou e-mail cadastrado.';
+    erroEl.style.display = 'block';
+    return;
+  }
+
+  const btn = document.getElementById('esqueciSenhaSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+  try{
+    let emailParaEnviar = digitado;
+    if(!digitado.includes('@')){
+      const encontrado = await buscarEmailPorCpf(digitado);
+      if(!encontrado){
+        erroEl.textContent = 'Não encontramos um cadastro com esse CPF.';
+        erroEl.style.display = 'block';
+        return;
+      }
+      emailParaEnviar = encontrado;
+    }
+    await auth.sendPasswordResetEmail(emailParaEnviar);
+    sucessoEl.textContent = 'Link enviado! Verifique sua caixa de entrada (e o spam) e siga as instruções do e-mail.';
+    sucessoEl.style.display = 'block';
+  }catch(err){
+    let msg = 'Não foi possível enviar o link. Confira o CPF/e-mail digitado.';
+    if(err && err.code === 'auth/user-not-found') msg = 'Não encontramos um cadastro com esse e-mail.';
+    erroEl.textContent = msg;
+    erroEl.style.display = 'block';
+  }finally{
+    btn.disabled = false;
+    btn.textContent = 'Enviar link de redefinição';
+  }
+});
+
 async function usuarioEstaAutorizado(uid){
   try{
     const doc = await db.collection(USUARIOS_COL).doc(uid).get();
@@ -1827,19 +1937,19 @@ function registrarAcesso(user){
 
 // Cria um novo usuário (login individual) sem derrubar a sessão de quem está criando,
 // usando uma instância separada do Firebase só para essa chamada.
-async function criarNovoUsuario(nome, cpf, senha){
-  const emailInterno = cpfParaEmailInterno(cpf);
-  const cred = await secondaryAuth.createUserWithEmailAndPassword(emailInterno, senha);
+async function criarNovoUsuario(nome, cpf, email, senha){
+  const cred = await secondaryAuth.createUserWithEmailAndPassword(email, senha);
   const uid = cred.user.uid;
   await secondaryAuth.signOut();
   await db.collection(USUARIOS_COL).doc(uid).set({
     nome,
     cpf,
-    email: emailInterno,
+    email,
     autorizado: true,
     criadoEm: Date.now(),
     criadoPor: usuarioAtual ? usuarioAtual.email : ''
   });
+  await db.collection(CPF_LOOKUP_COL).doc(cpfSoDigitos(cpf)).set({ email });
   return uid;
 }
 
@@ -1895,6 +2005,15 @@ const EYE_OFF_SVG = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"
 document.getElementById('togglePasswordBtn').addEventListener('click', () => {
   const pwd = document.getElementById('loginPassword');
   const btn = document.getElementById('togglePasswordBtn');
+  const showing = pwd.type === 'text';
+  pwd.type = showing ? 'password' : 'text';
+  btn.innerHTML = showing ? EYE_OPEN_SVG : EYE_OFF_SVG;
+  btn.setAttribute('aria-label', showing ? 'Mostrar senha' : 'Ocultar senha');
+});
+
+document.getElementById('toggleNovoUsuarioSenhaBtn').addEventListener('click', () => {
+  const pwd = document.getElementById('novoUsuarioSenha');
+  const btn = document.getElementById('toggleNovoUsuarioSenhaBtn');
   const showing = pwd.type === 'text';
   pwd.type = showing ? 'password' : 'text';
   btn.innerHTML = showing ? EYE_OPEN_SVG : EYE_OFF_SVG;
@@ -3694,11 +3813,12 @@ function renderUsuarios(){
   acessosArea.innerHTML = '<div class="loading">Carregando…</div>';
 
   db.collection(USUARIOS_COL).orderBy('criadoEm', 'desc').get().then(snap => {
-    if(snap.empty){
+    const docsVisiveis = snap.docs.filter(doc => doc.data().excluido !== true);
+    if(docsVisiveis.length === 0){
       listaArea.innerHTML = '<div class="empty-state">Nenhum usuário criado por aqui ainda.</div>';
       return;
     }
-    const rows = snap.docs.map(doc => {
+    const rows = docsVisiveis.map(doc => {
       const u = doc.data();
       const autorizado = u.autorizado === true;
       return `<tr>
@@ -3709,6 +3829,7 @@ function renderUsuarios(){
         <td><span class="status-chip status-${autorizado ? 'Ativo' : 'Finalizado'}">${autorizado ? 'Autorizado' : 'Pendente'}</span></td>
         <td class="row-actions">
           <button class="btn-ghost btn-small" onclick="alternarAutorizacaoUsuario('${doc.id}', ${!autorizado})">${autorizado ? 'Revogar' : 'Autorizar'}</button>
+          <button class="btn-danger btn-small" onclick="excluirCadastroUsuario('${doc.id}', '${(u.nome || 'esse usuário').replace(/'/g, "\\'")}')">Excluir</button>
         </td>
       </tr>`;
     }).join('');
@@ -3751,9 +3872,10 @@ window.alternarAutorizacaoUsuario = async function(uid, novoValor){
 document.getElementById('criarUsuarioBtn').addEventListener('click', async () => {
   const nome = document.getElementById('novoUsuarioNome').value.trim();
   const cpf = document.getElementById('novoUsuarioCpf').value.trim();
+  const email = document.getElementById('novoUsuarioEmail').value.trim();
   const senha = document.getElementById('novoUsuarioSenha').value;
 
-  if(!nome || !cpf || !senha){ showToast('Preencha nome, CPF e senha.'); return; }
+  if(!nome || !cpf || !email || !senha){ showToast('Preencha nome, CPF, e-mail e senha.'); return; }
   if(senha.length < 6){ showToast('A senha precisa ter pelo menos 6 caracteres.'); return; }
 
   const btn = document.getElementById('criarUsuarioBtn');
@@ -3762,10 +3884,11 @@ document.getElementById('criarUsuarioBtn').addEventListener('click', async () =>
   btn.textContent = 'Criando...';
 
   try{
-    await criarNovoUsuario(nome, cpf, senha);
+    await criarNovoUsuario(nome, cpf, email, senha);
     showSuccessFloat('Usuário criado com sucesso');
     document.getElementById('novoUsuarioNome').value = '';
     document.getElementById('novoUsuarioCpf').value = '';
+    document.getElementById('novoUsuarioEmail').value = '';
     document.getElementById('novoUsuarioSenha').value = '';
     renderUsuarios();
   }catch(e){
