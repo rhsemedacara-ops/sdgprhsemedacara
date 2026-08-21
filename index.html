@@ -4637,12 +4637,13 @@ function renderPrecadastros(){
   const area = document.getElementById('precadastrosListaArea');
   if(!area) return;
   area.innerHTML = '<div class="loading">Carregando…</div>';
-  db.collection(PRECADASTROS_COL).where('status', '==', 'pendente').orderBy('criadoEm', 'desc').get().then(snap => {
+  db.collection(PRECADASTROS_COL).where('status', '==', 'pendente').get().then(snap => {
     if(snap.empty){
       area.innerHTML = '<div class="empty-state">Nenhum pré-cadastro pendente no momento.</div>';
       return;
     }
-    const cards = snap.docs.map(doc => {
+    const docsOrdenados = snap.docs.slice().sort((a, b) => (b.data().criadoEm || 0) - (a.data().criadoEm || 0));
+    const cards = docsOrdenados.map(doc => {
       const p = doc.data();
       const fotoHtml = p.foto
         ? `<img src="${p.foto}" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid var(--line-strong);">`
