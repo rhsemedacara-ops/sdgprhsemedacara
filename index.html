@@ -1352,19 +1352,49 @@
         <fieldset>
           <legend>01 · Processo</legend>
           <div class="grid cols-3">
-            <div class="field">
+            <div class="field combo-field">
               <label>Nº Memo</label>
-              <input type="text" name="memo" id="memoInput" maxlength="4" autocomplete="off">
+              <div class="combo" id="memoCombo">
+                <button type="button" class="combo-toggle" id="memoComboToggle">
+                  <span id="memoComboLabel" class="combo-toggle-label placeholder">Selecione o nº memo...</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <input type="hidden" name="memo" id="memoInput">
+                <div class="combo-panel" id="memoComboPanel">
+                  <input type="text" class="combo-search" id="memoComboSearch" placeholder="Buscar número..." autocomplete="off">
+                  <div class="combo-list" id="memoComboList"></div>
+                </div>
+              </div>
               <div class="dup-warning" id="memoDupWarning"></div>
             </div>
-            <div class="field">
+            <div class="field combo-field">
               <label>Nº Ofício</label>
-              <input type="text" name="oficio" id="oficioInput" maxlength="4" autocomplete="off">
+              <div class="combo" id="oficioCombo">
+                <button type="button" class="combo-toggle" id="oficioComboToggle">
+                  <span id="oficioComboLabel" class="combo-toggle-label placeholder">Selecione o nº ofício...</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <input type="hidden" name="oficio" id="oficioInput">
+                <div class="combo-panel" id="oficioComboPanel">
+                  <input type="text" class="combo-search" id="oficioComboSearch" placeholder="Buscar número..." autocomplete="off">
+                  <div class="combo-list" id="oficioComboList"></div>
+                </div>
+              </div>
               <div class="dup-warning" id="oficioDupWarning"></div>
             </div>
-            <div class="field">
+            <div class="field combo-field">
               <label>Nº Autorização</label>
-              <input type="text" name="autorizacao" id="autorizacaoInput" maxlength="4" autocomplete="off">
+              <div class="combo" id="autorizacaoCombo">
+                <button type="button" class="combo-toggle" id="autorizacaoComboToggle">
+                  <span id="autorizacaoComboLabel" class="combo-toggle-label placeholder">Selecione o nº autorização...</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <input type="hidden" name="autorizacao" id="autorizacaoInput">
+                <div class="combo-panel" id="autorizacaoComboPanel">
+                  <input type="text" class="combo-search" id="autorizacaoComboSearch" placeholder="Buscar número..." autocomplete="off">
+                  <div class="combo-list" id="autorizacaoComboList"></div>
+                </div>
+              </div>
               <div class="dup-warning" id="autorizacaoDupWarning"></div>
             </div>
             <div class="field"><label>Nº Contrato</label><input type="text" name="contrato" id="regContratoInput" placeholder="0000/0000" maxlength="9" autocomplete="off"></div>
@@ -1424,9 +1454,19 @@
           </div>
 
           <div class="grid cols-3" id="aberturaContaExtra" style="display:none;margin-top:14px;">
-            <div class="field">
+            <div class="field combo-field">
               <label>Nº Ofício Abert. Conta *</label>
-              <input type="text" name="oficioAberturaConta" id="oficioAberturaContaInput" maxlength="4" autocomplete="off">
+              <div class="combo" id="oficioAberturaContaCombo">
+                <button type="button" class="combo-toggle" id="oficioAberturaContaComboToggle">
+                  <span id="oficioAberturaContaComboLabel" class="combo-toggle-label placeholder">Selecione o nº ofício...</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <input type="hidden" name="oficioAberturaConta" id="oficioAberturaContaInput">
+                <div class="combo-panel" id="oficioAberturaContaComboPanel">
+                  <input type="text" class="combo-search" id="oficioAberturaContaComboSearch" placeholder="Buscar número..." autocomplete="off">
+                  <div class="combo-list" id="oficioAberturaContaComboList"></div>
+                </div>
+              </div>
               <div class="dup-warning" id="oficioAberturaContaDupWarning"></div>
             </div>
             <div class="field"><label>Salário base *</label><input type="text" name="salarioBaseAbertura" id="regSalarioAberturaInput" placeholder="0,00" inputmode="decimal" autocomplete="off"></div>
@@ -2696,6 +2736,38 @@ function setNucleoComboValue(v){ nucleoComboApi.setValor(v); }
 const CARGO_OPCOES = ['AG. DE MANUTENÇÃO - ELETRICISTA','AG. DE MANUTENÇÃO - ENCANADOR','AG. DE MANUTENÇÃO - PINTOR','ASSISTENTE SOCIAL','AUXILIAR DE ADMINISTRAÇÃO','AUXILIAR DE SERVIÇOS GERAIS','CONTADOR (A)','MECÂNICO DE VEÍCULOS E MÁQUINAS','MOTORISTA DE VEÍCULOS LEVES','MOTORISTA DE VEÍCULOS PESADOS','NUTRICIONISTA','OPERADOR DE EMBARCAÇÃO','PROFESSOR (A)','PSICÓLOGO (A)','SECRETÁRIO (A) ESCOLAR','TÉCNICO-PEDAGÓGICO','VIGIA','TÉCNICO DE INFORMÁTICA'];
 const cargoComboApi = criarComboBusca('cargo', () => CARGO_OPCOES, 'Selecione o cargo...', () => atualizarSugestoesFuncao());
 function setCargoComboValue(v){ cargoComboApi.setValor(v); }
+
+// Gera a lista de números (0001, 0002, ...) ainda livres dentro de uma faixa, olhando
+// os registros do ano selecionado. Ignora o próprio registro em edição, pra não sumir
+// com o número que ele já está usando.
+function gerarNumerosDisponiveis(max, camposParaChecar){
+  const usados = new Set();
+  recordsDoAno().forEach(r => {
+    if(r.id === editingId) return;
+    camposParaChecar.forEach(campo => {
+      const v = (r[campo] || '').trim();
+      if(v) usados.add(v);
+    });
+  });
+  const disponiveis = [];
+  for(let i = 1; i <= max; i++){
+    const num = String(i).padStart(4, '0');
+    if(!usados.has(num)) disponiveis.push(num);
+  }
+  return disponiveis;
+}
+
+const memoComboApi = criarComboBusca('memo', () => gerarNumerosDisponiveis(600, ['memo']), 'Selecione o nº memo...');
+function setMemoComboValue(v){ memoComboApi.setValor(v); }
+
+const oficioComboApi = criarComboBusca('oficio', () => gerarNumerosDisponiveis(1500, ['oficio', 'oficioAberturaConta']), 'Selecione o nº ofício...');
+function setOficioComboValue(v){ oficioComboApi.setValor(v); }
+
+const autorizacaoComboApi = criarComboBusca('autorizacao', () => gerarNumerosDisponiveis(1500, ['autorizacao']), 'Selecione o nº autorização...');
+function setAutorizacaoComboValue(v){ autorizacaoComboApi.setValor(v); }
+
+const oficioAberturaContaComboApi = criarComboBusca('oficioAberturaConta', () => gerarNumerosDisponiveis(1500, ['oficio', 'oficioAberturaConta']), 'Selecione o nº ofício...');
+function setOficioAberturaContaComboValue(v){ oficioAberturaContaComboApi.setValor(v); }
 
 // Salva um único registro no Firestore (criação ou atualização).
 // Cada usuário grava só o documento que mexeu — sem risco de sobrescrever
@@ -4333,6 +4405,10 @@ function abrirCadastroParaNovo(){
   form.situacao.value = 'Ativo';
   setNucleoComboValue('');
   setCargoComboValue('');
+  setMemoComboValue('');
+  setOficioComboValue('');
+  setAutorizacaoComboValue('');
+  setOficioAberturaContaComboValue('');
   atualizarSugestoesFuncao();
   updateDependentFields('', '');
   toggleSituacaoData();
@@ -4427,9 +4503,13 @@ function abrirCadastroParaEditar(id){
   if(!r) return;
   limparAvisosDuplicidade();
   editingId = id;
-  fields.forEach(f => { if(f !== 'diretor' && f !== 'local' && f !== 'cargo' && form[f]) form[f].value = r[f] || ''; });
+  fields.forEach(f => { if(!['diretor','local','cargo','memo','oficio','autorizacao','oficioAberturaConta'].includes(f) && form[f]) form[f].value = r[f] || ''; });
   setNucleoComboValue(r.nucleo || '');
   setCargoComboValue(r.cargo || '');
+  setMemoComboValue(r.memo || '');
+  setOficioComboValue(r.oficio || '');
+  setAutorizacaoComboValue(r.autorizacao || '');
+  setOficioAberturaContaComboValue(r.oficioAberturaConta || '');
   atualizarSugestoesFuncao();
   updateDependentFields(r.diretor, r.local);
   toggleSituacaoData();
@@ -4469,6 +4549,7 @@ function toggleAberturaContaExtra(){
   }else{
     container.style.display = 'none';
     camposObrigatorios.forEach(el => { el.required = false; el.value = ''; });
+    setOficioAberturaContaComboValue('');
   }
 }
 
