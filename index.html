@@ -1611,6 +1611,7 @@
       <div style="padding:18px 22px 0;">
         <h2 style="font-family:'Fraunces',serif;font-size:18px;color:var(--primary-dark);margin:0;">Histórico de acessos (últimos 50)</h2>
       </div>
+      <div class="month-tabs" id="acessosPessoaTabs" style="padding:14px 22px 0;"></div>
       <div id="acessosListaArea" style="padding:14px 22px 22px;"></div>
     </div>
 
@@ -1619,6 +1620,7 @@
         <h2 style="font-family:'Fraunces',serif;font-size:18px;color:var(--primary-dark);margin:0;">Histórico de atividades (últimas 80)</h2>
         <p style="font-size:12.5px;color:var(--muted);margin:6px 0 0;">O que cada colaborador criou, editou ou excluiu no sistema.</p>
       </div>
+      <div class="month-tabs" id="atividadesPessoaTabs" style="padding:14px 22px 0;"></div>
       <div id="atividadesListaArea" style="padding:14px 22px 22px;"></div>
     </div>
   </div>
@@ -3655,6 +3657,8 @@ function renderDistrato(){
 
 const MESES_ABREV = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
 let selectedMonth = new Date().getMonth(); // 0-indexed, mês atual por padrão
+let pessoaSelecionadaAcessos = null;
+let pessoaSelecionadaAtividades = null;
 
 function renderPeriodo(){
   const monthTabs = document.getElementById('monthTabs');
@@ -4129,7 +4133,9 @@ function renderUsuarios(){
   });
 
   db.collection(ACESSOS_COL).orderBy('quando', 'desc').limit(200).get().then(snap => {
+    const tabsArea = document.getElementById('acessosPessoaTabs');
     if(snap.empty){
+      tabsArea.innerHTML = '';
       acessosArea.innerHTML = '<div class="empty-state">Nenhum acesso registrado ainda.</div>';
       return;
     }
@@ -4140,21 +4146,27 @@ function renderUsuarios(){
       if(!porPessoa.has(chave)) porPessoa.set(chave, []);
       porPessoa.get(chave).push(a);
     });
-    acessosArea.innerHTML = [...porPessoa.entries()].map(([nome, lista]) => `
-      <div class="historico-pessoa-bloco">
-        <div class="historico-pessoa-nome">${nome} <span class="count-pill" style="margin-left:6px;">${lista.length}</span></div>
-        <div class="table-scroll">
-          <table><thead><tr><th>Data/Hora do acesso</th></tr></thead>
-          <tbody>${lista.map(a => `<tr><td>${a.quando ? new Date(a.quando).toLocaleString('pt-BR') : '—'}</td></tr>`).join('')}</tbody></table>
-        </div>
-      </div>`).join('');
+    if(!pessoaSelecionadaAcessos || !porPessoa.has(pessoaSelecionadaAcessos)){
+      pessoaSelecionadaAcessos = [...porPessoa.keys()][0];
+    }
+    tabsArea.innerHTML = [...porPessoa.entries()].map(([nome, lista]) => `
+      <button type="button" class="month-btn ${nome === pessoaSelecionadaAcessos ? 'active' : ''}" onclick="selecionarPessoaHistorico('acessos', '${nome.replace(/'/g, "\\'")}')">${nome}<span class="month-count">${lista.length}</span></button>
+    `).join('');
+    const lista = porPessoa.get(pessoaSelecionadaAcessos) || [];
+    acessosArea.innerHTML = `
+      <div class="table-scroll">
+        <table><thead><tr><th>Data/Hora do acesso</th></tr></thead>
+        <tbody>${lista.map(a => `<tr><td>${a.quando ? new Date(a.quando).toLocaleString('pt-BR') : '—'}</td></tr>`).join('')}</tbody></table>
+      </div>`;
   }).catch(e => {
     console.error(e);
     acessosArea.innerHTML = '<div class="empty-state">Não foi possível carregar o histórico de acessos.</div>';
   });
 
   db.collection(ATIVIDADES_COL).orderBy('quando', 'desc').limit(300).get().then(snap => {
+    const tabsArea = document.getElementById('atividadesPessoaTabs');
     if(snap.empty){
+      tabsArea.innerHTML = '';
       atividadesArea.innerHTML = '<div class="empty-state">Nenhuma atividade registrada ainda.</div>';
       return;
     }
@@ -4165,19 +4177,29 @@ function renderUsuarios(){
       if(!porPessoa.has(chave)) porPessoa.set(chave, []);
       porPessoa.get(chave).push(a);
     });
-    atividadesArea.innerHTML = [...porPessoa.entries()].map(([nome, lista]) => `
-      <div class="historico-pessoa-bloco">
-        <div class="historico-pessoa-nome">${nome} <span class="count-pill" style="margin-left:6px;">${lista.length}</span></div>
-        <div class="table-scroll">
-          <table><thead><tr><th>Ação</th><th>Registro afetado</th><th>Quando</th></tr></thead>
-          <tbody>${lista.map(a => `<tr><td>${a.acao || '—'}</td><td class="wrap-cell">${a.detalhe || '—'}</td><td>${a.quando ? new Date(a.quando).toLocaleString('pt-BR') : '—'}</td></tr>`).join('')}</tbody></table>
-        </div>
-      </div>`).join('');
+    if(!pessoaSelecionadaAtividades || !porPessoa.has(pessoaSelecionadaAtividades)){
+      pessoaSelecionadaAtividades = [...porPessoa.keys()][0];
+    }
+    tabsArea.innerHTML = [...porPessoa.entries()].map(([nome, lista]) => `
+      <button type="button" class="month-btn ${nome === pessoaSelecionadaAtividades ? 'active' : ''}" onclick="selecionarPessoaHistorico('atividades', '${nome.replace(/'/g, "\\'")}')">${nome}<span class="month-count">${lista.length}</span></button>
+    `).join('');
+    const lista = porPessoa.get(pessoaSelecionadaAtividades) || [];
+    atividadesArea.innerHTML = `
+      <div class="table-scroll">
+        <table><thead><tr><th>Ação</th><th>Registro afetado</th><th>Quando</th></tr></thead>
+        <tbody>${lista.map(a => `<tr><td>${a.acao || '—'}</td><td class="wrap-cell">${a.detalhe || '—'}</td><td>${a.quando ? new Date(a.quando).toLocaleString('pt-BR') : '—'}</td></tr>`).join('')}</tbody></table>
+      </div>`;
   }).catch(e => {
     console.error(e);
     atividadesArea.innerHTML = '<div class="empty-state">Não foi possível carregar o histórico de atividades.</div>';
   });
 }
+
+window.selecionarPessoaHistorico = function(tipo, nome){
+  if(tipo === 'acessos') pessoaSelecionadaAcessos = nome;
+  else pessoaSelecionadaAtividades = nome;
+  renderUsuarios();
+};
 
 window.alternarAutorizacaoUsuario = async function(uid, novoValor){
   try{
