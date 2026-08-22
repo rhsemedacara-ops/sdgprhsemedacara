@@ -690,6 +690,65 @@
     text-transform:uppercase;
     color:var(--muted);
   }
+  .dash-card-total{background:linear-gradient(155deg, var(--primary-dark), #0a3c38); border-color:var(--primary-dark);}
+  .dash-card-total .num, .dash-card-total .lbl{color:#fff;}
+  .dash-card-total::before{background:linear-gradient(90deg, var(--seal-gold), var(--stamp-red));}
+
+  .dash-section-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+  }
+  .dash-section-row .dash-section{margin-bottom:0;}
+  @media (max-width:900px){
+    .dash-section-row{grid-template-columns:1fr;}
+  }
+
+  .dash-monthbar-chart{
+    display:flex;
+    align-items:flex-end;
+    gap:6px;
+    height:180px;
+    padding-top:10px;
+  }
+  .dash-monthbar-col{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    height:100%;
+  }
+  .dash-monthbar-num{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    font-weight:600;
+    color:var(--primary-dark);
+    margin-bottom:4px;
+    height:14px;
+  }
+  .dash-monthbar-track{
+    width:100%;
+    flex:1;
+    display:flex;
+    align-items:flex-end;
+    background:#F2F0E6;
+    border-radius:4px 4px 0 0;
+    overflow:hidden;
+  }
+  .dash-monthbar-fill{
+    width:100%;
+    background:linear-gradient(180deg, var(--primary-light), var(--primary-dark));
+    border-radius:4px 4px 0 0;
+    min-height:2px;
+  }
+  .dash-monthbar-lbl{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px;
+    color:var(--muted);
+    margin-top:6px;
+    letter-spacing:.03em;
+  }
+
   .dash-section{
     background:var(--surface);
     border:1px solid var(--line);
@@ -1345,14 +1404,14 @@
   <div class="app-shell">
   <nav class="tabs" id="sideTabs">
     <a class="tab-btn" id="tabPrecadastro" href="#precadastro">Pré-contratação</a>
-    <a class="tab-btn" id="tabCadastro" href="#cadastro">Cadastro</a>
-    <a class="tab-btn active" id="tabRegistros" href="#registros">Controle Servidores</a>
+    <a class="tab-btn" id="tabCadastro" href="#cadastro">Novo Cadastro</a>
+    <a class="tab-btn active" id="tabRegistros" href="#registros">Controle de Servidores</a>
     <a class="tab-btn" id="tabContas" href="#contas">Abertura de Conta</a>
     <a class="tab-btn" id="tabDistrato" href="#distrato">Distrato</a>
     <a class="tab-btn" id="tabPeriodo" href="#periodo">Contratações por Período</a>
     <a class="tab-btn" id="tabEmissoes" href="#emissoes">Acomp. Emi. Doc's</a>
     <a class="tab-btn" id="tabIndicacoes" href="#indicacoes">Indicações</a>
-    <a class="tab-btn" id="tabDashboard" href="#dashboard">Dashboard Geral</a>
+    <a class="tab-btn" id="tabDashboard" href="#dashboard">Dashboard (Relatórios)</a>
     <a class="tab-btn" id="tabUsuarios" href="#usuarios">Usuários</a>
 
     <div class="session-info">
@@ -4313,10 +4372,27 @@ function renderDashboard(){
   const countBy = (fn) => recordsAno.reduce((acc, r)=>{ const k = fn(r) || '—'; acc[k] = (acc[k]||0)+1; return acc; }, {});
   const situacoes = countBy(r => r.situacao || 'Ativo');
   const ativos = recordsAno.filter(r => (r.situacao || 'Ativo') === 'Ativo');
+  const nucleosAtivos = ativos.reduce((acc, r)=>{ const k = r.nucleo || '—'; acc[k] = (acc[k]||0)+1; return acc; }, {});
   const localsAtivos = ativos.reduce((acc, r)=>{ const k = r.local || '—'; acc[k] = (acc[k]||0)+1; return acc; }, {});
-  const funcoesAtivos = ativos.reduce((acc, r)=>{ const k = r.funcao || '—'; acc[k] = (acc[k]||0)+1; return acc; }, {});
+
+  // Contratações por mês (admissão), olhando todos os registros do ano.
+  const porMes = new Array(12).fill(0);
+  recordsAno.forEach(r => {
+    if(!r.admissao) return;
+    const mes = parseInt(r.admissao.split('-')[1], 10) - 1;
+    if(mes >= 0 && mes < 12) porMes[mes]++;
+  });
+  const maxMes = Math.max(1, ...porMes);
+  const MESES_ABREV = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const barrasMes = porMes.map((qtd, i) => `
+    <div class="dash-monthbar-col">
+      <div class="dash-monthbar-num">${qtd || ''}</div>
+      <div class="dash-monthbar-track"><div class="dash-monthbar-fill" style="height:${Math.max(3, Math.round(qtd/maxMes*100))}%"></div></div>
+      <div class="dash-monthbar-lbl">${MESES_ABREV[i]}</div>
+    </div>`).join('');
 
   const statusOrder = ['Ativo','Distratado(a)','Finalizado'];
+  const statusIcones = { 'Ativo':'✓', 'Distratado(a)':'⤬', 'Finalizado':'●' };
   const cards = statusOrder.map(s => `
     <div class="dash-card">
       <div class="num">${situacoes[s] || 0}</div>
@@ -4325,7 +4401,7 @@ function renderDashboard(){
   `).join('');
 
   const totalCard = `
-    <div class="dash-card">
+    <div class="dash-card dash-card-total">
       <div class="num">${total}</div>
       <div class="lbl">Total de registros</div>
     </div>`;
@@ -4349,13 +4425,20 @@ function renderDashboard(){
     </div>
 
     <div class="dash-section">
-      <h3>Servidores por local (Ativos)</h3>
-      ${barsHtml(localsAtivos, 15)}
+      <h3>Contratações por mês (${selectedAno})</h3>
+      <div class="dash-monthbar-chart">${barrasMes}</div>
     </div>
 
-    <div class="dash-section">
-      <h3>Servidores por função (Ativos)</h3>
-      ${barsHtml(funcoesAtivos, 15)}
+    <div class="dash-section-row">
+      <div class="dash-section">
+        <h3>Servidores por Núcleo (Ativos)</h3>
+        ${barsHtml(nucleosAtivos, 15)}
+      </div>
+
+      <div class="dash-section">
+        <h3>Servidores por Local (Ativos)</h3>
+        ${barsHtml(localsAtivos, 15)}
+      </div>
     </div>
   `;
 }
@@ -4375,15 +4458,15 @@ function renderUsuarios(){
       return;
     }
     const TABS_PERMISSAO = [
-      { chave: 'cadastro', nome: 'Cadastro' },
+      { chave: 'cadastro', nome: 'Novo Cadastro' },
       { chave: 'precadastro', nome: 'Pré-contratação' },
-      { chave: 'registros', nome: 'Controle Servidores' },
+      { chave: 'registros', nome: 'Controle de Servidores' },
       { chave: 'contas', nome: 'Abertura de Conta' },
       { chave: 'distrato', nome: 'Distrato' },
       { chave: 'periodo', nome: 'Contratações por Período' },
       { chave: 'emissoes', nome: "Acomp. Emi. Doc's" },
       { chave: 'indicacoes', nome: 'Indicações' },
-      { chave: 'dashboard', nome: 'Dashboard Geral' }
+      { chave: 'dashboard', nome: 'Dashboard (Relatórios)' }
     ];
 
     const rows = docsVisiveis.map(doc => {
