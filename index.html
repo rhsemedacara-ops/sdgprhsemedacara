@@ -1678,6 +1678,14 @@
         <button class="btn-primary" type="button" id="salvarPrecadastroBtn">Enviar pré-cadastro</button>
       </div>
     </div>
+
+    <div class="table-card">
+      <div style="padding:18px 22px 0;">
+        <h2 style="font-family:'Fraunces',serif;font-size:18px;color:var(--primary-dark);margin:0;">Meus pré-cadastros enviados</h2>
+        <p style="font-size:12.5px;color:var(--muted);margin:6px 0 0;">Acompanhe o andamento apenas dos pré-cadastros que você mesmo enviou.</p>
+      </div>
+      <div id="meusPrecadastrosArea" style="padding:14px 22px 22px;"></div>
+    </div>
   </div>
 
   <div class="toolbar" id="toolbarRegistros">
@@ -4599,6 +4607,8 @@ document.getElementById('removerPreFotoBtn').addEventListener('click', () => {
   document.getElementById('preFotoPreviewWrap').style.display = 'none';
 });
 
+let precadastroEmEdicaoId = null;
+
 function limparFormPrecadastro(){
   document.getElementById('preNome').value = '';
   preNucleoComboApi.setValor('');
@@ -4611,6 +4621,8 @@ function limparFormPrecadastro(){
   document.getElementById('preFoto').value = '';
   document.getElementById('preFotoPreviewWrap').style.display = 'none';
   preFotoBase64 = null;
+  precadastroEmEdicaoId = null;
+  document.getElementById('salvarPrecadastroBtn').textContent = 'Enviar pré-cadastro';
 }
 
 document.getElementById('salvarPrecadastroBtn').addEventListener('click', async () => {
@@ -4630,28 +4642,104 @@ document.getElementById('salvarPrecadastroBtn').addEventListener('click', async 
 
   const btn = document.getElementById('salvarPrecadastroBtn');
   btn.disabled = true;
-  btn.textContent = 'Enviando...';
+  btn.textContent = precadastroEmEdicaoId ? 'Salvando...' : 'Enviando...';
   try{
-    await db.collection(PRECADASTROS_COL).add({
-      nome, nucleo, local, admissao, ch, indicacao, contato, obs,
-      foto: preFotoBase64 || null,
-      status: 'pendente',
-      enviadoPor: usuarioAtual ? usuarioAtual.uid : '',
-      enviadoPorNome: document.getElementById('sessaoUsuario') ? document.getElementById('sessaoUsuario').textContent : '',
-      criadoEm: Date.now(),
-      ano: selectedAno
-    });
-    showSuccessFloat(`Pré-cadastro de ${nome} enviado com sucesso`);
-    registrarAtividade('Enviou pré-cadastro', nome);
+    if(precadastroEmEdicaoId){
+      await db.collection(PRECADASTROS_COL).doc(precadastroEmEdicaoId).update({
+        nome, nucleo, local, admissao, ch, indicacao, contato, obs,
+        foto: preFotoBase64 || null
+      });
+      showSuccessFloat(`Pré-cadastro de ${nome} atualizado com sucesso`);
+      registrarAtividade('Editou pré-cadastro', nome);
+    }else{
+      await db.collection(PRECADASTROS_COL).add({
+        nome, nucleo, local, admissao, ch, indicacao, contato, obs,
+        foto: preFotoBase64 || null,
+        status: 'pendente',
+        enviadoPor: usuarioAtual ? usuarioAtual.uid : '',
+        enviadoPorNome: document.getElementById('sessaoUsuario') ? document.getElementById('sessaoUsuario').textContent : '',
+        criadoEm: Date.now(),
+        ano: selectedAno
+      });
+      showSuccessFloat(`Pré-cadastro de ${nome} enviado com sucesso`);
+      registrarAtividade('Enviou pré-cadastro', nome);
+    }
     limparFormPrecadastro();
+    renderMeusPrecadastros();
+    atualizarBadgePendentes();
   }catch(e){
     console.error(e);
-    showToast('Não foi possível enviar o pré-cadastro.');
+    showToast('Não foi possível salvar o pré-cadastro.');
   }finally{
     btn.disabled = false;
     btn.textContent = 'Enviar pré-cadastro';
   }
 });
+
+function renderMeusPrecadastros(){
+  const area = document.getElementById('meusPrecadastrosArea');
+  if(!area || !usuarioAtual) return;
+  area.innerHTML = '<div class="loading">Carregando…</div>';
+  db.collection(PRECADASTROS_COL).where('enviadoPor', '==', usuarioAtual.uid).get().then(snap => {
+    if(snap.empty){
+      area.innerHTML = '<div class="empty-state">Você ainda não enviou nenhum pré-cadastro.</div>';
+      return;
+    }
+    const docsOrdenados = snap.docs.slice().sort((a, b) => (b.data().criadoEm || 0) - (a.data().criadoEm || 0));
+    const cards = docsOrdenados.map(doc => {
+      const p = doc.data();
+      const pendente = p.status !== 'processado';
+      const fotoHtml = p.foto
+        ? `<img src="${p.foto}" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid var(--line-strong);">`
+        : `<div style="width:56px;height:56px;border-radius:8px;background:#EFEEE7;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:10px;text-align:center;">Sem foto</div>`;
+      return `
+        <div class="pre-card">
+          ${fotoHtml}
+          <div class="pre-card-info">
+            <div class="servidor-name">${p.nome}</div>
+            <div class="pre-card-detalhe">${p.nucleo || '—'} · ${p.local || '—'} · Admissão: ${p.admissao ? new Date(p.admissao+'T00:00:00').toLocaleDateString('pt-BR') : '—'}</div>
+            <span class="status-chip status-${pendente ? 'Finalizado' : 'Ativo'}" style="margin-top:6px; display:inline-block;">${pendente ? 'Aguardando andamento' : 'Já em andamento'}</span>
+          </div>
+          ${pendente ? `<button class="btn-ghost btn-small" onclick="editarMeuPrecadastro('${doc.id}')">Editar</button>` : ''}
+          <button class="btn-danger btn-small" onclick="excluirPrecadastro('${doc.id}', '${(p.nome || '').replace(/'/g, "\\'")}')">Excluir</button>
+        </div>`;
+    }).join('');
+    area.innerHTML = cards;
+  }).catch(e => {
+    console.error(e);
+    area.innerHTML = '<div class="empty-state">Não foi possível carregar seus pré-cadastros.</div>';
+  });
+}
+
+window.editarMeuPrecadastro = async function(id){
+  try{
+    const doc = await db.collection(PRECADASTROS_COL).doc(id).get();
+    if(!doc.exists) return;
+    const p = doc.data();
+    precadastroEmEdicaoId = id;
+    document.getElementById('preNome').value = p.nome || '';
+    preNucleoComboApi.setValor(p.nucleo || '');
+    atualizarPreLocal();
+    document.getElementById('preLocal').value = p.local || '';
+    document.getElementById('preAdmissao').value = p.admissao || '';
+    document.getElementById('preCh').value = p.ch || '';
+    document.getElementById('preIndicacao').value = p.indicacao || '';
+    document.getElementById('preContato').value = p.contato || '';
+    document.getElementById('preObs').value = p.obs || '';
+    preFotoBase64 = p.foto || null;
+    if(preFotoBase64){
+      document.getElementById('preFotoPreview').src = preFotoBase64;
+      document.getElementById('preFotoPreviewWrap').style.display = 'block';
+    }else{
+      document.getElementById('preFotoPreviewWrap').style.display = 'none';
+    }
+    document.getElementById('salvarPrecadastroBtn').textContent = 'Salvar alterações';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }catch(e){
+    console.error(e);
+    showToast('Não foi possível abrir esse pré-cadastro para edição.');
+  }
+};
 
 function atualizarBadgePendentes(){
   const badge = document.getElementById('pendentesCountBadge');
@@ -4717,6 +4805,7 @@ window.darAndamentoPrecadastro = async function(id){
     irParaSubAbaCadastro('form');
     showToast('Continue preenchendo o restante dos dados e clique em Salvar registro.');
     atualizarBadgePendentes();
+    renderMeusPrecadastros();
   }catch(e){
     console.error(e);
     showToast('Não foi possível abrir esse pré-cadastro.');
@@ -4730,6 +4819,7 @@ window.excluirPrecadastro = async function(id, nome){
     showToast('Pré-cadastro excluído.');
     registrarAtividade('Excluiu pré-cadastro', nome);
     renderPrecadastros();
+    renderMeusPrecadastros();
     atualizarBadgePendentes();
   }catch(e){
     console.error(e);
@@ -5174,6 +5264,7 @@ function switchTab(tabKey){
   document.getElementById('cadastroArea').style.display = cfg.view === 'cadastro' ? 'block' : 'none';
   if(cfg.view === 'cadastro') atualizarBadgePendentes();
   document.getElementById('precadastroArea').style.display = cfg.view === 'precadastro' ? 'block' : 'none';
+  if(cfg.view === 'precadastro') renderMeusPrecadastros();
   document.getElementById('tableCard').style.display = cfg.view === 'table' ? 'block' : 'none';
   document.getElementById('dashboardArea').style.display = cfg.view === 'dashboard' ? 'block' : 'none';
   document.getElementById('periodoArea').style.display = cfg.view === 'periodo' ? 'block' : 'none';
