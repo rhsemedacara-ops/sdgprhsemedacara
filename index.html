@@ -4122,7 +4122,7 @@ function gerarIndicacoesPDFGeral(){
   const dados = recordsDoAno()
     .filter(r => r.situacao !== 'Finalizado')
     .slice()
-    .sort((a,b)=> (b.criadoEm||0) - (a.criadoEm||0))
+    .sort((a,b)=> (a.indicacao || '').localeCompare(b.indicacao || '', 'pt-BR'))
     .filter(r => !q || (r.indicacao || '').toLowerCase().includes(q.toLowerCase()));
 
   if(dados.length === 0){ showToast('Não há indicações para gerar o PDF.'); return; }
@@ -4228,9 +4228,11 @@ function gerarIndicacoesPDFGeral(){
       const linhas = linhasPorColuna[i];
       const blocoAltura = linhas.length * lineH;
       const inicioY = y + (alturaLinha - blocoAltura) / 2 + lineH - 0.8;
+      if(c.key === '__adm') doc.setFontSize(6.5);
       linhas.forEach((linha, li) => {
         doc.text(linha, x + 1.5, inicioY + li * lineH);
       });
+      if(c.key === '__adm') doc.setFontSize(7.5);
       x += c.w;
     });
 
