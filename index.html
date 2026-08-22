@@ -4082,6 +4082,7 @@ document.getElementById('meusPrecadastrosSubTabs').addEventListener('click', (e)
   const btn = e.target.closest('.month-btn');
   if(!btn) return;
   filtroMeusPrecadastros = btn.dataset.status;
+  paginaMeusPrecadastros = 1;
   document.querySelectorAll('#meusPrecadastrosSubTabs .month-btn').forEach(b => b.classList.toggle('active', b === btn));
   renderMeusPrecadastros();
 });
@@ -4650,6 +4651,8 @@ document.getElementById('removerPreFotoBtn').addEventListener('click', () => {
 
 let precadastroEmEdicaoId = null;
 let filtroMeusPrecadastros = 'pendente';
+let paginaMeusPrecadastros = 1;
+const MEUS_PRECADASTROS_POR_PAGINA = 5;
 
 function limparFormPrecadastro(){
   document.getElementById('preNome').value = '';
@@ -4741,7 +4744,14 @@ function renderMeusPrecadastros(){
       return;
     }
     const docsOrdenados = docsFiltrados.slice().sort((a, b) => (b.data().criadoEm || 0) - (a.data().criadoEm || 0));
-    const cards = docsOrdenados.map(doc => {
+
+    const totalPaginasMeus = Math.max(1, Math.ceil(docsOrdenados.length / MEUS_PRECADASTROS_POR_PAGINA));
+    if(paginaMeusPrecadastros > totalPaginasMeus) paginaMeusPrecadastros = totalPaginasMeus;
+    if(paginaMeusPrecadastros < 1) paginaMeusPrecadastros = 1;
+    const inicio = (paginaMeusPrecadastros - 1) * MEUS_PRECADASTROS_POR_PAGINA;
+    const docsPagina = docsOrdenados.slice(inicio, inicio + MEUS_PRECADASTROS_POR_PAGINA);
+
+    const cards = docsPagina.map(doc => {
       const p = doc.data();
       const pendente = p.status !== 'processado';
       const fotoHtml = p.foto
@@ -4753,18 +4763,44 @@ function renderMeusPrecadastros(){
           <div class="pre-card-info">
             <div class="servidor-name">${p.nome}</div>
             <div class="pre-card-detalhe">${p.nucleo || '—'} · ${p.local || '—'} · Admissão: ${p.admissao ? new Date(p.admissao+'T00:00:00').toLocaleDateString('pt-BR') : '—'}</div>
+            <div class="pre-card-detalhe" style="opacity:.7;">Enviado em ${p.criadoEm ? new Date(p.criadoEm).toLocaleString('pt-BR') : '—'}</div>
             <span class="status-chip status-${pendente ? 'Finalizado' : 'Ativo'}" style="margin-top:6px; display:inline-block;">${pendente ? 'Aguardando andamento' : 'Admissão Concluída'}</span>
           </div>
           ${pendente ? `<button class="btn-ghost btn-small" onclick="editarMeuPrecadastro('${doc.id}')">Editar</button>` : ''}
           <button class="btn-danger btn-small" onclick="excluirPrecadastro('${doc.id}', '${(p.nome || '').replace(/'/g, "\\'")}')">Excluir</button>
         </div>`;
     }).join('');
-    area.innerHTML = cards;
+    area.innerHTML = cards + renderPaginacaoMeusPrecadastros(docsOrdenados.length, paginaMeusPrecadastros, totalPaginasMeus);
   }).catch(e => {
     console.error(e);
     area.innerHTML = '<div class="empty-state">Não foi possível carregar seus pré-contratações.</div>';
   });
 }
+
+function renderPaginacaoMeusPrecadastros(totalRegistros, pagina, totalPaginas){
+  const inicioExibido = totalRegistros === 0 ? 0 : (pagina - 1) * MEUS_PRECADASTROS_POR_PAGINA + 1;
+  const fimExibido = Math.min(pagina * MEUS_PRECADASTROS_POR_PAGINA, totalRegistros);
+  const botoesNumeros = [];
+  for(let p = 1; p <= totalPaginas; p++){
+    botoesNumeros.push(`<button type="button" class="page-btn ${p === pagina ? 'active' : ''}" onclick="mudarPaginaMeusPrecadastros(${p})">${p}</button>`);
+  }
+  return `
+    <div class="pagination">
+      <div class="pagination-info">Mostrando ${inicioExibido} até ${fimExibido} de ${totalRegistros} registro(s)</div>
+      <div class="pagination-controls">
+        <button type="button" class="page-btn" ${pagina === 1 ? 'disabled' : ''} onclick="mudarPaginaMeusPrecadastros(1)">Primeiro</button>
+        <button type="button" class="page-btn" ${pagina === 1 ? 'disabled' : ''} onclick="mudarPaginaMeusPrecadastros(${pagina - 1})">Anterior</button>
+        ${botoesNumeros.join('')}
+        <button type="button" class="page-btn" ${pagina === totalPaginas ? 'disabled' : ''} onclick="mudarPaginaMeusPrecadastros(${pagina + 1})">Próximo</button>
+        <button type="button" class="page-btn" ${pagina === totalPaginas ? 'disabled' : ''} onclick="mudarPaginaMeusPrecadastros(${totalPaginas})">Último</button>
+      </div>
+    </div>`;
+}
+
+window.mudarPaginaMeusPrecadastros = function(p){
+  paginaMeusPrecadastros = p;
+  renderMeusPrecadastros();
+};
 
 window.editarMeuPrecadastro = async function(id){
   try{
@@ -4815,7 +4851,7 @@ function renderPrecadastros(){
       area.innerHTML = '<div class="empty-state">Nenhum pré-contratação pendente no momento.</div>';
       return;
     }
-    const docsOrdenados = snap.docs.slice().sort((a, b) => (b.data().criadoEm || 0) - (a.data().criadoEm || 0));
+    const docsOrdenados = snap.docs.slice().sort((a, b) => (a.data().criadoEm || 0) - (b.data().criadoEm || 0));
     const cards = docsOrdenados.map(doc => {
       const p = doc.data();
       const fotoHtml = p.foto
@@ -4827,7 +4863,7 @@ function renderPrecadastros(){
           <div class="pre-card-info">
             <div class="servidor-name">${p.nome}</div>
             <div class="pre-card-detalhe">${p.nucleo || '—'} · ${p.local || '—'} · Admissão: ${p.admissao ? new Date(p.admissao+'T00:00:00').toLocaleDateString('pt-BR') : '—'}</div>
-            <div class="pre-card-detalhe" style="opacity:.7;">Enviado por ${p.enviadoPorNome || '—'}</div>
+            <div class="pre-card-detalhe" style="opacity:.7;">Enviado por ${p.enviadoPorNome || '—'} · ${p.criadoEm ? new Date(p.criadoEm).toLocaleString('pt-BR') : '—'}</div>
           </div>
           <button class="btn-primary btn-small" onclick="darAndamentoPrecadastro('${doc.id}')">Dar andamento</button>
           <button class="btn-danger btn-small" onclick="excluirPrecadastro('${doc.id}', '${(p.nome || '').replace(/'/g, "\\'")}')">Excluir</button>
