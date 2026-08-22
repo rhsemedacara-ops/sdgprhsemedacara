@@ -3310,7 +3310,7 @@ async function gerarAutorizacaoMailMerge(r){
     y = pdfParagraph(doc, [{ t: `AUTORIZAÇÃO DE CONTRATAÇÃO N° ${autorizacaoNum}/2026` }], PDF_X0, y, PDF_W, { align: 'center' }); y += 5;
     y = pdfParagraph(doc, [{ t: 'À' }], PDF_X0, y, PDF_W);
     y = pdfParagraph(doc, [{ t: 'DIRETORIA ADMINISTRATIVA E SETORIAL' }], PDF_X0, y, PDF_W); y += 5;
-    y = pdfParagraph(doc, [{ t: `Assunto: Autorização de contratação de servidor Temporário - ${servidor}.`, b: true }], PDF_X0, y, PDF_W); y += 5;
+    y = pdfParagraph(doc, [{ t: `Assunto: Autorização de contratação de servidor Temporário - ${servidor}.`, b: true }], PDF_X0, y, PDF_W, { align: 'justify' }); y += 5;
     y = pdfParagraph(doc, [{ t: 'Senhor (a) Diretor (a),' }], PDF_X0, y, PDF_W, { firstIndent: 30 }); y += 5;
     y = pdfParagraph(doc, [{ t: 'Cumprimentando-o (a) e, considerando as necessidades dos serviços educacionais desta secretaria e, diante do número insuficiente de servidores no quadro de efetivos, autorizo a contratação temporária abaixo:' }], PDF_X0, y, PDF_W, { align: 'justify', firstIndent: 30, lineHeight: 7.5 }); y += 5;
 
@@ -3379,7 +3379,7 @@ async function gerarAberturaContaPDF(r){
     y = pdfParagraph(doc, [{ t: `Acará/PA, ${dataPorExtenso}.` }], PDF_X0, y, PDF_W, { align: 'right' }); y += 5;
     y = pdfParagraph(doc, [{ t: 'A (o). Sr. (a)' }], PDF_X0, y, PDF_W);
     y = pdfParagraph(doc, [{ t: 'SETOR DE RECURSOS HUMANOS DA PREFEITURA MUNICIPAL DE ACARÁ' }], PDF_X0, y, PDF_W); y += 5;
-    y = pdfParagraph(doc, [{ t: `Assunto: Solicitação de abertura de conta – ${servidor}.`, b: true }], PDF_X0, y, PDF_W); y += 10;
+    y = pdfParagraph(doc, [{ t: `Assunto: Solicitação de abertura de conta – ${servidor}.`, b: true }], PDF_X0, y, PDF_W, { align: 'justify' }); y += 10;
     y = pdfParagraph(doc, [{ t: 'Senhor (a) Diretor (a),' }], PDF_X0, y, PDF_W, { firstIndent: 30 }); y += 10;
     y = pdfParagraph(doc, [
       { t: `Cumprimentando-o (a) e, considerando a contratação em caráter temporário do Sr (a). ` },
