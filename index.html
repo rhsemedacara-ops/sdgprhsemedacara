@@ -1657,18 +1657,18 @@
         </div>
         <div class="field" id="preLocalField"><label>Local *</label><input type="text" id="preLocal" autocomplete="off"></div>
         <div class="field"><label>Data de admissão *</label><input type="date" id="preAdmissao" autocomplete="off"></div>
-        <div class="field"><label>CH (carga horária)</label><input type="text" id="preCh" placeholder="ex: 40h" maxlength="3" autocomplete="off"></div>
+        <div class="field"><label>CH (carga horária) *</label><input type="text" id="preCh" placeholder="ex: 40h" maxlength="3" autocomplete="off"></div>
         <div class="field full">
-          <label>Foto</label>
+          <label>Foto *</label>
           <input type="file" id="preFoto" accept="image/*" capture="environment">
           <div id="preFotoPreviewWrap" style="display:none; margin-top:10px; position:relative; width:96px;">
             <img id="preFotoPreview" style="width:96px; height:96px; object-fit:cover; border-radius:10px; border:1px solid var(--line-strong); display:block;">
             <button type="button" id="removerPreFotoBtn" class="foto-remove-btn" aria-label="Remover foto">×</button>
           </div>
         </div>
-        <div class="field"><label>Indicação</label><input type="text" id="preIndicacao" list="preIndicacaoList" autocomplete="off"><datalist id="preIndicacaoList"></datalist></div>
+        <div class="field"><label>Indicação *</label><input type="text" id="preIndicacao" list="preIndicacaoList" autocomplete="off"><datalist id="preIndicacaoList"></datalist></div>
         <div class="field combo-field">
-          <label>Cargo</label>
+          <label>Cargo *</label>
           <div class="combo" id="preCargoCombo">
             <button type="button" class="combo-toggle" id="preCargoComboToggle">
               <span id="preCargoComboLabel" class="combo-toggle-label placeholder">Selecione o cargo...</span>
@@ -1682,7 +1682,7 @@
           </div>
         </div>
         <div class="field">
-          <label>Turno</label>
+          <label>Turno *</label>
           <select id="preTurno" autocomplete="off">
             <option value="">—</option>
             <option value="MANHÃ">MANHÃ</option>
@@ -1696,7 +1696,7 @@
             <option value="INTEGRAL">INTEGRAL</option>
           </select>
         </div>
-        <div class="field"><label>Contato</label><input type="tel" id="preContato" placeholder="(00) 00000-0000" maxlength="15" autocomplete="off"></div>
+        <div class="field"><label>Contato *</label><input type="tel" id="preContato" placeholder="(00) 00000-0000" maxlength="15" autocomplete="off"></div>
         <div class="field full"><label>Observação</label><textarea id="preObs" autocomplete="off"></textarea></div>
       </div>
       <div class="cadastro-foot">
@@ -4689,8 +4689,12 @@ document.getElementById('salvarPrecadastroBtn').addEventListener('click', async 
   const turno = document.getElementById('preTurno').value;
   const obs = document.getElementById('preObs').value.trim();
 
-  if(!nome || !nucleo || !local || !admissao){
-    showToast('Preencha nome, núcleo, local e data de admissão.');
+  if(!nome || !nucleo || !local || !admissao || !ch || !indicacao || !contato || !cargo || !turno){
+    showToast('Preencha todos os campos obrigatórios (tudo, menos Observação).');
+    return;
+  }
+  if(!preFotoBase64){
+    showToast('A foto é obrigatória.');
     return;
   }
 
