@@ -1666,11 +1666,26 @@
             <button type="button" id="removerPreFotoBtn" class="foto-remove-btn" aria-label="Remover foto">×</button>
           </div>
         </div>
-        <div class="field"><label>Indicação</label><input type="text" id="preIndicacao" autocomplete="off"></div>
+        <div class="field"><label>Indicação</label><input type="text" id="preIndicacao" list="preIndicacaoList" autocomplete="off"><datalist id="preIndicacaoList"></datalist></div>
+        <div class="field combo-field">
+          <label>Cargo</label>
+          <div class="combo" id="preCargoCombo">
+            <button type="button" class="combo-toggle" id="preCargoComboToggle">
+              <span id="preCargoComboLabel" class="combo-toggle-label placeholder">Selecione o cargo...</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <input type="hidden" id="preCargoInput">
+            <div class="combo-panel" id="preCargoComboPanel">
+              <input type="text" class="combo-search" id="preCargoComboSearch" placeholder="Buscar cargo..." autocomplete="off">
+              <div class="combo-list" id="preCargoComboList"></div>
+            </div>
+          </div>
+        </div>
         <div class="field"><label>Contato</label><input type="tel" id="preContato" placeholder="(00) 00000-0000" maxlength="15" autocomplete="off"></div>
         <div class="field full"><label>Observação</label><textarea id="preObs" autocomplete="off"></textarea></div>
       </div>
       <div class="cadastro-foot">
+        <button class="btn-ghost" type="button" id="limparPrecadastroBtn">Limpar dados</button>
         <button class="btn-primary" type="button" id="salvarPrecadastroBtn">Enviar pré-contratação</button>
       </div>
     </div>
@@ -2751,6 +2766,8 @@ function loadRecords(){
 function atualizarSugestoesFormulario(){
   const indicacoes = [...new Set(records.map(r => (r.indicacao || '').trim()).filter(Boolean))].sort();
   document.getElementById('indicacaoList').innerHTML = indicacoes.map(v => `<option value="${v.replace(/"/g,'&quot;')}">`).join('');
+  const preIndicacaoList = document.getElementById('preIndicacaoList');
+  if(preIndicacaoList) preIndicacaoList.innerHTML = indicacoes.map(v => `<option value="${v.replace(/"/g,'&quot;')}">`).join('');
   atualizarSugestoesFuncao();
 }
 
@@ -2850,6 +2867,7 @@ function atualizarPreLocal(){
 }
 
 const preNucleoComboApi = criarComboBusca('preNucleo', () => NUCLEO_OPCOES, 'Selecione o núcleo...', atualizarPreLocal);
+const preCargoComboApi = criarComboBusca('preCargo', () => CARGO_OPCOES, 'Selecione o cargo...');
 
 const CARGO_OPCOES = ['AG. DE MANUTENÇÃO - ELETRICISTA','AG. DE MANUTENÇÃO - ENCANADOR','AG. DE MANUTENÇÃO - PINTOR','ASSISTENTE SOCIAL','AUXILIAR DE ADMINISTRAÇÃO','AUXILIAR DE SERVIÇOS GERAIS','CONTADOR (A)','MECÂNICO DE VEÍCULOS E MÁQUINAS','MOTORISTA DE VEÍCULOS LEVES','MOTORISTA DE VEÍCULOS PESADOS','NUTRICIONISTA','OPERADOR DE EMBARCAÇÃO','PROFESSOR (A)','PSICÓLOGO (A)','SECRETÁRIO (A) ESCOLAR','TÉCNICO-PEDAGÓGICO','VIGIA','TÉCNICO DE INFORMÁTICA'];
 const cargoComboApi = criarComboBusca('cargo', () => CARGO_OPCOES, 'Selecione o cargo...', () => atualizarSugestoesFuncao());
@@ -4626,6 +4644,7 @@ function limparFormPrecadastro(){
   document.getElementById('preCh').value = '';
   document.getElementById('preIndicacao').value = '';
   document.getElementById('preContato').value = '';
+  preCargoComboApi.setValor('');
   document.getElementById('preObs').value = '';
   document.getElementById('preFoto').value = '';
   document.getElementById('preFotoPreviewWrap').style.display = 'none';
@@ -4633,6 +4652,11 @@ function limparFormPrecadastro(){
   precadastroEmEdicaoId = null;
   document.getElementById('salvarPrecadastroBtn').textContent = 'Enviar pré-contratação';
 }
+
+document.getElementById('limparPrecadastroBtn').addEventListener('click', () => {
+  limparFormPrecadastro();
+  showToast('Dados do formulário limpos.');
+});
 
 document.getElementById('salvarPrecadastroBtn').addEventListener('click', async () => {
   const nome = document.getElementById('preNome').value.trim();
@@ -4642,6 +4666,7 @@ document.getElementById('salvarPrecadastroBtn').addEventListener('click', async 
   const ch = document.getElementById('preCh').value.trim();
   const indicacao = document.getElementById('preIndicacao').value.trim();
   const contato = document.getElementById('preContato').value.trim();
+  const cargo = document.getElementById('preCargoInput').value;
   const obs = document.getElementById('preObs').value.trim();
 
   if(!nome || !nucleo || !local || !admissao){
@@ -4655,14 +4680,14 @@ document.getElementById('salvarPrecadastroBtn').addEventListener('click', async 
   try{
     if(precadastroEmEdicaoId){
       await db.collection(PRECADASTROS_COL).doc(precadastroEmEdicaoId).update({
-        nome, nucleo, local, admissao, ch, indicacao, contato, obs,
+        nome, nucleo, local, admissao, ch, indicacao, contato, cargo, obs,
         foto: preFotoBase64 || null
       });
       showSuccessFloat(`Pré-contratação de ${nome} atualizado com sucesso`);
       registrarAtividade('Editou pré-contratação', nome);
     }else{
       await db.collection(PRECADASTROS_COL).add({
-        nome, nucleo, local, admissao, ch, indicacao, contato, obs,
+        nome, nucleo, local, admissao, ch, indicacao, contato, cargo, obs,
         foto: preFotoBase64 || null,
         status: 'pendente',
         enviadoPor: usuarioAtual ? usuarioAtual.uid : '',
@@ -4738,6 +4763,7 @@ window.editarMeuPrecadastro = async function(id){
     document.getElementById('preCh').value = p.ch || '';
     document.getElementById('preIndicacao').value = p.indicacao || '';
     document.getElementById('preContato').value = p.contato || '';
+    preCargoComboApi.setValor(p.cargo || '');
     document.getElementById('preObs').value = p.obs || '';
     preFotoBase64 = p.foto || null;
     if(preFotoBase64){
@@ -4811,6 +4837,7 @@ window.darAndamentoPrecadastro = async function(id){
     form.obs.value = p.obs || '';
     form.indicacao.value = p.indicacao || '';
     form.contato.value = p.contato || '';
+    if(p.cargo) setCargoComboValue(p.cargo);
     fotoServidorAtual = p.foto || null;
     precadastroOrigemAtual = id;
     atualizarPreviewFotoCadastro();
