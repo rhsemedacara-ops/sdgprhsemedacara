@@ -1850,7 +1850,8 @@
 <div class="bottom-bar">
   <footer class="note">
     <span>© Todos os direitos reservados — Copyright © 2026-2026</span>
-    <button type="button" id="diagFab" class="diag-fab" aria-label="Diagnóstico do sistema">
+    <span id="rodapeTextoUsuario" style="display:none;">Diretoria Administrativa e Setorial | Desenvolvido por Arthur Silva</span>
+    <button type="button" id="diagFab" class="diag-fab" aria-label="Diagnóstico do sistema" style="display:none;">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
     </button>
   </footer>
@@ -1898,6 +1899,7 @@ const PRECADASTROS_COL = 'pre_cadastros';
 let records = [];
 let editingId = null;
 let fotoServidorAtual = null; // guarda a foto (base64) entre o pré-cadastro e o registro final
+let precadastroOrigemAtual = null; // guarda o id do pré-cadastro de origem, se o registro veio de um
 let perfilAbertoId = null;
 let usuarioAtual = null;
 let souAdminAtual = false;
@@ -1975,6 +1977,8 @@ auth.onAuthStateChanged((user) => {
       souAdminAtual = ehAdmin;
       document.getElementById('tabUsuarios').style.display = ehAdmin ? '' : 'none';
       if(!ehAdmin && activeTab === 'usuarios') switchTab('registros');
+      document.getElementById('diagFab').style.display = ehAdmin ? 'flex' : 'none';
+      document.getElementById('rodapeTextoUsuario').style.display = ehAdmin ? 'none' : 'inline';
     });
     aplicarPermissoesDeAbas(user.uid);
     loadRecords();
@@ -4808,6 +4812,7 @@ window.darAndamentoPrecadastro = async function(id){
     form.indicacao.value = p.indicacao || '';
     form.contato.value = p.contato || '';
     fotoServidorAtual = p.foto || null;
+    precadastroOrigemAtual = id;
     atualizarPreviewFotoCadastro();
     await db.collection(PRECADASTROS_COL).doc(id).update({ status: 'processado' });
     registrarAtividade('Deu andamento ao pré-cadastro', p.nome || '');
@@ -4868,6 +4873,7 @@ function abrirCadastroParaNovo(){
   limparAvisosDuplicidade();
   form.situacao.value = 'Ativo';
   fotoServidorAtual = null;
+  precadastroOrigemAtual = null;
   atualizarPreviewFotoCadastro();
   setNucleoComboValue('');
   setCargoComboValue('');
@@ -4976,6 +4982,7 @@ function abrirCadastroParaEditar(id){
   limparAvisosDuplicidade();
   editingId = id;
   fotoServidorAtual = r.foto || null;
+  precadastroOrigemAtual = r.precadastroOrigemId || null;
   atualizarPreviewFotoCadastro();
   fields.forEach(f => { if(!['diretor','local','cargo','memo','oficio','autorizacao','oficioAberturaConta'].includes(f) && form[f]) form[f].value = r[f] || ''; });
   setNucleoComboValue(r.nucleo || '');
@@ -4998,6 +5005,18 @@ function abrirCadastroParaEditar(id){
 }
 
 const SITUACOES_COM_DATA = ['Distratado(a)', 'Finalizado'];
+
+// Some com o pré-cadastro de origem (aba "Concluído") quando o servidor sai do sistema
+// de vez (Finalizado/Distratado) ou é excluído — evita informação duplicada/desatualizada.
+async function removerPrecadastroOrigemSeExistir(precadastroOrigemId){
+  if(!precadastroOrigemId) return;
+  try{
+    await db.collection(PRECADASTROS_COL).doc(precadastroOrigemId).delete();
+    renderMeusPrecadastros();
+  }catch(e){
+    console.error('Não foi possível remover o pré-cadastro de origem:', e);
+  }
+}
 const SITUACAO_DATA_LABELS = {
   'Distratado(a)': 'Data de encerramento',
   'Finalizado': 'Data de finalização'
@@ -5188,6 +5207,7 @@ document.getElementById('saveBtn').addEventListener('click', async ()=>{
   const data = {};
   fields.forEach(f => data[f] = form[f] ? form[f].value.trim() : '');
   data.foto = fotoServidorAtual || null;
+  data.precadastroOrigemId = precadastroOrigemAtual || null;
   if(!editingId){
     data.ano = selectedAno;
     data.criadoEm = Date.now();
@@ -5205,6 +5225,7 @@ document.getElementById('saveBtn').addEventListener('click', async ()=>{
       if(ok){
         showSuccessFloat('Alterações salvas com sucesso');
         registrarAtividade('Editou registro', data.servidor || '');
+        if(SITUACOES_COM_DATA.includes(data.situacao)) await removerPrecadastroOrigemSeExistir(data.precadastroOrigemId);
         editingId = null;
         switchTab('registros');
       }
@@ -5214,6 +5235,7 @@ document.getElementById('saveBtn').addEventListener('click', async ()=>{
       if(ok){
         showSuccessFloat(`Servidor (a) ${data.servidor || ''} cadastrado com sucesso`);
         registrarAtividade('Criou registro', data.servidor || '');
+        if(SITUACOES_COM_DATA.includes(data.situacao)) await removerPrecadastroOrigemSeExistir(data.precadastroOrigemId);
         abrirCadastroParaNovo();
       }
     }
@@ -5231,6 +5253,7 @@ document.getElementById('deleteBtn').addEventListener('click', async ()=>{
   if(ok){
     showToast('Registro excluído.');
     registrarAtividade('Excluiu registro', registroExcluido ? registroExcluido.servidor : '');
+    if(registroExcluido) await removerPrecadastroOrigemSeExistir(registroExcluido.precadastroOrigemId);
   }
   fecharPerfil();
 });
