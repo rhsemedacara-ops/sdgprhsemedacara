@@ -4757,17 +4757,23 @@ function renderMeusPrecadastros(){
       const fotoHtml = p.foto
         ? `<img src="${p.foto}" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid var(--line-strong);">`
         : `<div style="width:56px;height:56px;border-radius:8px;background:#EFEEE7;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:10px;text-align:center;">Sem foto</div>`;
+      const detalhe = pendente
+        ? `${p.nucleo || '—'} · ${p.local || '—'} · Admissão: ${p.admissao ? new Date(p.admissao+'T00:00:00').toLocaleDateString('pt-BR') : '—'}`
+        : `${p.cargo || '—'} · ${p.local || '—'} · Admissão: ${p.admissao ? new Date(p.admissao+'T00:00:00').toLocaleDateString('pt-BR') : '—'}`;
+      const dataHtml = pendente
+        ? `Enviado em ${p.criadoEm ? new Date(p.criadoEm).toLocaleString('pt-BR') : '—'}`
+        : `Concluído em ${p.concluidoEm ? new Date(p.concluidoEm).toLocaleString('pt-BR') : '—'}`;
       return `
         <div class="pre-card">
           ${fotoHtml}
           <div class="pre-card-info">
             <div class="servidor-name">${p.nome}</div>
-            <div class="pre-card-detalhe">${p.nucleo || '—'} · ${p.local || '—'} · Admissão: ${p.admissao ? new Date(p.admissao+'T00:00:00').toLocaleDateString('pt-BR') : '—'}</div>
-            <div class="pre-card-detalhe" style="opacity:.7;">Enviado em ${p.criadoEm ? new Date(p.criadoEm).toLocaleString('pt-BR') : '—'}</div>
+            <div class="pre-card-detalhe">${detalhe}</div>
+            <div class="pre-card-detalhe" style="opacity:.7;">${dataHtml}</div>
             <span class="status-chip status-${pendente ? 'Finalizado' : 'Ativo'}" style="margin-top:6px; display:inline-block;">${pendente ? 'Aguardando andamento' : 'Admissão Concluída'}</span>
           </div>
           ${pendente ? `<button class="btn-ghost btn-small" onclick="editarMeuPrecadastro('${doc.id}')">Editar</button>` : ''}
-          <button class="btn-danger btn-small" onclick="excluirPrecadastro('${doc.id}', '${(p.nome || '').replace(/'/g, "\\'")}')">Excluir</button>
+          ${pendente ? `<button class="btn-danger btn-small" onclick="excluirPrecadastro('${doc.id}', '${(p.nome || '').replace(/'/g, "\\'")}')">Excluir</button>` : ''}
         </div>`;
     }).join('');
     area.innerHTML = cards + renderPaginacaoMeusPrecadastros(docsOrdenados.length, paginaMeusPrecadastros, totalPaginasMeus);
@@ -4896,7 +4902,7 @@ window.darAndamentoPrecadastro = async function(id){
     fotoServidorAtual = p.foto || null;
     precadastroOrigemAtual = id;
     atualizarPreviewFotoCadastro();
-    await db.collection(PRECADASTROS_COL).doc(id).update({ status: 'processado' });
+    await db.collection(PRECADASTROS_COL).doc(id).update({ status: 'processado', concluidoEm: Date.now() });
     registrarAtividade('Deu andamento ao pré-contratação', p.nome || '');
     irParaSubAbaCadastro('form');
     showToast('Continue preenchendo o restante dos dados e clique em Salvar registro.');
