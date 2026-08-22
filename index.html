@@ -1344,7 +1344,7 @@
   <div id="appContent">
   <div class="app-shell">
   <nav class="tabs" id="sideTabs">
-    <a class="tab-btn" id="tabPrecadastro" href="#precadastro">Pré-cadastro</a>
+    <a class="tab-btn" id="tabPrecadastro" href="#precadastro">Pré-contratação</a>
     <a class="tab-btn" id="tabCadastro" href="#cadastro">Cadastro</a>
     <a class="tab-btn active" id="tabRegistros" href="#registros">Controle Servidores</a>
     <a class="tab-btn" id="tabContas" href="#contas">Abertura de Conta</a>
@@ -1371,7 +1371,7 @@
   <div id="cadastroArea" style="display:none;">
     <div class="month-tabs" id="cadastroSubTabs" style="margin-bottom:16px;">
       <button class="month-btn active" data-secao="form" type="button">Novo registro</button>
-      <button class="month-btn" data-secao="pendentes" type="button">Pré-cadastros pendentes<span class="month-count" id="pendentesCountBadge">0</span></button>
+      <button class="month-btn" data-secao="pendentes" type="button">Pré-contratações pendentes<span class="month-count" id="pendentesCountBadge">0</span></button>
     </div>
 
     <div id="cadastroSecaoForm">
@@ -1627,7 +1627,7 @@
     <div id="cadastroSecaoPendentes" style="display:none;">
       <div class="table-card">
         <div style="padding:18px 22px 0;">
-          <h2 style="font-family:'Fraunces',serif;font-size:18px;color:var(--primary-dark);margin:0;">Pré-cadastros pendentes</h2>
+          <h2 style="font-family:'Fraunces',serif;font-size:18px;color:var(--primary-dark);margin:0;">Pré-contratações pendentes</h2>
           <p style="font-size:12.5px;color:var(--muted);margin:6px 0 0;">Aguardando alguém completar o cadastro e dar andamento ao processo.</p>
         </div>
         <div id="precadastrosListaArea" style="padding:14px 22px 22px;"></div>
@@ -1637,7 +1637,7 @@
 
   <div id="precadastroArea" style="display:none;">
     <div class="table-card" style="padding:26px 28px;">
-      <h2 style="font-family:'Fraunces',serif;font-size:22px;color:var(--primary-dark);margin:0 0 6px;">Novo pré-cadastro</h2>
+      <h2 style="font-family:'Fraunces',serif;font-size:22px;color:var(--primary-dark);margin:0 0 6px;">Novo pré-contratação</h2>
       <p style="font-size:13px;color:var(--muted);margin:0 0 20px;">Preenchido durante a entrevista. Depois, alguém da equipe completa o restante das informações e dá andamento à contratação.</p>
       <div class="grid" style="grid-template-columns:repeat(2, minmax(0,1fr));">
         <div class="field full"><label>Nome completo *</label><input type="text" id="preNome" autocomplete="off"></div>
@@ -1671,14 +1671,14 @@
         <div class="field full"><label>Observação</label><textarea id="preObs" autocomplete="off"></textarea></div>
       </div>
       <div class="cadastro-foot">
-        <button class="btn-primary" type="button" id="salvarPrecadastroBtn">Enviar pré-cadastro</button>
+        <button class="btn-primary" type="button" id="salvarPrecadastroBtn">Enviar pré-contratação</button>
       </div>
     </div>
 
     <div class="table-card">
       <div style="padding:18px 22px 0;">
-        <h2 style="font-family:'Fraunces',serif;font-size:18px;color:var(--primary-dark);margin:0;">Meus pré-cadastros enviados</h2>
-        <p style="font-size:12.5px;color:var(--muted);margin:6px 0 0;">Acompanhe o andamento dos pré-cadastros enviados ao RH.</p>
+        <h2 style="font-family:'Fraunces',serif;font-size:18px;color:var(--primary-dark);margin:0;">Meus pré-contratações enviados</h2>
+        <p style="font-size:12.5px;color:var(--muted);margin:6px 0 0;">Acompanhe o andamento dos pré-contratações enviados ao RH.</p>
       </div>
       <div class="month-tabs" id="meusPrecadastrosSubTabs" style="padding:14px 22px 0;">
         <button class="month-btn active" data-status="pendente" type="button">Enviados</button>
@@ -1898,8 +1898,8 @@ const ATIVIDADES_COL = 'atividades_log';
 const PRECADASTROS_COL = 'pre_cadastros';
 let records = [];
 let editingId = null;
-let fotoServidorAtual = null; // guarda a foto (base64) entre o pré-cadastro e o registro final
-let precadastroOrigemAtual = null; // guarda o id do pré-cadastro de origem, se o registro veio de um
+let fotoServidorAtual = null; // guarda a foto (base64) entre o pré-contratação e o registro final
+let precadastroOrigemAtual = null; // guarda o id do pré-contratação de origem, se o registro veio de um
 let perfilAbertoId = null;
 let usuarioAtual = null;
 let souAdminAtual = false;
@@ -4342,7 +4342,7 @@ function renderUsuarios(){
     }
     const TABS_PERMISSAO = [
       { chave: 'cadastro', nome: 'Cadastro' },
-      { chave: 'precadastro', nome: 'Pré-cadastro' },
+      { chave: 'precadastro', nome: 'Pré-contratação' },
       { chave: 'registros', nome: 'Controle Servidores' },
       { chave: 'contas', nome: 'Abertura de Conta' },
       { chave: 'distrato', nome: 'Distrato' },
@@ -4577,7 +4577,7 @@ function limparAvisosDuplicidade(){
   });
 }
 
-// --- Pré-cadastro (formulário simples preenchido na entrevista) ---
+// --- Pré-contratação (formulário simples preenchido na entrevista) ---
 let preFotoBase64 = null;
 
 function comprimirFoto(file, callback){
@@ -4631,7 +4631,7 @@ function limparFormPrecadastro(){
   document.getElementById('preFotoPreviewWrap').style.display = 'none';
   preFotoBase64 = null;
   precadastroEmEdicaoId = null;
-  document.getElementById('salvarPrecadastroBtn').textContent = 'Enviar pré-cadastro';
+  document.getElementById('salvarPrecadastroBtn').textContent = 'Enviar pré-contratação';
 }
 
 document.getElementById('salvarPrecadastroBtn').addEventListener('click', async () => {
@@ -4658,8 +4658,8 @@ document.getElementById('salvarPrecadastroBtn').addEventListener('click', async 
         nome, nucleo, local, admissao, ch, indicacao, contato, obs,
         foto: preFotoBase64 || null
       });
-      showSuccessFloat(`Pré-cadastro de ${nome} atualizado com sucesso`);
-      registrarAtividade('Editou pré-cadastro', nome);
+      showSuccessFloat(`Pré-contratação de ${nome} atualizado com sucesso`);
+      registrarAtividade('Editou pré-contratação', nome);
     }else{
       await db.collection(PRECADASTROS_COL).add({
         nome, nucleo, local, admissao, ch, indicacao, contato, obs,
@@ -4670,18 +4670,18 @@ document.getElementById('salvarPrecadastroBtn').addEventListener('click', async 
         criadoEm: Date.now(),
         ano: selectedAno
       });
-      showSuccessFloat(`Pré-cadastro de ${nome} enviado com sucesso`);
-      registrarAtividade('Enviou pré-cadastro', nome);
+      showSuccessFloat(`Pré-contratação de ${nome} enviado com sucesso`);
+      registrarAtividade('Enviou pré-contratação', nome);
     }
     limparFormPrecadastro();
     renderMeusPrecadastros();
     atualizarBadgePendentes();
   }catch(e){
     console.error(e);
-    showToast('Não foi possível salvar o pré-cadastro.');
+    showToast('Não foi possível salvar o pré-contratação.');
   }finally{
     btn.disabled = false;
-    btn.textContent = 'Enviar pré-cadastro';
+    btn.textContent = 'Enviar pré-contratação';
   }
 });
 
@@ -4695,7 +4695,7 @@ function renderMeusPrecadastros(){
       return status === filtroMeusPrecadastros;
     });
     if(docsFiltrados.length === 0){
-      area.innerHTML = `<div class="empty-state">${filtroMeusPrecadastros === 'pendente' ? 'Nenhum pré-cadastro aguardando no momento.' : 'Nenhum pré-cadastro concluído ainda.'}</div>`;
+      area.innerHTML = `<div class="empty-state">${filtroMeusPrecadastros === 'pendente' ? 'Nenhum pré-contratação aguardando no momento.' : 'Nenhum pré-contratação concluído ainda.'}</div>`;
       return;
     }
     const docsOrdenados = docsFiltrados.slice().sort((a, b) => (b.data().criadoEm || 0) - (a.data().criadoEm || 0));
@@ -4720,7 +4720,7 @@ function renderMeusPrecadastros(){
     area.innerHTML = cards;
   }).catch(e => {
     console.error(e);
-    area.innerHTML = '<div class="empty-state">Não foi possível carregar seus pré-cadastros.</div>';
+    area.innerHTML = '<div class="empty-state">Não foi possível carregar seus pré-contratações.</div>';
   });
 }
 
@@ -4750,7 +4750,7 @@ window.editarMeuPrecadastro = async function(id){
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }catch(e){
     console.error(e);
-    showToast('Não foi possível abrir esse pré-cadastro para edição.');
+    showToast('Não foi possível abrir esse pré-contratação para edição.');
   }
 };
 
@@ -4768,7 +4768,7 @@ function renderPrecadastros(){
   area.innerHTML = '<div class="loading">Carregando…</div>';
   db.collection(PRECADASTROS_COL).where('status', '==', 'pendente').get().then(snap => {
     if(snap.empty){
-      area.innerHTML = '<div class="empty-state">Nenhum pré-cadastro pendente no momento.</div>';
+      area.innerHTML = '<div class="empty-state">Nenhum pré-contratação pendente no momento.</div>';
       return;
     }
     const docsOrdenados = snap.docs.slice().sort((a, b) => (b.data().criadoEm || 0) - (a.data().criadoEm || 0));
@@ -4792,7 +4792,7 @@ function renderPrecadastros(){
     area.innerHTML = cards;
   }).catch(e => {
     console.error(e);
-    area.innerHTML = '<div class="empty-state">Não foi possível carregar os pré-cadastros.</div>';
+    area.innerHTML = '<div class="empty-state">Não foi possível carregar os pré-contratações.</div>';
   });
 }
 
@@ -4815,29 +4815,29 @@ window.darAndamentoPrecadastro = async function(id){
     precadastroOrigemAtual = id;
     atualizarPreviewFotoCadastro();
     await db.collection(PRECADASTROS_COL).doc(id).update({ status: 'processado' });
-    registrarAtividade('Deu andamento ao pré-cadastro', p.nome || '');
+    registrarAtividade('Deu andamento ao pré-contratação', p.nome || '');
     irParaSubAbaCadastro('form');
     showToast('Continue preenchendo o restante dos dados e clique em Salvar registro.');
     atualizarBadgePendentes();
     renderMeusPrecadastros();
   }catch(e){
     console.error(e);
-    showToast('Não foi possível abrir esse pré-cadastro.');
+    showToast('Não foi possível abrir esse pré-contratação.');
   }
 };
 
 window.excluirPrecadastro = async function(id, nome){
-  if(!confirm(`Excluir o pré-cadastro de "${nome}"?`)) return;
+  if(!confirm(`Excluir o pré-contratação de "${nome}"?`)) return;
   try{
     await db.collection(PRECADASTROS_COL).doc(id).delete();
-    showToast('Pré-cadastro excluído.');
-    registrarAtividade('Excluiu pré-cadastro', nome);
+    showToast('Pré-contratação excluído.');
+    registrarAtividade('Excluiu pré-contratação', nome);
     renderPrecadastros();
     renderMeusPrecadastros();
     atualizarBadgePendentes();
   }catch(e){
     console.error(e);
-    showToast('Não foi possível excluir o pré-cadastro.');
+    showToast('Não foi possível excluir o pré-contratação.');
   }
 };
 
@@ -5006,7 +5006,7 @@ function abrirCadastroParaEditar(id){
 
 const SITUACOES_COM_DATA = ['Distratado(a)', 'Finalizado'];
 
-// Some com o pré-cadastro de origem (aba "Concluído") quando o servidor sai do sistema
+// Some com o pré-contratação de origem (aba "Concluído") quando o servidor sai do sistema
 // de vez (Finalizado/Distratado) ou é excluído — evita informação duplicada/desatualizada.
 async function removerPrecadastroOrigemSeExistir(precadastroOrigemId){
   if(!precadastroOrigemId) return;
@@ -5014,7 +5014,7 @@ async function removerPrecadastroOrigemSeExistir(precadastroOrigemId){
     await db.collection(PRECADASTROS_COL).doc(precadastroOrigemId).delete();
     renderMeusPrecadastros();
   }catch(e){
-    console.error('Não foi possível remover o pré-cadastro de origem:', e);
+    console.error('Não foi possível remover o pré-contratação de origem:', e);
   }
 }
 const SITUACAO_DATA_LABELS = {
