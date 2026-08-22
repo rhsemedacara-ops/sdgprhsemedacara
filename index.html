@@ -1712,13 +1712,12 @@
 
   <div id="usuariosArea" style="display:none;">
     <div class="month-tabs" id="usuariosSubTabs" style="margin-bottom:16px;">
-      <button class="month-btn active" data-secao="criar" type="button">Criar novo usuário</button>
-      <button class="month-btn" data-secao="lista" type="button">Usuários cadastrados</button>
+      <button class="month-btn active" data-secao="lista" type="button">Usuários cadastrados</button>
       <button class="month-btn" data-secao="acessos" type="button">Histórico de acessos (últimos 50)</button>
       <button class="month-btn" data-secao="atividades" type="button">Histórico de atividades (últimas 80)</button>
     </div>
 
-    <div id="usuariosSecaoCriar" class="table-card" style="padding:26px 28px;">
+    <div id="usuariosSecaoCriar" class="table-card" style="padding:26px 28px; display:none;">
       <h2 style="font-family:'Fraunces',serif;font-size:20px;color:var(--primary-dark);margin:0 0 18px;">Criar novo usuário</h2>
       <div class="grid" style="grid-template-columns:repeat(2, minmax(0,1fr));">
         <div class="field"><label>Nome</label><input type="text" id="novoUsuarioNome" autocomplete="off"></div>
@@ -1739,7 +1738,7 @@
       </div>
     </div>
 
-    <div id="usuariosSecaoLista" class="table-card" style="display:none;">
+    <div id="usuariosSecaoLista" class="table-card">
       <div style="padding:18px 22px 0;">
         <h2 style="font-family:'Fraunces',serif;font-size:18px;color:var(--primary-dark);margin:0;">Usuários cadastrados</h2>
       </div>
@@ -4183,9 +4182,25 @@ function gerarIndicacoesPDFGeral(){
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7.5);
+  const lineH = 3.2;
+  const minRowH = 12;
 
   dados.forEach((r, idx) => {
-    if(y + rowH > pageHeight - marginBottom){
+    // Calcula quantas linhas cada célula vai precisar, e usa a maior pra definir a altura da linha inteira.
+    const linhasPorColuna = cols.map(c => {
+      if(c.key === '__foto') return [];
+      let valor;
+      if(c.key === '__adm'){
+        valor = r.admissao ? new Date(r.admissao+'T00:00:00').toLocaleDateString('pt-BR') : '—';
+      }else{
+        valor = r[c.key] || '—';
+      }
+      return doc.splitTextToSize(String(valor), c.w - 3);
+    });
+    const maxLinhas = Math.max(1, ...linhasPorColuna.map(l => l.length));
+    const alturaLinha = Math.max(minRowH, maxLinhas * lineH + 3);
+
+    if(y + alturaLinha > pageHeight - marginBottom){
       doc.addPage();
       y = marginTop;
       y = desenhaLinhaCabecalhoTabela(y);
@@ -4195,36 +4210,34 @@ function gerarIndicacoesPDFGeral(){
 
     if(idx % 2 === 1){
       doc.setFillColor(245, 244, 238);
-      doc.rect(marginX, y, cols.reduce((s,c)=>s+c.w,0), rowH, 'F');
+      doc.rect(marginX, y, cols.reduce((s,c)=>s+c.w,0), alturaLinha, 'F');
     }
 
     let x = marginX;
-    cols.forEach(c => {
+    cols.forEach((c, i) => {
       if(c.key === '__foto'){
         if(r.foto){
           try{
-            const imgSize = rowH - 3;
+            const imgSize = Math.min(alturaLinha - 3, c.w - 3);
             doc.addImage(r.foto, 'JPEG', x + (c.w - imgSize) / 2, y + 1.5, imgSize, imgSize);
           }catch(e){ /* segue sem a foto se der algum erro de formato */ }
         }
         x += c.w;
         return;
       }
-      let valor;
-      if(c.key === '__adm'){
-        valor = r.admissao ? new Date(r.admissao+'T00:00:00').toLocaleDateString('pt-BR') : '—';
-      }else{
-        valor = r[c.key] || '—';
-      }
-      const texto = doc.splitTextToSize(String(valor), c.w - 3)[0] || '';
-      doc.text(texto, x + 1.5, y + rowH/2 + 1.2);
+      const linhas = linhasPorColuna[i];
+      const blocoAltura = linhas.length * lineH;
+      const inicioY = y + (alturaLinha - blocoAltura) / 2 + lineH - 0.8;
+      linhas.forEach((linha, li) => {
+        doc.text(linha, x + 1.5, inicioY + li * lineH);
+      });
       x += c.w;
     });
 
     doc.setDrawColor(220, 220, 210);
-    doc.line(marginX, y + rowH, marginX + cols.reduce((s,c)=>s+c.w,0), y + rowH);
+    doc.line(marginX, y + alturaLinha, marginX + cols.reduce((s,c)=>s+c.w,0), y + alturaLinha);
 
-    y += rowH;
+    y += alturaLinha;
   });
 
   const blobUrl = doc.output('bloburl');
@@ -4769,6 +4782,7 @@ function abrirCadastroParaNovo(){
   toggleDistratoExtra();
   document.getElementById('cadastroTitulo').textContent = 'Novo registro';
   document.getElementById('saveBtn').textContent = 'Salvar registro';
+  document.getElementById('cancelCadastroBtn').textContent = 'Limpar dados';
   switchTab('cadastro');
 }
 
@@ -4878,6 +4892,7 @@ function abrirCadastroParaEditar(id){
   toggleDistratoExtra();
   document.getElementById('cadastroTitulo').textContent = 'Editar registro';
   document.getElementById('saveBtn').textContent = 'Salvar Alterações';
+  document.getElementById('cancelCadastroBtn').textContent = 'Cancelar';
   switchTab('cadastro');
 }
 
@@ -4969,8 +4984,14 @@ document.getElementById('cancelBtn').addEventListener('click', fecharPerfil);
 overlay.addEventListener('click', (e)=>{ if(e.target === overlay) fecharPerfil(); });
 
 document.getElementById('cancelCadastroBtn').addEventListener('click', () => {
-  abrirCadastroParaNovo();
-  showToast('Dados do formulário limpos.');
+  if(editingId){
+    editingId = null;
+    form.reset();
+    switchTab('registros');
+  }else{
+    abrirCadastroParaNovo();
+    showToast('Dados do formulário limpos.');
+  }
 });
 
 document.getElementById('editarViaPerfilBtn').addEventListener('click', () => {
