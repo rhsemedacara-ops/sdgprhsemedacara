@@ -1684,6 +1684,10 @@
         <h2 style="font-family:'Fraunces',serif;font-size:18px;color:var(--primary-dark);margin:0;">Meus pré-cadastros enviados</h2>
         <p style="font-size:12.5px;color:var(--muted);margin:6px 0 0;">Acompanhe o andamento apenas dos pré-cadastros que você mesmo enviou.</p>
       </div>
+      <div class="month-tabs" id="meusPrecadastrosSubTabs" style="padding:14px 22px 0;">
+        <button class="month-btn active" data-status="pendente" type="button">Enviados</button>
+        <button class="month-btn" data-status="processado" type="button">Concluído</button>
+      </div>
       <div id="meusPrecadastrosArea" style="padding:14px 22px 22px;"></div>
     </div>
   </div>
@@ -4045,6 +4049,14 @@ document.getElementById('cadastroSubTabs').addEventListener('click', (e) => {
   irParaSubAbaCadastro(btn.dataset.secao);
 });
 
+document.getElementById('meusPrecadastrosSubTabs').addEventListener('click', (e) => {
+  const btn = e.target.closest('.month-btn');
+  if(!btn) return;
+  filtroMeusPrecadastros = btn.dataset.status;
+  document.querySelectorAll('#meusPrecadastrosSubTabs .month-btn').forEach(b => b.classList.toggle('active', b === btn));
+  renderMeusPrecadastros();
+});
+
 function irParaSubAbaCadastro(secao){
   document.querySelectorAll('#cadastroSubTabs .month-btn').forEach(b => b.classList.toggle('active', b.dataset.secao === secao));
   document.getElementById('cadastroSecaoForm').style.display = secao === 'form' ? 'block' : 'none';
@@ -4608,6 +4620,7 @@ document.getElementById('removerPreFotoBtn').addEventListener('click', () => {
 });
 
 let precadastroEmEdicaoId = null;
+let filtroMeusPrecadastros = 'pendente';
 
 function limparFormPrecadastro(){
   document.getElementById('preNome').value = '';
@@ -4681,11 +4694,15 @@ function renderMeusPrecadastros(){
   if(!area || !usuarioAtual) return;
   area.innerHTML = '<div class="loading">Carregando…</div>';
   db.collection(PRECADASTROS_COL).where('enviadoPor', '==', usuarioAtual.uid).get().then(snap => {
-    if(snap.empty){
-      area.innerHTML = '<div class="empty-state">Você ainda não enviou nenhum pré-cadastro.</div>';
+    const docsFiltrados = snap.docs.filter(doc => {
+      const status = doc.data().status === 'processado' ? 'processado' : 'pendente';
+      return status === filtroMeusPrecadastros;
+    });
+    if(docsFiltrados.length === 0){
+      area.innerHTML = `<div class="empty-state">${filtroMeusPrecadastros === 'pendente' ? 'Nenhum pré-cadastro aguardando no momento.' : 'Nenhum pré-cadastro concluído ainda.'}</div>`;
       return;
     }
-    const docsOrdenados = snap.docs.slice().sort((a, b) => (b.data().criadoEm || 0) - (a.data().criadoEm || 0));
+    const docsOrdenados = docsFiltrados.slice().sort((a, b) => (b.data().criadoEm || 0) - (a.data().criadoEm || 0));
     const cards = docsOrdenados.map(doc => {
       const p = doc.data();
       const pendente = p.status !== 'processado';
@@ -4698,7 +4715,7 @@ function renderMeusPrecadastros(){
           <div class="pre-card-info">
             <div class="servidor-name">${p.nome}</div>
             <div class="pre-card-detalhe">${p.nucleo || '—'} · ${p.local || '—'} · Admissão: ${p.admissao ? new Date(p.admissao+'T00:00:00').toLocaleDateString('pt-BR') : '—'}</div>
-            <span class="status-chip status-${pendente ? 'Finalizado' : 'Ativo'}" style="margin-top:6px; display:inline-block;">${pendente ? 'Aguardando andamento' : 'Já em andamento'}</span>
+            <span class="status-chip status-${pendente ? 'Finalizado' : 'Ativo'}" style="margin-top:6px; display:inline-block;">${pendente ? 'Aguardando andamento' : 'Admissão Concluída'}</span>
           </div>
           ${pendente ? `<button class="btn-ghost btn-small" onclick="editarMeuPrecadastro('${doc.id}')">Editar</button>` : ''}
           <button class="btn-danger btn-small" onclick="excluirPrecadastro('${doc.id}', '${(p.nome || '').replace(/'/g, "\\'")}')">Excluir</button>
