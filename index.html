@@ -1358,14 +1358,10 @@
     <div class="session-info">
       <div class="session-info-item">
         <span class="session-info-label">Usuário</span>
-        <span class="session-info-value" id="sessaoUsuario">—</span>
+        <span class="session-info-value" id="sessaoUsuario" style="white-space:normal; overflow:visible; text-overflow:clip; word-break:break-word;">—</span>
       </div>
       <div class="session-info-item">
-        <span class="session-info-label">Último login</span>
-        <span class="session-info-value" id="sessaoUltimoLogin">—</span>
-      </div>
-      <div class="session-info-item">
-        <span class="session-info-label">Ano selecionado</span>
+        <span class="session-info-label">Ano</span>
         <span class="session-info-value" id="sessaoAno">—</span>
       </div>
     </div>
@@ -1682,7 +1678,7 @@
     <div class="table-card">
       <div style="padding:18px 22px 0;">
         <h2 style="font-family:'Fraunces',serif;font-size:18px;color:var(--primary-dark);margin:0;">Meus pré-cadastros enviados</h2>
-        <p style="font-size:12.5px;color:var(--muted);margin:6px 0 0;">Acompanhe o andamento apenas dos pré-cadastros que você mesmo enviou.</p>
+        <p style="font-size:12.5px;color:var(--muted);margin:6px 0 0;">Acompanhe o andamento dos pré-cadastros enviados ao RH.</p>
       </div>
       <div class="month-tabs" id="meusPrecadastrosSubTabs" style="padding:14px 22px 0;">
         <button class="month-btn active" data-status="pendente" type="button">Enviados</button>
@@ -2357,10 +2353,6 @@ function atualizarPainelSessao(){
   }else{
     elUsuario.textContent = '—';
   }
-
-  const elUltimoLogin = document.getElementById('sessaoUltimoLogin');
-  const lastSignIn = usuarioAtual && usuarioAtual.metadata && usuarioAtual.metadata.lastSignInTime;
-  elUltimoLogin.textContent = lastSignIn ? new Date(lastSignIn).toLocaleString('pt-BR') : '—';
 
   const elAno = document.getElementById('sessaoAno');
   elAno.textContent = selectedAno || '—';
