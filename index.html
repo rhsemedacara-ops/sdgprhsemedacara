@@ -1681,6 +1681,21 @@
             </div>
           </div>
         </div>
+        <div class="field">
+          <label>Turno</label>
+          <select id="preTurno" autocomplete="off">
+            <option value="">—</option>
+            <option value="MANHÃ">MANHÃ</option>
+            <option value="TARDE">TARDE</option>
+            <option value="NOITE">NOITE</option>
+            <option value="MANHÃ, TARDE E NOITE">MANHÃ, TARDE E NOITE</option>
+            <option value="MANHÃ E TARDE">MANHÃ E TARDE</option>
+            <option value="MANHÃ E NOITE">MANHÃ E NOITE</option>
+            <option value="TARDE E NOITE">TARDE E NOITE</option>
+            <option value="MANHÃ/TARDE">MANHÃ/TARDE</option>
+            <option value="INTEGRAL">INTEGRAL</option>
+          </select>
+        </div>
         <div class="field"><label>Contato</label><input type="tel" id="preContato" placeholder="(00) 00000-0000" maxlength="15" autocomplete="off"></div>
         <div class="field full"><label>Observação</label><textarea id="preObs" autocomplete="off"></textarea></div>
       </div>
@@ -4645,6 +4660,7 @@ function limparFormPrecadastro(){
   document.getElementById('preIndicacao').value = '';
   document.getElementById('preContato').value = '';
   preCargoComboApi.setValor('');
+  document.getElementById('preTurno').value = '';
   document.getElementById('preObs').value = '';
   document.getElementById('preFoto').value = '';
   document.getElementById('preFotoPreviewWrap').style.display = 'none';
@@ -4667,6 +4683,7 @@ document.getElementById('salvarPrecadastroBtn').addEventListener('click', async 
   const indicacao = document.getElementById('preIndicacao').value.trim();
   const contato = document.getElementById('preContato').value.trim();
   const cargo = document.getElementById('preCargoInput').value;
+  const turno = document.getElementById('preTurno').value;
   const obs = document.getElementById('preObs').value.trim();
 
   if(!nome || !nucleo || !local || !admissao){
@@ -4680,14 +4697,14 @@ document.getElementById('salvarPrecadastroBtn').addEventListener('click', async 
   try{
     if(precadastroEmEdicaoId){
       await db.collection(PRECADASTROS_COL).doc(precadastroEmEdicaoId).update({
-        nome, nucleo, local, admissao, ch, indicacao, contato, cargo, obs,
+        nome, nucleo, local, admissao, ch, indicacao, contato, cargo, turno, obs,
         foto: preFotoBase64 || null
       });
       showSuccessFloat(`Pré-contratação de ${nome} atualizado com sucesso`);
       registrarAtividade('Editou pré-contratação', nome);
     }else{
       await db.collection(PRECADASTROS_COL).add({
-        nome, nucleo, local, admissao, ch, indicacao, contato, cargo, obs,
+        nome, nucleo, local, admissao, ch, indicacao, contato, cargo, turno, obs,
         foto: preFotoBase64 || null,
         status: 'pendente',
         enviadoPor: usuarioAtual ? usuarioAtual.uid : '',
@@ -4764,6 +4781,7 @@ window.editarMeuPrecadastro = async function(id){
     document.getElementById('preIndicacao').value = p.indicacao || '';
     document.getElementById('preContato').value = p.contato || '';
     preCargoComboApi.setValor(p.cargo || '');
+    document.getElementById('preTurno').value = p.turno || '';
     document.getElementById('preObs').value = p.obs || '';
     preFotoBase64 = p.foto || null;
     if(preFotoBase64){
@@ -4838,6 +4856,7 @@ window.darAndamentoPrecadastro = async function(id){
     form.indicacao.value = p.indicacao || '';
     form.contato.value = p.contato || '';
     if(p.cargo) setCargoComboValue(p.cargo);
+    form.turno.value = p.turno || '';
     fotoServidorAtual = p.foto || null;
     precadastroOrigemAtual = id;
     atualizarPreviewFotoCadastro();
