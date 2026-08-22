@@ -1637,8 +1637,8 @@
 
   <div id="precadastroArea" style="display:none;">
     <div class="table-card" style="padding:26px 28px;">
-      <h2 style="font-family:'Fraunces',serif;font-size:22px;color:var(--primary-dark);margin:0 0 6px;">Novo pré-contratação</h2>
-      <p style="font-size:13px;color:var(--muted);margin:0 0 20px;">Preenchido durante a entrevista. Depois, alguém da equipe completa o restante das informações e dá andamento à contratação.</p>
+      <h2 style="font-family:'Fraunces',serif;font-size:22px;color:var(--primary-dark);margin:0 0 6px;">Novo pré-contrato</h2>
+      <p style="font-size:13px;color:var(--muted);margin:0 0 20px;">Preenchido durante a entrevista. Depois, alguém da Diretoria Administrativa e Setorial- RH completa o restante das informações e dá andamento ao processo de contratação.</p>
       <div class="grid" style="grid-template-columns:repeat(2, minmax(0,1fr));">
         <div class="field full"><label>Nome completo *</label><input type="text" id="preNome" autocomplete="off"></div>
         <div class="field combo-field">
@@ -1677,8 +1677,8 @@
 
     <div class="table-card">
       <div style="padding:18px 22px 0;">
-        <h2 style="font-family:'Fraunces',serif;font-size:18px;color:var(--primary-dark);margin:0;">Meus pré-contratações enviados</h2>
-        <p style="font-size:12.5px;color:var(--muted);margin:6px 0 0;">Acompanhe o andamento dos pré-contratações enviados ao RH.</p>
+        <h2 style="font-family:'Fraunces',serif;font-size:18px;color:var(--primary-dark);margin:0;">Pré-contratações enviadas</h2>
+        <p style="font-size:12.5px;color:var(--muted);margin:6px 0 0;">Acompanhe o andamento de suas pré-contratações enviados ao RH.</p>
       </div>
       <div class="month-tabs" id="meusPrecadastrosSubTabs" style="padding:14px 22px 0;">
         <button class="month-btn active" data-status="pendente" type="button">Enviados</button>
@@ -4695,7 +4695,7 @@ function renderMeusPrecadastros(){
       return status === filtroMeusPrecadastros;
     });
     if(docsFiltrados.length === 0){
-      area.innerHTML = `<div class="empty-state">${filtroMeusPrecadastros === 'pendente' ? 'Nenhum pré-contratação aguardando no momento.' : 'Nenhum pré-contratação concluído ainda.'}</div>`;
+      area.innerHTML = `<div class="empty-state">${filtroMeusPrecadastros === 'pendente' ? 'Nenhum pré-contrato aguardando no momento.' : 'Nenhum pré-contrato concluído ainda.'}</div>`;
       return;
     }
     const docsOrdenados = docsFiltrados.slice().sort((a, b) => (b.data().criadoEm || 0) - (a.data().criadoEm || 0));
