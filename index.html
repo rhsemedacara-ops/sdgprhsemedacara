@@ -756,14 +756,17 @@
   .dash-nucleo-grupo:last-child{border-bottom:none; padding-bottom:0;}
   .dash-nucleo-grupo:first-child{padding-top:0;}
   .dash-nucleo-sub{
-    display:flex;
-    flex-direction:column;
-    gap:14px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px 24px;
     margin:12px 0 0 0;
     padding-left:18px;
     border-left:2px solid var(--line);
   }
   .dash-nucleo-sub-col{min-width:0;}
+  @media (max-width:700px){
+    .dash-nucleo-sub{grid-template-columns:1fr;}
+  }
   .dash-nucleo-sub-titulo{
     font-family:'IBM Plex Mono', monospace;
     font-size:10px;
