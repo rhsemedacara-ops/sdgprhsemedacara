@@ -756,30 +756,55 @@
   .dash-nucleo-grupo:last-child{border-bottom:none; padding-bottom:0;}
   .dash-nucleo-grupo:first-child{padding-top:0;}
   .dash-nucleo-sub{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:8px 24px;
     margin:12px 0 0 0;
     padding-left:18px;
     border-left:2px solid var(--line);
   }
-  .dash-nucleo-sub-col{min-width:0;}
-  @media (max-width:700px){
-    .dash-nucleo-sub{grid-template-columns:1fr;}
-  }
-  .dash-nucleo-sub-titulo{
+  .dash-local-cabecalho{
+    display:flex;
+    gap:16px;
+    padding-bottom:6px;
+    margin-bottom:2px;
+    border-bottom:1.5px solid var(--line-strong);
     font-family:'IBM Plex Mono', monospace;
     font-size:10px;
     letter-spacing:.06em;
     text-transform:uppercase;
     color:var(--muted);
-    margin-bottom:4px;
   }
-  .bar-row-mini{gap:14px; padding:6px 0; border-bottom:1px solid var(--line);}
-  .bar-row-mini:last-child{border-bottom:none;}
-  .bar-row-mini .bar-label{font-size:11.5px; flex:0 0 130px;}
-  .bar-row-mini .bar-track{height:6px;}
-  .bar-row-mini .bar-count{font-size:11px; min-width:24px; text-align:right;}
+  .dash-local-row{
+    display:flex;
+    align-items:baseline;
+    gap:16px;
+    padding:9px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .dash-local-row:last-child{border-bottom:none;}
+  .dash-local-nome{
+    flex:0 0 190px;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--ink);
+  }
+  .dash-local-cargos{
+    flex:1;
+    min-width:0;
+    font-size:12px;
+    color:var(--muted);
+  }
+  .dash-local-total{
+    flex:0 0 30px;
+    text-align:right;
+    font-family:'IBM Plex Mono', monospace;
+    font-weight:700;
+    font-size:12.5px;
+    color:var(--primary-dark);
+  }
+  @media (max-width:700px){
+    .dash-local-nome{flex-basis:110px;}
+    .dash-local-cabecalho{display:none;}
+    .dash-local-row{flex-wrap:wrap;}
+  }
 
   .dash-section{
     background:var(--surface);
@@ -4406,16 +4431,17 @@ function renderDashboard(){
   const ativos = recordsAno.filter(r => (r.situacao || 'Ativo') === 'Ativo');
   const nucleosAtivos = ativos.reduce((acc, r)=>{ const k = r.nucleo || '—'; acc[k] = (acc[k]||0)+1; return acc; }, {});
 
-  // Junta Núcleo, Local e Cargo num só grupo (só servidores Ativos).
+  // Junta Núcleo -> Local -> Cargo num só grupo (só servidores Ativos).
   const grupoPorNucleo = {};
   ativos.forEach(r => {
     const nucleo = r.nucleo || '—';
-    if(!grupoPorNucleo[nucleo]) grupoPorNucleo[nucleo] = { total: 0, locais: {}, cargos: {} };
+    if(!grupoPorNucleo[nucleo]) grupoPorNucleo[nucleo] = { total: 0, porLocal: {} };
     grupoPorNucleo[nucleo].total++;
     const local = r.local || '—';
-    grupoPorNucleo[nucleo].locais[local] = (grupoPorNucleo[nucleo].locais[local] || 0) + 1;
+    if(!grupoPorNucleo[nucleo].porLocal[local]) grupoPorNucleo[nucleo].porLocal[local] = { total: 0, cargos: {} };
+    grupoPorNucleo[nucleo].porLocal[local].total++;
     const cargo = r.cargo || '—';
-    grupoPorNucleo[nucleo].cargos[cargo] = (grupoPorNucleo[nucleo].cargos[cargo] || 0) + 1;
+    grupoPorNucleo[nucleo].porLocal[local].cargos[cargo] = (grupoPorNucleo[nucleo].porLocal[local].cargos[cargo] || 0) + 1;
   });
 
   // Contratações por mês (admissão), olhando todos os registros do ano.
@@ -4461,16 +4487,20 @@ function renderDashboard(){
     `).join('');
   }
 
-  function miniBarsHtml(dict){
-    const entries = Object.entries(dict).sort((a,b)=>b[1]-a[1]);
-    const top = entries.length ? entries[0][1] : 1;
-    return entries.map(([label, count]) => `
-      <div class="bar-row bar-row-mini">
-        <div class="bar-label">${label}</div>
-        <div class="bar-track"><div class="bar-fill" style="width:${Math.max(4, Math.round(count/top*100))}%"></div></div>
-        <div class="bar-count">${count}</div>
-      </div>
-    `).join('');
+  function localRowHtml(porLocal){
+    const locais = Object.entries(porLocal).sort((a,b) => b[1].total - a[1].total);
+    return locais.map(([local, dadosLocal]) => {
+      const cargosTexto = Object.entries(dadosLocal.cargos)
+        .sort((a,b) => b[1]-a[1])
+        .map(([cargo, qtd]) => `${cargo} (${qtd})`)
+        .join(', ');
+      return `
+        <div class="dash-local-row">
+          <div class="dash-local-nome">${local}</div>
+          <div class="dash-local-cargos">${cargosTexto}</div>
+          <div class="dash-local-total">${dadosLocal.total}</div>
+        </div>`;
+    }).join('');
   }
 
   const nucleosOrdenados = Object.entries(grupoPorNucleo).sort((a,b) => b[1].total - a[1].total);
@@ -4483,14 +4513,12 @@ function renderDashboard(){
         <div class="bar-count">${dados.total}</div>
       </div>
       <div class="dash-nucleo-sub">
-        <div class="dash-nucleo-sub-col">
-          <div class="dash-nucleo-sub-titulo">Local</div>
-          ${miniBarsHtml(dados.locais)}
+        <div class="dash-local-cabecalho">
+          <div class="dash-local-nome">Local</div>
+          <div class="dash-local-cargos">Cargo (contratações)</div>
+          <div class="dash-local-total">Total</div>
         </div>
-        <div class="dash-nucleo-sub-col">
-          <div class="dash-nucleo-sub-titulo">Cargo</div>
-          ${miniBarsHtml(dados.cargos)}
-        </div>
+        ${localRowHtml(dados.porLocal)}
       </div>
     </div>
   `).join('');
