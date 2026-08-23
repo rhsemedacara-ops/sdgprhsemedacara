@@ -1012,6 +1012,21 @@
   .eye-btn:hover{background:#F2F0E6; border-color:var(--primary); color:var(--primary-dark);}
   .servidor-cargo{font-size:12px; color:var(--muted);}
 
+  .foto-cell{text-align:center; padding:6px !important;}
+  .foto-mini{
+    width:36px; height:36px;
+    object-fit:cover;
+    border-radius:7px;
+    border:1px solid var(--line-strong);
+    display:inline-block;
+  }
+  .foto-mini-vazia{
+    display:flex; align-items:center; justify-content:center;
+    background:#EFEEE7;
+    color:var(--muted);
+    font-size:11px;
+  }
+
   .status-chip{
     display:inline-block;
     font-family:'IBM Plex Mono', monospace;
@@ -1780,7 +1795,7 @@
   </div>
 
   <div id="precadastroArea" style="display:none;">
-    <div class="table-card" style="padding:26px 28px;">
+    <div class="table-card" style="padding:26px 28px; margin-bottom:20px;">
       <h2 style="font-family:'Fraunces',serif;font-size:22px;color:var(--primary-dark);margin:0 0 6px;">Novo pré-contrato</h2>
       <p style="font-size:13px;color:var(--muted);margin:0 0 20px;">Preenchido durante a entrevista. Depois, alguém da Diretoria Administrativa e Setorial- RH completa o restante das informações e dá andamento ao processo de contratação.</p>
       <div class="grid" style="grid-template-columns:repeat(2, minmax(0,1fr));">
@@ -3846,6 +3861,11 @@ function renderRegistros(){
       ${pdfCell(temAutorizacao, 'Baixar Autorização (PDF)', `gerarPDF('${r.id}','autorizacao')`, 'pdf-cell-narrow')}
       ${pdfCell(temAberturaConta, 'Baixar Ofício de Abertura de Conta (PDF)', `gerarPDF('${r.id}','aberturaConta')`, 'pdf-cell-narrow')}
       ${pdfCell(temDistrato, 'Baixar documento de Distrato (PDF)', `gerarPDF('${r.id}','distrato')`)}
+      <td class="foto-cell">
+        ${r.foto
+          ? `<img src="${r.foto}" class="foto-mini" alt="Foto de ${r.servidor || 'servidor'}">`
+          : `<div class="foto-mini foto-mini-vazia">—</div>`}
+      </td>
       <td class="servidor-cell">
         <div class="servidor-name-wrap">
           <button class="eye-btn" title="Ver perfil" onclick="abrirPerfil('${r.id}')">
@@ -3870,11 +3890,11 @@ function renderRegistros(){
       <table class="tbl-fixed">
         <colgroup>
           <col style="width:58px"><col style="width:58px"><col style="width:58px"><col style="width:58px"><col style="width:70px">
-          <col style="width:160px"><col style="width:130px"><col style="width:130px"><col style="width:120px"><col style="width:120px">
+          <col style="width:64px"><col style="width:160px"><col style="width:130px"><col style="width:130px"><col style="width:120px"><col style="width:120px">
           <col style="width:90px"><col style="width:50px"><col style="width:100px">
         </colgroup>
         <thead><tr>
-          <th class="pdf-cell pdf-cell-narrow">Enc. MEMO</th><th class="pdf-cell pdf-cell-narrow">Enc. OFÍCIO</th><th class="pdf-cell pdf-cell-narrow">AUTORIZAÇÃO</th><th class="pdf-cell pdf-cell-narrow">DOC. ABERT. CONTA</th><th class="pdf-cell">DISTRATO</th><th>Servidor</th><th>Cargo/Função</th><th>Núcleo</th><th>Diretor</th><th>Local</th><th>Admissão</th><th>CH</th><th>Situação</th>
+          <th class="pdf-cell pdf-cell-narrow">Enc. MEMO</th><th class="pdf-cell pdf-cell-narrow">Enc. OFÍCIO</th><th class="pdf-cell pdf-cell-narrow">AUTORIZAÇÃO</th><th class="pdf-cell pdf-cell-narrow">DOC. ABERT. CONTA</th><th class="pdf-cell">DISTRATO</th><th>Identificação</th><th>Servidor</th><th>Cargo/Função</th><th>Núcleo</th><th>Diretor</th><th>Local</th><th>Admissão</th><th>CH</th><th>Situação</th>
         </tr></thead>
         <tbody>${rows}</tbody>
       </table>
