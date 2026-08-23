@@ -749,6 +749,37 @@
     letter-spacing:.03em;
   }
 
+  .dash-nucleo-grupo{
+    padding:14px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .dash-nucleo-grupo:last-child{border-bottom:none; padding-bottom:0;}
+  .dash-nucleo-grupo:first-child{padding-top:0;}
+  .dash-nucleo-sub{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px 20px;
+    margin:10px 0 0 0;
+    padding-left:18px;
+    border-left:2px solid var(--line);
+  }
+  .dash-nucleo-sub-col{min-width:0;}
+  .dash-nucleo-sub-titulo{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:4px;
+  }
+  .bar-row-mini{gap:8px; margin-bottom:4px;}
+  .bar-row-mini .bar-label{font-size:11.5px; flex:0 0 100px;}
+  .bar-row-mini .bar-track{height:6px;}
+  .bar-row-mini .bar-count{font-size:11px; min-width:20px;}
+  @media (max-width:700px){
+    .dash-nucleo-sub{grid-template-columns:1fr;}
+  }
+
   .dash-section{
     background:var(--surface);
     border:1px solid var(--line);
@@ -4373,7 +4404,18 @@ function renderDashboard(){
   const situacoes = countBy(r => r.situacao || 'Ativo');
   const ativos = recordsAno.filter(r => (r.situacao || 'Ativo') === 'Ativo');
   const nucleosAtivos = ativos.reduce((acc, r)=>{ const k = r.nucleo || '—'; acc[k] = (acc[k]||0)+1; return acc; }, {});
-  const localsAtivos = ativos.reduce((acc, r)=>{ const k = r.local || '—'; acc[k] = (acc[k]||0)+1; return acc; }, {});
+
+  // Junta Núcleo, Local e Cargo num só grupo (só servidores Ativos).
+  const grupoPorNucleo = {};
+  ativos.forEach(r => {
+    const nucleo = r.nucleo || '—';
+    if(!grupoPorNucleo[nucleo]) grupoPorNucleo[nucleo] = { total: 0, locais: {}, cargos: {} };
+    grupoPorNucleo[nucleo].total++;
+    const local = r.local || '—';
+    grupoPorNucleo[nucleo].locais[local] = (grupoPorNucleo[nucleo].locais[local] || 0) + 1;
+    const cargo = r.cargo || '—';
+    grupoPorNucleo[nucleo].cargos[cargo] = (grupoPorNucleo[nucleo].cargos[cargo] || 0) + 1;
+  });
 
   // Contratações por mês (admissão), olhando todos os registros do ano.
   const porMes = new Array(12).fill(0);
@@ -4418,6 +4460,40 @@ function renderDashboard(){
     `).join('');
   }
 
+  function miniBarsHtml(dict){
+    const entries = Object.entries(dict).sort((a,b)=>b[1]-a[1]);
+    const top = entries.length ? entries[0][1] : 1;
+    return entries.map(([label, count]) => `
+      <div class="bar-row bar-row-mini">
+        <div class="bar-label">${label}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${Math.max(4, Math.round(count/top*100))}%"></div></div>
+        <div class="bar-count">${count}</div>
+      </div>
+    `).join('');
+  }
+
+  const nucleosOrdenados = Object.entries(grupoPorNucleo).sort((a,b) => b[1].total - a[1].total);
+  const topNucleo = nucleosOrdenados.length ? nucleosOrdenados[0][1].total : 1;
+  const grupoNucleoHtml = nucleosOrdenados.map(([nucleo, dados]) => `
+    <div class="dash-nucleo-grupo">
+      <div class="bar-row">
+        <div class="bar-label">${nucleo}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${Math.max(4, Math.round(dados.total/topNucleo*100))}%"></div></div>
+        <div class="bar-count">${dados.total}</div>
+      </div>
+      <div class="dash-nucleo-sub">
+        <div class="dash-nucleo-sub-col">
+          <div class="dash-nucleo-sub-titulo">Local</div>
+          ${miniBarsHtml(dados.locais)}
+        </div>
+        <div class="dash-nucleo-sub-col">
+          <div class="dash-nucleo-sub-titulo">Cargo</div>
+          ${miniBarsHtml(dados.cargos)}
+        </div>
+      </div>
+    </div>
+  `).join('');
+
   area.innerHTML = `
     <div class="dash-grid">
       ${totalCard}
@@ -4429,16 +4505,9 @@ function renderDashboard(){
       <div class="dash-monthbar-chart">${barrasMes}</div>
     </div>
 
-    <div class="dash-section-row">
-      <div class="dash-section">
-        <h3>Servidores por Núcleo (Ativos)</h3>
-        ${barsHtml(nucleosAtivos, 15)}
-      </div>
-
-      <div class="dash-section">
-        <h3>Servidores por Local (Ativos)</h3>
-        ${barsHtml(localsAtivos, 15)}
-      </div>
+    <div class="dash-section">
+      <h3>Servidores por Núcleo, Local e Cargo (Ativos)</h3>
+      ${grupoNucleoHtml}
     </div>
   `;
 }
