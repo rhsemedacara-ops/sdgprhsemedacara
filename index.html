@@ -543,7 +543,7 @@
   .app-shell{
     display:block;
   }
-  .main-panel{margin-left:244px; width:auto; display:block;}
+  .main-panel{margin-left:244px; width:calc(100% - 244px); box-sizing:border-box; display:block;}
   #tableArea{display:block; width:100%;}
 
   .tabs{
@@ -604,7 +604,7 @@
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
   }
   @media (max-width:900px){
-    .main-panel{margin-left:0;}
+    .main-panel{margin-left:0; width:100%;}
     .tabs{
       flex-direction:row;
       flex-wrap:wrap;
