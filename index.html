@@ -4444,21 +4444,37 @@ function renderDashboard(){
     grupoPorNucleo[nucleo].porLocal[local].cargos[cargo] = (grupoPorNucleo[nucleo].porLocal[local].cargos[cargo] || 0) + 1;
   });
 
-  // Contratações por mês (admissão), olhando todos os registros do ano.
-  const porMes = new Array(12).fill(0);
-  recordsAno.forEach(r => {
-    if(!r.admissao) return;
-    const mes = parseInt(r.admissao.split('-')[1], 10) - 1;
-    if(mes >= 0 && mes < 12) porMes[mes]++;
-  });
-  const maxMes = Math.max(1, ...porMes);
   const MESES_ABREV = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-  const barrasMes = porMes.map((qtd, i) => `
-    <div class="dash-monthbar-col">
-      <div class="dash-monthbar-num">${qtd || ''}</div>
-      <div class="dash-monthbar-track"><div class="dash-monthbar-fill" style="height:${Math.max(3, Math.round(qtd/maxMes*100))}%"></div></div>
-      <div class="dash-monthbar-lbl">${MESES_ABREV[i]}</div>
-    </div>`).join('');
+
+  function contarPorMes(lista, campoData){
+    const porMes = new Array(12).fill(0);
+    lista.forEach(r => {
+      const v = r[campoData];
+      if(!v) return;
+      const mes = parseInt(v.split('-')[1], 10) - 1;
+      if(mes >= 0 && mes < 12) porMes[mes]++;
+    });
+    return porMes;
+  }
+
+  function barrasMesHtml(porMes){
+    const maxMes = Math.max(1, ...porMes);
+    return porMes.map((qtd, i) => `
+      <div class="dash-monthbar-col">
+        <div class="dash-monthbar-num">${qtd || ''}</div>
+        <div class="dash-monthbar-track"><div class="dash-monthbar-fill" style="height:${Math.max(3, Math.round(qtd/maxMes*100))}%"></div></div>
+        <div class="dash-monthbar-lbl">${MESES_ABREV[i]}</div>
+      </div>`).join('');
+  }
+
+  // Contratações por mês (admissão), olhando todos os registros do ano.
+  const barrasMes = barrasMesHtml(contarPorMes(recordsAno, 'admissao'));
+
+  // Distratado(a) e Finalizado por mês, usando a data de situação (situacaoData).
+  const distratados = recordsAno.filter(r => r.situacao === 'Distratado(a)');
+  const finalizados = recordsAno.filter(r => r.situacao === 'Finalizado');
+  const barrasDistrato = barrasMesHtml(contarPorMes(distratados, 'situacaoData'));
+  const barrasFinalizado = barrasMesHtml(contarPorMes(finalizados, 'situacaoData'));
 
   const statusOrder = ['Ativo','Distratado(a)','Finalizado'];
   const statusIcones = { 'Ativo':'✓', 'Distratado(a)':'⤬', 'Finalizado':'●' };
@@ -4532,6 +4548,18 @@ function renderDashboard(){
     <div class="dash-section">
       <h3>Contratações por mês (${selectedAno})</h3>
       <div class="dash-monthbar-chart">${barrasMes}</div>
+    </div>
+
+    <div class="dash-section-row">
+      <div class="dash-section">
+        <h3>Distratado(a) por mês (${selectedAno})</h3>
+        <div class="dash-monthbar-chart">${barrasDistrato}</div>
+      </div>
+
+      <div class="dash-section">
+        <h3>Finalizado por mês (${selectedAno})</h3>
+        <div class="dash-monthbar-chart">${barrasFinalizado}</div>
+      </div>
     </div>
 
     <div class="dash-section">
