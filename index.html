@@ -2138,10 +2138,11 @@ function resetarTimersInatividade(){
   esconderAvisoInatividade();
   if(!auth.currentUser) return;
   avisoInatividadeTimer = setTimeout(mostrarAvisoInatividade, INATIVIDADE_LIMITE_MS - AVISO_ANTES_MS);
-  inatividadeTimer = setTimeout(() => {
+  inatividadeTimer = setTimeout(async () => {
     esconderAvisoInatividade();
     localStorage.removeItem('sdgp_ano_sessao');
     if(unsubscribeRecords){ unsubscribeRecords(); unsubscribeRecords = null; }
+    await registrarSaida('Automático (inatividade)');
     auth.signOut();
   }, INATIVIDADE_LIMITE_MS);
 }
@@ -2473,9 +2474,10 @@ async function aplicarPermissoesDeAbas(uid){
   }
 }
 
-document.getElementById('logoutBtn').addEventListener('click', () => {
+document.getElementById('logoutBtn').addEventListener('click', async () => {
   localStorage.removeItem('sdgp_ano_sessao');
   if(unsubscribeRecords){ unsubscribeRecords(); unsubscribeRecords = null; }
+  await registrarSaida('Manual (botão Sair)');
   auth.signOut();
 });
 
@@ -2552,6 +2554,7 @@ function registrarAcesso(user){
         uid: user.uid,
         email: user.email,
         nome,
+        tipo: 'entrada',
         dispositivo,
         ip: ip || 'Não disponível',
         quando: Date.now(),
@@ -2562,6 +2565,7 @@ function registrarAcesso(user){
         uid: user.uid,
         email: user.email,
         nome: 'Administrador',
+        tipo: 'entrada',
         dispositivo,
         ip: ip || 'Não disponível',
         quando: Date.now(),
@@ -2569,6 +2573,27 @@ function registrarAcesso(user){
       }).catch(e => console.error('Não foi possível registrar o acesso:', e));
     });
   });
+}
+
+// Registra a saída (logout manual pelo botão "Sair" ou automático por inatividade).
+// Precisa ser chamada ANTES do auth.signOut(), enquanto o usuário ainda está autenticado.
+async function registrarSaida(motivo){
+  if(!usuarioAtual) return;
+  const nome = document.getElementById('sessaoUsuario') ? document.getElementById('sessaoUsuario').textContent : (usuarioAtual.email || '—');
+  try{
+    await db.collection(ACESSOS_COL).add({
+      uid: usuarioAtual.uid,
+      email: usuarioAtual.email,
+      nome,
+      tipo: 'saida',
+      motivo,
+      dispositivo: identificarDispositivo(),
+      quando: Date.now(),
+      dataHora: new Date().toISOString()
+    });
+  }catch(e){
+    console.error('Não foi possível registrar a saída:', e);
+  }
 }
 
 // Cria um novo usuário (login individual) sem derrubar a sessão de quem está criando,
@@ -4782,8 +4807,17 @@ function renderUsuarios(){
     const lista = porPessoa.get(pessoaSelecionadaAcessos) || [];
     acessosArea.innerHTML = `
       <div class="table-scroll">
-        <table><thead><tr><th>Data/Hora do acesso</th><th>Dispositivo</th><th>IP</th></tr></thead>
-        <tbody>${lista.map(a => `<tr><td>${a.quando ? new Date(a.quando).toLocaleString('pt-BR') : '—'}</td><td>${a.dispositivo || '—'}</td><td class="mono">${a.ip || '—'}</td></tr>`).join('')}</tbody></table>
+        <table><thead><tr><th>Tipo</th><th>Data/Hora</th><th>Motivo</th><th>Dispositivo</th><th>IP</th></tr></thead>
+        <tbody>${lista.map(a => {
+          const ehSaida = a.tipo === 'saida';
+          return `<tr>
+            <td><span class="status-chip status-${ehSaida ? 'Finalizado' : 'Ativo'}">${ehSaida ? 'Saída' : 'Entrada'}</span></td>
+            <td>${a.quando ? new Date(a.quando).toLocaleString('pt-BR') : '—'}</td>
+            <td>${a.motivo || '—'}</td>
+            <td>${a.dispositivo || '—'}</td>
+            <td class="mono">${a.ip || '—'}</td>
+          </tr>`;
+        }).join('')}</tbody></table>
       </div>`;
   }).catch(e => {
     console.error(e);
