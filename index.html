@@ -1786,7 +1786,7 @@
             <div class="field" style="grid-column:span 2;"><label>Admissão</label><input type="date" name="admissao" autocomplete="off"></div>
             <div class="field" style="grid-column:span 1;"><label>CH (carga horária)</label><input type="text" name="ch" placeholder="ex: 40h" maxlength="3" autocomplete="off"></div>
             <div class="field combo-field" style="grid-column:span 3;">
-              <label>Núcleo</label>
+              <label>Núcleo *</label>
               <div class="combo" id="nucleoCombo">
                 <button type="button" class="combo-toggle" id="nucleoComboToggle">
                   <span id="nucleoComboLabel" class="combo-toggle-label placeholder">Selecione o núcleo...</span>
@@ -1799,8 +1799,8 @@
                 </div>
               </div>
             </div>
-            <div class="field" id="diretorField" style="grid-column:span 2;"><label>Diretor</label><input type="text" name="diretor" autocomplete="off"></div>
-            <div class="field" id="localField" style="grid-column:span 4;"><label>Local</label><input type="text" name="local" autocomplete="off"></div>
+            <div class="field" id="diretorField" style="grid-column:span 2;"><label>Diretor *</label><input type="text" name="diretor" autocomplete="off"></div>
+            <div class="field" id="localField" style="grid-column:span 4;"><label>Local *</label><input type="text" name="local" autocomplete="off"></div>
             <div class="field full"><label>Observações</label><textarea name="obs" autocomplete="off"></textarea></div>
           </div>
         </fieldset>
@@ -2110,7 +2110,7 @@
       <button class="modal-close" id="docsModalClose">&times;</button>
     </div>
     <div class="modal-body">
-      <p style="font-size:13px;color:var(--muted);margin:0 0 16px;">Imprimir os documentos prontos para seguir com o processo de contratação.</p>
+      <p style="font-size:13px;color:var(--muted);margin:0 0 16px;">Imprima os documentos prontos para seguir com o processo de contratação.</p>
       <div id="docsModalLista" class="docs-modal-lista"></div>
     </div>
   </div>
@@ -3134,8 +3134,8 @@ function renderDependentField(containerId, fieldName, labelText, options, preset
 function updateDependentFields(presetDiretor, presetLocal){
   const nucleoVal = form.nucleo.value;
   const config = NUCLEO_CONFIG[nucleoVal];
-  renderDependentField('diretorField', 'diretor', 'Diretor', config ? config.diretor : null, presetDiretor);
-  renderDependentField('localField', 'local', 'Local', config ? config.local : null, presetLocal);
+  renderDependentField('diretorField', 'diretor', 'Diretor *', config ? config.diretor : null, presetDiretor);
+  renderDependentField('localField', 'local', 'Local *', config ? config.local : null, presetLocal);
 }
 
 // Aplica fonte vermelha em linhas específicas de uma planilha (1-indexed, sem contar cabeçalho).
@@ -3170,7 +3170,7 @@ function showSuccessFloat(msg){
 
 // Mostra, logo após salvar um registro (novo ou com situação alterada), quais
 // documentos já estão preenchidos e prontos pra baixar/imprimir.
-function mostrarDocsDisponiveis(r){
+function mostrarDocsDisponiveis(r, ehEdicao){
   const temMemo = !!(r.memo && r.memo.trim());
   const temOficio = !!(r.oficio && r.oficio.trim());
   const temAutorizacao = !!(r.autorizacao && r.autorizacao.trim());
@@ -3186,7 +3186,9 @@ function mostrarDocsDisponiveis(r){
   ];
 
   const disponiveis = docs.filter(d => d.disponivel);
-  document.getElementById('docsModalTitulo').textContent = `Servidor ${r.servidor || ''} cadastrado com sucesso`;
+  document.getElementById('docsModalTitulo').textContent = ehEdicao
+    ? 'Alterações salvas com sucesso!'
+    : `Servidor ${r.servidor || ''} cadastrado com sucesso!`;
 
   const lista = document.getElementById('docsModalLista');
   if(disponiveis.length === 0){
@@ -5853,6 +5855,18 @@ document.getElementById('saveBtn').addEventListener('click', async ()=>{
     form.servidor.focus();
     return;
   }
+  if(!form.nucleo.value){
+    showToast('Selecione o "Núcleo".');
+    return;
+  }
+  if(!form.diretor.value.trim()){
+    showToast('Informe o "Diretor".');
+    return;
+  }
+  if(!form.local.value.trim()){
+    showToast('Informe o "Local".');
+    return;
+  }
   if(!form.vinculo.value){
     showToast('Selecione o "Vínculo".');
     form.vinculo.focus();
@@ -5949,10 +5963,9 @@ document.getElementById('saveBtn').addEventListener('click', async ()=>{
       data.id = editingId;
       const ok = await salvarRegistro(data);
       if(ok){
-        showSuccessFloat('Alterações salvas com sucesso');
         registrarAtividade('Editou registro', data.servidor || '');
         if(SITUACOES_COM_DATA.includes(data.situacao)) await removerPrecadastroOrigemSeExistir(data.precadastroOrigemId);
-        mostrarDocsDisponiveis(data);
+        mostrarDocsDisponiveis(data, true);
         editingId = null;
         switchTab('registros');
       }
@@ -5960,10 +5973,9 @@ document.getElementById('saveBtn').addEventListener('click', async ()=>{
       data.id = (crypto.randomUUID ? crypto.randomUUID() : 'id-' + Date.now() + '-' + Math.random().toString(16).slice(2));
       const ok = await salvarRegistro(data);
       if(ok){
-        showSuccessFloat(`Servidor (a) ${data.servidor || ''} cadastrado com sucesso`);
         registrarAtividade('Criou registro', data.servidor || '');
         if(SITUACOES_COM_DATA.includes(data.situacao)) await removerPrecadastroOrigemSeExistir(data.precadastroOrigemId);
-        mostrarDocsDisponiveis(data);
+        mostrarDocsDisponiveis(data, false);
         abrirCadastroParaNovo();
       }
     }
