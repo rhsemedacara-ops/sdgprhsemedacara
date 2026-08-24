@@ -2596,6 +2596,33 @@ async function registrarSaida(motivo){
   }
 }
 
+function formatarDuracao(ms){
+  if(ms == null || ms < 0) return null;
+  const totalMin = Math.round(ms / 60000);
+  const h = Math.floor(totalMin / 60);
+  const min = totalMin % 60;
+  if(h === 0) return `${min}min`;
+  return `${h}h ${min}min`;
+}
+
+// Pareia cada "Saída" com a "Entrada" mais recente que veio antes dela (mesma pessoa),
+// calculando quanto tempo a sessão durou. Devolve a lista na ordem original (mais recente primeiro).
+function calcularDuracoesSessao(lista){
+  const ordemCrescente = lista.slice().sort((a, b) => (a.quando || 0) - (b.quando || 0));
+  let entradaPendente = null;
+  const comDuracao = ordemCrescente.map(item => {
+    if(item.tipo === 'saida'){
+      const duracaoMs = entradaPendente ? (item.quando - entradaPendente.quando) : null;
+      entradaPendente = null;
+      return { ...item, duracaoTexto: formatarDuracao(duracaoMs) };
+    }else{
+      entradaPendente = item;
+      return item;
+    }
+  });
+  return comDuracao.sort((a, b) => (b.quando || 0) - (a.quando || 0));
+}
+
 // Cria um novo usuário (login individual) sem derrubar a sessão de quem está criando,
 // usando uma instância separada do Firebase só para essa chamada.
 async function criarNovoUsuario(nome, cpf, email, senha){
@@ -4805,14 +4832,16 @@ function renderUsuarios(){
       <button type="button" class="month-btn ${nome === pessoaSelecionadaAcessos ? 'active' : ''}" onclick="selecionarPessoaHistorico('acessos', '${nome.replace(/'/g, "\\'")}')">${nome}<span class="month-count">${lista.length}</span></button>
     `).join('');
     const lista = porPessoa.get(pessoaSelecionadaAcessos) || [];
+    const listaComDuracao = calcularDuracoesSessao(lista);
     acessosArea.innerHTML = `
       <div class="table-scroll">
-        <table><thead><tr><th>Tipo</th><th>Data/Hora</th><th>Motivo</th><th>Dispositivo</th><th>IP</th></tr></thead>
-        <tbody>${lista.map(a => {
+        <table><thead><tr><th>Tipo</th><th>Data/Hora</th><th>Tempo de uso</th><th>Motivo</th><th>Dispositivo</th><th>IP</th></tr></thead>
+        <tbody>${listaComDuracao.map(a => {
           const ehSaida = a.tipo === 'saida';
           return `<tr>
             <td><span class="status-chip status-${ehSaida ? 'Finalizado' : 'Ativo'}">${ehSaida ? 'Saída' : 'Entrada'}</span></td>
             <td>${a.quando ? new Date(a.quando).toLocaleString('pt-BR') : '—'}</td>
+            <td class="mono">${a.duracaoTexto || '—'}</td>
             <td>${a.motivo || '—'}</td>
             <td>${a.dispositivo || '—'}</td>
             <td class="mono">${a.ip || '—'}</td>
