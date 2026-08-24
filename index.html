@@ -1026,6 +1026,7 @@
     color:var(--muted);
     font-size:11px;
   }
+  .foto-botoes{display:flex; gap:8px; flex-wrap:wrap;}
 
   .status-chip{
     display:inline-block;
@@ -1677,7 +1678,12 @@
             <div class="field full"><label>Nome do servidor *</label><input type="text" name="servidor" required autocomplete="off"></div>
             <div class="field full" id="fotoServidorField">
               <label>Foto</label>
-              <input type="file" id="fotoServidorInput" accept="image/*">
+              <div class="foto-botoes">
+                <button type="button" class="btn-ghost btn-small" id="fotoServidorCameraBtn">📷 Tirar foto</button>
+                <button type="button" class="btn-ghost btn-small" id="fotoServidorGaleriaBtn">🖼️ Escolher da galeria/arquivo</button>
+              </div>
+              <input type="file" id="fotoServidorCamera" accept="image/*" capture="environment" style="display:none;">
+              <input type="file" id="fotoServidorGaleria" accept="image/*" style="display:none;">
               <div id="fotoServidorPreviewWrap" style="display:none; margin-top:10px; position:relative; width:96px;">
                 <img id="fotoServidorPreview" style="width:96px; height:96px; object-fit:cover; border-radius:10px; border:1px solid var(--line-strong); display:block;">
                 <button type="button" id="removerFotoServidorBtn" class="foto-remove-btn" aria-label="Remover foto">×</button>
@@ -1819,7 +1825,12 @@
         <div class="field"><label>CH (carga horária) *</label><input type="text" id="preCh" placeholder="ex: 40h" maxlength="3" autocomplete="off"></div>
         <div class="field full">
           <label>Foto *</label>
-          <input type="file" id="preFoto" accept="image/*">
+          <div class="foto-botoes">
+            <button type="button" class="btn-ghost btn-small" id="preFotoCameraBtn">📷 Tirar foto</button>
+            <button type="button" class="btn-ghost btn-small" id="preFotoGaleriaBtn">🖼️ Escolher da galeria/arquivo</button>
+          </div>
+          <input type="file" id="preFotoCamera" accept="image/*" capture="environment" style="display:none;">
+          <input type="file" id="preFotoGaleria" accept="image/*" style="display:none;">
           <div id="preFotoPreviewWrap" style="display:none; margin-top:10px; position:relative; width:96px;">
             <img id="preFotoPreview" style="width:96px; height:96px; object-fit:cover; border-radius:10px; border:1px solid var(--line-strong); display:block;">
             <button type="button" id="removerPreFotoBtn" class="foto-remove-btn" aria-label="Remover foto">×</button>
@@ -2493,24 +2504,65 @@ function registrarAtividade(acao, detalhe){
   }).catch(e => console.error('Não foi possível registrar a atividade:', e));
 }
 
+// Identifica sistema operacional, navegador e tipo de aparelho a partir do user agent.
+function identificarDispositivo(){
+  const ua = navigator.userAgent;
+  let sistema = 'Desconhecido';
+  if(/Windows/i.test(ua)) sistema = 'Windows';
+  else if(/Android/i.test(ua)) sistema = 'Android';
+  else if(/iPhone|iPad|iPod/i.test(ua)) sistema = 'iOS';
+  else if(/Mac OS/i.test(ua)) sistema = 'Mac';
+  else if(/Linux/i.test(ua)) sistema = 'Linux';
+
+  let navegadorNome = 'Navegador';
+  if(/Edg\//i.test(ua)) navegadorNome = 'Edge';
+  else if(/OPR\//i.test(ua)) navegadorNome = 'Opera';
+  else if(/Chrome\//i.test(ua) && !/Chromium/i.test(ua)) navegadorNome = 'Chrome';
+  else if(/Firefox\//i.test(ua)) navegadorNome = 'Firefox';
+  else if(/Safari\//i.test(ua) && !/Chrome/i.test(ua)) navegadorNome = 'Safari';
+
+  const tipo = /Mobi|Android|iPhone/i.test(ua) ? 'Celular' : (/iPad|Tablet/i.test(ua) ? 'Tablet' : 'Computador');
+
+  return `${tipo} · ${sistema} · ${navegadorNome}`;
+}
+
+// Consulta um serviço público gratuito pra descobrir o IP de quem está acessando.
+async function buscarIpPublico(){
+  try{
+    const resp = await fetch('https://api.ipify.org?format=json');
+    const dados = await resp.json();
+    return dados.ip || null;
+  }catch(e){
+    console.error('Não foi possível obter o IP:', e);
+    return null;
+  }
+}
+
 function registrarAcesso(user){
-  db.collection(USUARIOS_COL).doc(user.uid).get().then(doc => {
-    const nome = doc.exists ? (doc.data().nome || user.email) : (usuarioAtual && usuarioAtual.email === user.email ? 'Administrador' : user.email);
-    db.collection(ACESSOS_COL).add({
-      uid: user.uid,
-      email: user.email,
-      nome,
-      quando: Date.now(),
-      dataHora: new Date().toISOString()
-    }).catch(e => console.error('Não foi possível registrar o acesso:', e));
-  }).catch(() => {
-    db.collection(ACESSOS_COL).add({
-      uid: user.uid,
-      email: user.email,
-      nome: 'Administrador',
-      quando: Date.now(),
-      dataHora: new Date().toISOString()
-    }).catch(e => console.error('Não foi possível registrar o acesso:', e));
+  const dispositivo = identificarDispositivo();
+  buscarIpPublico().then(ip => {
+    db.collection(USUARIOS_COL).doc(user.uid).get().then(doc => {
+      const nome = doc.exists ? (doc.data().nome || user.email) : (usuarioAtual && usuarioAtual.email === user.email ? 'Administrador' : user.email);
+      db.collection(ACESSOS_COL).add({
+        uid: user.uid,
+        email: user.email,
+        nome,
+        dispositivo,
+        ip: ip || 'Não disponível',
+        quando: Date.now(),
+        dataHora: new Date().toISOString()
+      }).catch(e => console.error('Não foi possível registrar o acesso:', e));
+    }).catch(() => {
+      db.collection(ACESSOS_COL).add({
+        uid: user.uid,
+        email: user.email,
+        nome: 'Administrador',
+        dispositivo,
+        ip: ip || 'Não disponível',
+        quando: Date.now(),
+        dataHora: new Date().toISOString()
+      }).catch(e => console.error('Não foi possível registrar o acesso:', e));
+    });
   });
 }
 
@@ -4725,8 +4777,8 @@ function renderUsuarios(){
     const lista = porPessoa.get(pessoaSelecionadaAcessos) || [];
     acessosArea.innerHTML = `
       <div class="table-scroll">
-        <table><thead><tr><th>Data/Hora do acesso</th></tr></thead>
-        <tbody>${lista.map(a => `<tr><td>${a.quando ? new Date(a.quando).toLocaleString('pt-BR') : '—'}</td></tr>`).join('')}</tbody></table>
+        <table><thead><tr><th>Data/Hora do acesso</th><th>Dispositivo</th><th>IP</th></tr></thead>
+        <tbody>${lista.map(a => `<tr><td>${a.quando ? new Date(a.quando).toLocaleString('pt-BR') : '—'}</td><td>${a.dispositivo || '—'}</td><td class="mono">${a.ip || '—'}</td></tr>`).join('')}</tbody></table>
       </div>`;
   }).catch(e => {
     console.error(e);
@@ -4911,7 +4963,10 @@ function comprimirFoto(file, callback){
   reader.readAsDataURL(file);
 }
 
-document.getElementById('preFoto').addEventListener('change', (e) => {
+document.getElementById('preFotoCameraBtn').addEventListener('click', () => document.getElementById('preFotoCamera').click());
+document.getElementById('preFotoGaleriaBtn').addEventListener('click', () => document.getElementById('preFotoGaleria').click());
+
+function aoEscolherPreFoto(e){
   const file = e.target.files[0];
   if(!file) return;
   comprimirFoto(file, (base64) => {
@@ -4919,11 +4974,14 @@ document.getElementById('preFoto').addEventListener('change', (e) => {
     document.getElementById('preFotoPreview').src = base64;
     document.getElementById('preFotoPreviewWrap').style.display = 'block';
   });
-});
+}
+document.getElementById('preFotoCamera').addEventListener('change', aoEscolherPreFoto);
+document.getElementById('preFotoGaleria').addEventListener('change', aoEscolherPreFoto);
 
 document.getElementById('removerPreFotoBtn').addEventListener('click', () => {
   preFotoBase64 = null;
-  document.getElementById('preFoto').value = '';
+  document.getElementById('preFotoCamera').value = '';
+  document.getElementById('preFotoGaleria').value = '';
   document.getElementById('preFotoPreviewWrap').style.display = 'none';
 });
 
@@ -4943,7 +5001,8 @@ function limparFormPrecadastro(){
   preCargoComboApi.setValor('');
   document.getElementById('preTurno').value = '';
   document.getElementById('preObs').value = '';
-  document.getElementById('preFoto').value = '';
+  document.getElementById('preFotoCamera').value = '';
+  document.getElementById('preFotoGaleria').value = '';
   document.getElementById('preFotoPreviewWrap').style.display = 'none';
   preFotoBase64 = null;
   precadastroEmEdicaoId = null;
@@ -5219,10 +5278,14 @@ function atualizarPreviewFotoCadastro(){
   }else{
     wrap.style.display = 'none';
   }
-  document.getElementById('fotoServidorInput').value = '';
+  document.getElementById('fotoServidorCamera').value = '';
+  document.getElementById('fotoServidorGaleria').value = '';
 }
 
-document.getElementById('fotoServidorInput').addEventListener('change', (e) => {
+document.getElementById('fotoServidorCameraBtn').addEventListener('click', () => document.getElementById('fotoServidorCamera').click());
+document.getElementById('fotoServidorGaleriaBtn').addEventListener('click', () => document.getElementById('fotoServidorGaleria').click());
+
+function aoEscolherFotoServidor(e){
   const file = e.target.files[0];
   if(!file) return;
   comprimirFoto(file, (base64) => {
@@ -5230,7 +5293,9 @@ document.getElementById('fotoServidorInput').addEventListener('change', (e) => {
     document.getElementById('fotoServidorPreview').src = base64;
     document.getElementById('fotoServidorPreviewWrap').style.display = 'block';
   });
-});
+}
+document.getElementById('fotoServidorCamera').addEventListener('change', aoEscolherFotoServidor);
+document.getElementById('fotoServidorGaleria').addEventListener('change', aoEscolherFotoServidor);
 
 document.getElementById('removerFotoServidorBtn').addEventListener('click', () => {
   fotoServidorAtual = null;
