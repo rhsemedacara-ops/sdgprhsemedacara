@@ -597,17 +597,8 @@
     flex-wrap:wrap;
     align-items:center;
     gap:2px;
-    width:calc(100% + 64px);
-    margin-left:-32px;
-    margin-right:-32px;
-    position:sticky;
-    top:84px;
-    max-height:none;
-    overflow-y:visible;
-    z-index:39;
-    margin-bottom:20px;
-    background:linear-gradient(155deg, var(--primary-dark), #0a3c38);
-    box-shadow:0 4px 10px rgba(0,0,0,.14);
+    max-width:1600px;
+    margin:0 auto;
     padding:0 32px;
   }
   .tab-btn{white-space:nowrap; text-align:center;}
@@ -1540,6 +1531,19 @@
       <button type="button" id="logoutBtn" class="btn-primary" style="width:100%;">Sair</button>
     </div>
   </div>
+
+  <nav class="tabs" id="sideTabs">
+    <a class="tab-btn" id="tabPrecadastro" href="#precadastro">Pré-contratação</a>
+    <a class="tab-btn" id="tabCadastro" href="#cadastro">Novo Cadastro</a>
+    <a class="tab-btn active" id="tabRegistros" href="#registros">Controle de Servidores</a>
+    <a class="tab-btn" id="tabContas" href="#contas">Abertura de Conta</a>
+    <a class="tab-btn" id="tabDistrato" href="#distrato">Distrato</a>
+    <a class="tab-btn" id="tabPeriodo" href="#periodo">Contratações por Período</a>
+    <a class="tab-btn" id="tabEmissoes" href="#emissoes">Acomp. Emi. Doc's</a>
+    <a class="tab-btn" id="tabIndicacoes" href="#indicacoes">Indicações</a>
+    <a class="tab-btn" id="tabDashboard" href="#dashboard">Dashboard (Relatórios)</a>
+    <a class="tab-btn" id="tabUsuarios" href="#usuarios">Usuários</a>
+  </nav>
 </div>
 
 <div class="wrap" id="appWrap" style="display:none;">
@@ -1562,20 +1566,6 @@
 
   <div id="appContent">
   <div class="app-shell">
-  <nav class="tabs" id="sideTabs">
-    <a class="tab-btn" id="tabPrecadastro" href="#precadastro">Pré-contratação</a>
-    <a class="tab-btn" id="tabCadastro" href="#cadastro">Novo Cadastro</a>
-    <a class="tab-btn active" id="tabRegistros" href="#registros">Controle de Servidores</a>
-    <a class="tab-btn" id="tabContas" href="#contas">Abertura de Conta</a>
-    <a class="tab-btn" id="tabDistrato" href="#distrato">Distrato</a>
-    <a class="tab-btn" id="tabPeriodo" href="#periodo">Contratações por Período</a>
-    <a class="tab-btn" id="tabEmissoes" href="#emissoes">Acomp. Emi. Doc's</a>
-    <a class="tab-btn" id="tabIndicacoes" href="#indicacoes">Indicações</a>
-    <a class="tab-btn" id="tabDashboard" href="#dashboard">Dashboard (Relatórios)</a>
-    <a class="tab-btn" id="tabUsuarios" href="#usuarios">Usuários</a>
-
-  </nav>
-
   <div class="main-panel">
   <div id="cadastroArea" style="display:none;">
     <div class="month-tabs" id="cadastroSubTabs" style="margin-bottom:16px;">
