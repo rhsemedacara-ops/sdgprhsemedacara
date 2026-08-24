@@ -2157,6 +2157,7 @@ auth.onAuthStateChanged((user) => {
   if(user){
     document.title = 'SDGP RH SEMED';
     usuarioAtual = user;
+    nomeUsuarioAtualCache = null;
     loginScreen.style.display = 'none';
     appWrap.style.display = 'block';
     document.getElementById('topBrandBar').style.display = 'block';
@@ -2492,11 +2493,26 @@ function anoEstaLiberado(ano){
 
 // Registra no histórico cada vez que alguém efetivamente faz login (não conta
 // aberturas de novas guias com a sessão já ativa, só o login "de verdade").
+// Busca o nome de quem está logado direto no banco (mais confiável que ler da tela,
+// que pode ainda estar com "Carregando..." se a ação for feita muito rápido).
+let nomeUsuarioAtualCache = null;
+async function obterNomeUsuarioAtual(){
+  if(!usuarioAtual) return 'Administrador';
+  if(nomeUsuarioAtualCache) return nomeUsuarioAtualCache;
+  try{
+    const doc = await db.collection(USUARIOS_COL).doc(usuarioAtual.uid).get();
+    nomeUsuarioAtualCache = (doc.exists && doc.data().nome) ? doc.data().nome : (usuarioAtual.email || 'Administrador');
+  }catch(e){
+    nomeUsuarioAtualCache = usuarioAtual.email || 'Administrador';
+  }
+  return nomeUsuarioAtualCache;
+}
+
 // Registra uma ação de alguém no sistema (criou/editou/excluiu um registro), para
 // acompanhar o fluxo de produtividade de cada colaborador.
-function registrarAtividade(acao, detalhe){
+async function registrarAtividade(acao, detalhe){
   if(!usuarioAtual) return;
-  const nomeExibicao = document.getElementById('sessaoUsuario') ? document.getElementById('sessaoUsuario').textContent : usuarioAtual.email;
+  const nomeExibicao = await obterNomeUsuarioAtual();
   db.collection(ATIVIDADES_COL).add({
     uid: usuarioAtual.uid,
     nome: nomeExibicao,
@@ -2579,7 +2595,7 @@ function registrarAcesso(user){
 // Precisa ser chamada ANTES do auth.signOut(), enquanto o usuário ainda está autenticado.
 async function registrarSaida(motivo){
   if(!usuarioAtual) return;
-  const nome = document.getElementById('sessaoUsuario') ? document.getElementById('sessaoUsuario').textContent : (usuarioAtual.email || '—');
+  const nome = await obterNomeUsuarioAtual();
   try{
     await db.collection(ACESSOS_COL).add({
       uid: usuarioAtual.uid,
@@ -5115,12 +5131,13 @@ document.getElementById('salvarPrecadastroBtn').addEventListener('click', async 
       showSuccessFloat(`Pré-contratação de ${nome} atualizado com sucesso`);
       registrarAtividade('Editou pré-contratação', nome);
     }else{
+      const nomeQuemEnviou = await obterNomeUsuarioAtual();
       await db.collection(PRECADASTROS_COL).add({
         nome, nucleo, local, admissao, ch, indicacao, contato, cargo, turno, obs,
         foto: preFotoBase64 || null,
         status: 'pendente',
         enviadoPor: usuarioAtual ? usuarioAtual.uid : '',
-        enviadoPorNome: document.getElementById('sessaoUsuario') ? document.getElementById('sessaoUsuario').textContent : '',
+        enviadoPorNome: nomeQuemEnviou,
         criadoEm: Date.now(),
         ano: selectedAno
       });
@@ -5311,7 +5328,7 @@ window.darAndamentoPrecadastro = async function(id){
     fotoServidorAtual = p.foto || null;
     precadastroOrigemAtual = id;
     atualizarPreviewFotoCadastro();
-    const nomeQuemConcluiu = document.getElementById('sessaoUsuario') ? document.getElementById('sessaoUsuario').textContent : (usuarioAtual ? usuarioAtual.email : 'Administrador');
+    const nomeQuemConcluiu = await obterNomeUsuarioAtual();
     await db.collection(PRECADASTROS_COL).doc(id).update({ status: 'processado', concluidoEm: Date.now(), concluidoPor: nomeQuemConcluiu });
     registrarAtividade('Deu andamento ao pré-contratação', p.nome || '');
     irParaSubAbaCadastro('form');
