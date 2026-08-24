@@ -6006,7 +6006,11 @@ document.getElementById('saveBtn').addEventListener('click', async ()=>{
       if(ok){
         registrarAtividade('Editou registro', data.servidor || '');
         if(SITUACOES_COM_DATA.includes(data.situacao)) await removerPrecadastroOrigemSeExistir(data.precadastroOrigemId);
-        showSuccessFloat('Alterações salvas com sucesso');
+        if(data.situacao === 'Distratado(a)'){
+          mostrarDocsDisponiveis(data, true, ['distrato']);
+        }else{
+          showSuccessFloat('Alterações salvas com sucesso');
+        }
         editingId = null;
         switchTab('registros');
       }
