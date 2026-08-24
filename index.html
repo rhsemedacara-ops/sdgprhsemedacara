@@ -2110,7 +2110,7 @@
       <button class="modal-close" id="docsModalClose">&times;</button>
     </div>
     <div class="modal-body">
-      <p style="font-size:13px;color:var(--muted);margin:0 0 16px;">Baixe e imprima os documentos já preenchidos para este servidor.</p>
+      <p style="font-size:13px;color:var(--muted);margin:0 0 16px;">Imprimir os documentos prontos para seguir com o processo de contratação.</p>
       <div id="docsModalLista" class="docs-modal-lista"></div>
     </div>
   </div>
@@ -3186,7 +3186,7 @@ function mostrarDocsDisponiveis(r){
   ];
 
   const disponiveis = docs.filter(d => d.disponivel);
-  document.getElementById('docsModalTitulo').textContent = `Documentos de ${r.servidor || 'servidor'}`;
+  document.getElementById('docsModalTitulo').textContent = `Servidor ${r.servidor || ''} cadastrado com sucesso`;
 
   const lista = document.getElementById('docsModalLista');
   if(disponiveis.length === 0){
@@ -3195,7 +3195,7 @@ function mostrarDocsDisponiveis(r){
     lista.innerHTML = disponiveis.map(d => `
       <div class="docs-modal-item">
         <span class="docs-modal-item-nome">${d.rotulo}</span>
-        <button class="btn-primary btn-small" onclick="gerarPDF('${r.id}','${d.tipo}')">Baixar / Imprimir</button>
+        <button class="btn-primary btn-small" onclick="gerarPDF('${r.id}','${d.tipo}')">Imprimir</button>
       </div>
     `).join('');
   }
