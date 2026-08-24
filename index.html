@@ -2501,9 +2501,9 @@ async function obterNomeUsuarioAtual(){
   if(nomeUsuarioAtualCache) return nomeUsuarioAtualCache;
   try{
     const doc = await db.collection(USUARIOS_COL).doc(usuarioAtual.uid).get();
-    nomeUsuarioAtualCache = (doc.exists && doc.data().nome) ? doc.data().nome : (usuarioAtual.email || 'Administrador');
+    nomeUsuarioAtualCache = (doc.exists && doc.data().nome) ? doc.data().nome : 'Administrador';
   }catch(e){
-    nomeUsuarioAtualCache = usuarioAtual.email || 'Administrador';
+    nomeUsuarioAtualCache = 'Administrador';
   }
   return nomeUsuarioAtualCache;
 }
