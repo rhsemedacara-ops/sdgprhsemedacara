@@ -5171,7 +5171,7 @@ function renderMeusPrecadastros(){
         : `${p.cargo || '—'} · ${p.local || '—'} · Admissão: ${p.admissao ? new Date(p.admissao+'T00:00:00').toLocaleDateString('pt-BR') : '—'}`;
       const dataHtml = pendente
         ? `Enviado em ${p.criadoEm ? new Date(p.criadoEm).toLocaleString('pt-BR') : '—'}`
-        : `Concluído em ${p.concluidoEm ? new Date(p.concluidoEm).toLocaleString('pt-BR') : '—'}`;
+        : `Concluído em ${p.concluidoEm ? new Date(p.concluidoEm).toLocaleString('pt-BR') : '—'}${p.concluidoPor ? `, por ${p.concluidoPor}` : ''}`;
       return `
         <div class="pre-card">
           ${fotoHtml}
@@ -5311,7 +5311,8 @@ window.darAndamentoPrecadastro = async function(id){
     fotoServidorAtual = p.foto || null;
     precadastroOrigemAtual = id;
     atualizarPreviewFotoCadastro();
-    await db.collection(PRECADASTROS_COL).doc(id).update({ status: 'processado', concluidoEm: Date.now() });
+    const nomeQuemConcluiu = document.getElementById('sessaoUsuario') ? document.getElementById('sessaoUsuario').textContent : (usuarioAtual ? usuarioAtual.email : 'Administrador');
+    await db.collection(PRECADASTROS_COL).doc(id).update({ status: 'processado', concluidoEm: Date.now(), concluidoPor: nomeQuemConcluiu });
     registrarAtividade('Deu andamento ao pré-contratação', p.nome || '');
     irParaSubAbaCadastro('form');
     showToast('Continue preenchendo o restante dos dados e clique em Salvar registro.');
