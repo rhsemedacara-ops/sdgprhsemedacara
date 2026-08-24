@@ -3170,7 +3170,7 @@ function showSuccessFloat(msg){
 
 // Mostra, logo após salvar um registro (novo ou com situação alterada), quais
 // documentos já estão preenchidos e prontos pra baixar/imprimir.
-function mostrarDocsDisponiveis(r, ehEdicao){
+function mostrarDocsDisponiveis(r, ehEdicao, tiposPermitidos){
   const temMemo = !!(r.memo && r.memo.trim());
   const temOficio = !!(r.oficio && r.oficio.trim());
   const temAutorizacao = !!(r.autorizacao && r.autorizacao.trim());
@@ -3185,7 +3185,8 @@ function mostrarDocsDisponiveis(r, ehEdicao){
     { rotulo: 'DISTRATO', disponivel: temDistrato, tipo: 'distrato' }
   ];
 
-  const disponiveis = docs.filter(d => d.disponivel);
+  let disponiveis = docs.filter(d => d.disponivel);
+  if(tiposPermitidos) disponiveis = disponiveis.filter(d => tiposPermitidos.includes(d.tipo));
   document.getElementById('docsModalTitulo').textContent = ehEdicao
     ? 'Alterações salvas com sucesso!'
     : `Servidor ${r.servidor || ''} cadastrado com sucesso!`;
@@ -5965,7 +5966,13 @@ document.getElementById('saveBtn').addEventListener('click', async ()=>{
       if(ok){
         registrarAtividade('Editou registro', data.servidor || '');
         if(SITUACOES_COM_DATA.includes(data.situacao)) await removerPrecadastroOrigemSeExistir(data.precadastroOrigemId);
-        mostrarDocsDisponiveis(data, true);
+        if(data.situacao === 'Finalizado'){
+          showSuccessFloat('Alterações salvas com sucesso');
+        }else if(data.situacao === 'Distratado(a)'){
+          mostrarDocsDisponiveis(data, true, ['distrato']);
+        }else{
+          mostrarDocsDisponiveis(data, true);
+        }
         editingId = null;
         switchTab('registros');
       }
@@ -5975,7 +5982,7 @@ document.getElementById('saveBtn').addEventListener('click', async ()=>{
       if(ok){
         registrarAtividade('Criou registro', data.servidor || '');
         if(SITUACOES_COM_DATA.includes(data.situacao)) await removerPrecadastroOrigemSeExistir(data.precadastroOrigemId);
-        mostrarDocsDisponiveis(data, false);
+        mostrarDocsDisponiveis(data, false, ['memo','oficio','autorizacao','aberturaConta']);
         abrirCadastroParaNovo();
       }
     }
