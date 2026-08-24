@@ -2521,7 +2521,12 @@ function identificarDispositivo(){
   else if(/Firefox\//i.test(ua)) navegadorNome = 'Firefox';
   else if(/Safari\//i.test(ua) && !/Chrome/i.test(ua)) navegadorNome = 'Safari';
 
-  const tipo = /Mobi|Android|iPhone/i.test(ua) ? 'Celular' : (/iPad|Tablet/i.test(ua) ? 'Tablet' : 'Computador');
+  const tipoUA = /Mobi|Android|iPhone/i.test(ua) ? 'Celular' : (/iPad|Tablet/i.test(ua) ? 'Tablet' : 'Computador');
+  const temToque = ('ontouchstart' in window) || (navigator.maxTouchPoints && navigator.maxTouchPoints > 0);
+  // Se o navegador diz "Computador" mas o aparelho tem tela sensível ao toque, é bem provável
+  // que seja um celular/tablet com o modo "Ver como Desktop" ativado — o site não consegue
+  // saber o modelo exato nesse caso, mas avisa que pode não ser um computador de verdade.
+  const tipo = (tipoUA === 'Computador' && temToque) ? 'Computador (ou celular em modo Desktop)' : tipoUA;
 
   return `${tipo} · ${sistema} · ${navegadorNome}`;
 }
