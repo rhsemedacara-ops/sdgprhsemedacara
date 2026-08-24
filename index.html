@@ -640,8 +640,8 @@
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
   }
   @media (max-width:900px){
-    .tabs{flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch;}
-    .tab-btn{padding:12px 12px; font-size:12.5px; margin:4px 0;}
+    .tabs{flex-wrap:wrap; justify-content:center;}
+    .tab-btn{padding:10px 10px; font-size:12px; margin:4px 0;}
     .session-info{display:none;}
   }
 
@@ -1532,7 +1532,7 @@
     </div>
   </div>
 
-  <nav class="tabs" id="sideTabs">
+  <nav class="tabs" id="sideTabs" style="display:none;">
     <a class="tab-btn" id="tabPrecadastro" href="#precadastro">Pré-contratação</a>
     <a class="tab-btn" id="tabCadastro" href="#cadastro">Novo Cadastro</a>
     <a class="tab-btn active" id="tabRegistros" href="#registros">Controle de Servidores</a>
@@ -2783,14 +2783,17 @@ function atualizarPainelSessao(){
 
 function updateAppContentVisibility(){
   const welcomeEl = document.getElementById('welcomeMessage');
+  const tabsEl = document.getElementById('sideTabs');
   if(!selectedAno){
     welcomeEl.style.display = 'block';
     document.getElementById('appContent').style.display = 'none';
+    if(tabsEl) tabsEl.style.display = 'none';
     return;
   }
   welcomeEl.style.display = 'none';
   const ativo = anoEstaLiberado(selectedAno);
   document.getElementById('appContent').style.display = ativo ? '' : 'none';
+  if(tabsEl) tabsEl.style.display = ativo ? '' : 'none';
 }
 
 document.getElementById('anoSelector').addEventListener('change', (e)=>{
