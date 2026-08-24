@@ -3553,16 +3553,6 @@ function pdfParagraph(doc, runs, x, y, width, opts = {}){
     run.t.split(/(\s+)/).forEach(p => { if(p !== '') tokens.push({ w: p, b: run.b }); });
   });
 
-  // Garante que um espaço nunca "suma" (largura zero/quase-zero) por alguma
-  // particularidade de medição de fonte do jsPDF — usa um mínimo seguro,
-  // aplicado tanto na quebra de linha quanto na renderização.
-  function larguraToken(t, fontSizeAtual){
-    if(/^\s+$/.test(t.w)){
-      return fontSizeAtual * 0.26;
-    }
-    return doc.getTextWidth(t.w);
-  }
-
   let lines = [];
   let current = [];
   let currentWidth = 0;
@@ -3571,7 +3561,7 @@ function pdfParagraph(doc, runs, x, y, width, opts = {}){
 
   tokens.forEach(tok => {
     pdfFont(doc, tok.b);
-    const w = larguraToken(tok, fontSize);
+    const w = doc.getTextWidth(tok.w);
     if(currentWidth + w > usableWidth && current.length){
       lines.push({ toks: current, indent: firstLine ? firstIndent : 0 });
       current = []; currentWidth = 0; firstLine = false; usableWidth = width;
@@ -3581,27 +3571,38 @@ function pdfParagraph(doc, runs, x, y, width, opts = {}){
   });
   if(current.length) lines.push({ toks: current, indent: firstLine ? firstIndent : 0 });
 
+  // Quando um espaço fica entre um trecho em negrito e outro normal (ex: nome em negrito
+  // seguido de texto normal), o peso visual do negrito faz o espaço parecer menor do que é.
+  // Este pequeno reforço (só nessas transições) corrige a aparência sem alterar o resto.
+  function bonusTransicaoNegrito(toks, i){
+    if(!/^\s+$/.test(toks[i].w)) return 0;
+    const antes = toks[i - 1];
+    const depois = toks[i + 1];
+    if(antes && depois && !!antes.b !== !!depois.b) return 0.35;
+    return 0;
+  }
+
   lines.forEach((line, idx) => {
     let toks = line.toks.slice();
     while(toks.length && /^\s+$/.test(toks[toks.length - 1].w)) toks.pop();
     const isLast = idx === lines.length - 1;
     let naturalWidth = 0;
-    toks.forEach(t => { pdfFont(doc, t.b); naturalWidth += larguraToken(t, fontSize); });
+    toks.forEach((t, i) => { pdfFont(doc, t.b); naturalWidth += doc.getTextWidth(t.w) + bonusTransicaoNegrito(toks, i); });
 
     let cx = x + line.indent;
     if(align === 'justify' && !isLast){
       const spaces = toks.filter(t => /^\s+$/.test(t.w)).length;
       const extra = spaces > 0 ? (width - line.indent - naturalWidth) / spaces : 0;
-      toks.forEach(t => {
+      toks.forEach((t, i) => {
         pdfFont(doc, t.b);
         doc.text(t.w, cx, y);
-        cx += larguraToken(t, fontSize) + (/^\s+$/.test(t.w) ? extra : 0);
+        cx += doc.getTextWidth(t.w) + bonusTransicaoNegrito(toks, i) + (/^\s+$/.test(t.w) ? extra : 0);
       });
     }else{
-      toks.forEach(t => {
+      toks.forEach((t, i) => {
         pdfFont(doc, t.b);
         doc.text(t.w, cx, y);
-        cx += larguraToken(t, fontSize);
+        cx += doc.getTextWidth(t.w) + bonusTransicaoNegrito(toks, i);
       });
     }
     y += lineH;
@@ -3922,14 +3923,14 @@ async function gerarDistratoPDF(r){
     pdfHLine(doc, PDF_X0, borderY, PDF_X1, 0.4);
     let y = borderY + 6;
 
-    y = pdfParagraph(doc, [{ t: `DISTRATO DO CONTRATO ${contrato}`, b: true }], PDF_X0, y, PDF_W, { align: 'center', fontSize: 11.5 }); y += 6;
+    y = pdfParagraph(doc, [{ t: `DISTRATO DO CONTRATO ${contrato}`, b: true }], PDF_X0, y, PDF_W, { align: 'center', fontSize: 11 }); y += 6;
     y = pdfParagraph(doc, [
       { t: 'Termo de Distrato Administrativo de Serviços temporários, que celebram ' },
       { t: 'PREFEITURA MUNICIPAL DE ACARÁ', b: true },
       { t: ' e ' },
       { t: servidor, b: true },
       { t: ' como abaixo se infere.' }
-    ], PDF_X0 + 75, y, PDF_W - 75, { align: 'justify', fontSize: 11.5 }); y += 6;
+    ], PDF_X0 + 75, y, PDF_W - 75, { align: 'justify', fontSize: 11 }); y += 6;
 
     y = pdfParagraph(doc, [
       { t: 'A PREFEITURA MUNICIPAL DE ACARÁ', b: true },
@@ -3952,33 +3953,33 @@ async function gerarDistratoPDF(r){
       { t: ', doravante denominado ' },
       { t: 'DISTRATADO(A)', b: true },
       { t: ', têm justos e pactuado nos termos da Lei Orgânica do Município, regulamentado pela Lei Municipal n° 1.688/97, de 30/01/1997, alterado pela Lei Municipal n° 001/2005 e Lei Municipal nº 028/2005 de 30 de Dezembro de 2005, observadas as cláusulas e condições seguintes, que reciprocamente se outorgam e obrigam-se:' }
-    ], PDF_X0, y, PDF_W, { align: 'justify', firstIndent: 15, fontSize: 11.5, lineHeight: 4.6 }); y += 5;
+    ], PDF_X0, y, PDF_W, { align: 'justify', firstIndent: 15, fontSize: 11, lineHeight: 4.6 }); y += 5;
 
-    y = pdfParagraph(doc, [{ t: 'CLÁUSULA I', b: true }], PDF_X0, y, PDF_W, { fontSize: 11.5 });
-    y = pdfParagraph(doc, [{ t: `Fica distratado o Contrato Administrativo Nº ${contrato}, ` }, { t: servidor, b: true }, { t: ' cujo objetivo era a prestação de serviços temporários.' }], PDF_X0, y, PDF_W, { align: 'justify', fontSize: 11.5 }); y += 5;
+    y = pdfParagraph(doc, [{ t: 'CLÁUSULA I', b: true }], PDF_X0, y, PDF_W, { fontSize: 11 });
+    y = pdfParagraph(doc, [{ t: `Fica distratado o Contrato Administrativo Nº ${contrato}, ` }, { t: servidor, b: true }, { t: ' cujo objetivo era a prestação de serviços temporários.' }], PDF_X0, y, PDF_W, { align: 'justify', fontSize: 11 }); y += 5;
 
-    y = pdfParagraph(doc, [{ t: 'CLAÚSULA II', b: true }], PDF_X0, y, PDF_W, { fontSize: 11.5 });
-    y = pdfParagraph(doc, [{ t: `Com a celebração do presente Ato, ficam distratadas as obrigações de ambas as partes contraídas do Contrato Temporário Nº ${contrato}, ` }, { t: servidor, b: true }, { t: ', e por estarem de pleno acordo firmam o presente Termo de Distrato, em 3 (três) vias de igual teor e forma, na presença das testemunhas abaixo.' }], PDF_X0, y, PDF_W, { align: 'justify', fontSize: 11.5 }); y += 5;
+    y = pdfParagraph(doc, [{ t: 'CLAÚSULA II', b: true }], PDF_X0, y, PDF_W, { fontSize: 11 });
+    y = pdfParagraph(doc, [{ t: `Com a celebração do presente Ato, ficam distratadas as obrigações de ambas as partes contraídas do Contrato Temporário Nº ${contrato}, ` }, { t: servidor, b: true }, { t: ', e por estarem de pleno acordo firmam o presente Termo de Distrato, em 3 (três) vias de igual teor e forma, na presença das testemunhas abaixo.' }], PDF_X0, y, PDF_W, { align: 'justify', fontSize: 11 }); y += 5;
 
-    y = pdfParagraph(doc, [{ t: `Acará – PA, em ${dataCurta}.` }], PDF_X0, y, PDF_W, { align: 'right', fontSize: 11.5 });
+    y = pdfParagraph(doc, [{ t: `Acará – PA, em ${dataCurta}.` }], PDF_X0, y, PDF_W, { align: 'right', fontSize: 11 });
 
     // Assinaturas e testemunhas ficam em posição fixa perto do fim da página,
     // para nunca saírem da folha mesmo se o texto acima for mais longo.
     let sy = 200;
-    sy = pdfParagraph(doc, [{ t: '________________________________________________' }], PDF_X0, sy, PDF_W, { align: 'center', fontSize: 11.5 });
-    sy = pdfParagraph(doc, [{ t: 'PEDRO PAULO GOUVEA MORAES' }], PDF_X0, sy, PDF_W, { align: 'center', fontSize: 11.5 });
-    sy = pdfParagraph(doc, [{ t: 'Prefeito Municipal' }], PDF_X0, sy, PDF_W, { align: 'center', fontSize: 11.5 }); sy += 5;
-    sy = pdfParagraph(doc, [{ t: '________________________________________________' }], PDF_X0, sy, PDF_W, { align: 'center', fontSize: 11.5 });
-    sy = pdfParagraph(doc, [{ t: 'CARLA LUCIANA SEABRA PORTAL' }], PDF_X0, sy, PDF_W, { align: 'center', fontSize: 11.5 });
-    sy = pdfParagraph(doc, [{ t: 'Secretária Municipal de Educação' }], PDF_X0, sy, PDF_W, { align: 'center', fontSize: 11.5 }); sy += 5;
-    sy = pdfParagraph(doc, [{ t: '________________________________________________' }], PDF_X0, sy, PDF_W, { align: 'center', fontSize: 11.5 });
-    sy = pdfParagraph(doc, [{ t: servidor }], PDF_X0, sy, PDF_W, { align: 'center', fontSize: 11.5 });
-    sy = pdfParagraph(doc, [{ t: 'Distratado (a)' }], PDF_X0, sy, PDF_W, { align: 'center', fontSize: 11.5 }); sy += 12;
+    sy = pdfParagraph(doc, [{ t: '________________________________________________' }], PDF_X0, sy, PDF_W, { align: 'center', fontSize: 11 });
+    sy = pdfParagraph(doc, [{ t: 'PEDRO PAULO GOUVEA MORAES' }], PDF_X0, sy, PDF_W, { align: 'center', fontSize: 11 });
+    sy = pdfParagraph(doc, [{ t: 'Prefeito Municipal' }], PDF_X0, sy, PDF_W, { align: 'center', fontSize: 11 }); sy += 5;
+    sy = pdfParagraph(doc, [{ t: '________________________________________________' }], PDF_X0, sy, PDF_W, { align: 'center', fontSize: 11 });
+    sy = pdfParagraph(doc, [{ t: 'CARLA LUCIANA SEABRA PORTAL' }], PDF_X0, sy, PDF_W, { align: 'center', fontSize: 11 });
+    sy = pdfParagraph(doc, [{ t: 'Secretária Municipal de Educação' }], PDF_X0, sy, PDF_W, { align: 'center', fontSize: 11 }); sy += 5;
+    sy = pdfParagraph(doc, [{ t: '________________________________________________' }], PDF_X0, sy, PDF_W, { align: 'center', fontSize: 11 });
+    sy = pdfParagraph(doc, [{ t: servidor }], PDF_X0, sy, PDF_W, { align: 'center', fontSize: 11 });
+    sy = pdfParagraph(doc, [{ t: 'Distratado (a)' }], PDF_X0, sy, PDF_W, { align: 'center', fontSize: 11 }); sy += 12;
 
-    pdfParagraph(doc, [{ t: '______________________________' }], PDF_X0 + 7, sy, 65, { align: 'center', fontSize: 11.5 });
-    pdfParagraph(doc, [{ t: 'Testemunha – 1' }], PDF_X0 + 7, sy + 5, 65, { align: 'center', fontSize: 11.5 });
-    pdfParagraph(doc, [{ t: '______________________________' }], PDF_X0 + 87, sy, 65, { align: 'center', fontSize: 11.5 });
-    pdfParagraph(doc, [{ t: 'Testemunha – 2' }], PDF_X0 + 87, sy + 5, 65, { align: 'center', fontSize: 11.5 });
+    pdfParagraph(doc, [{ t: '______________________________' }], PDF_X0 + 7, sy, 65, { align: 'center', fontSize: 11 });
+    pdfParagraph(doc, [{ t: 'Testemunha – 1' }], PDF_X0 + 7, sy + 5, 65, { align: 'center', fontSize: 11 });
+    pdfParagraph(doc, [{ t: '______________________________' }], PDF_X0 + 87, sy, 65, { align: 'center', fontSize: 11 });
+    pdfParagraph(doc, [{ t: 'Testemunha – 2' }], PDF_X0 + 87, sy + 5, 65, { align: 'center', fontSize: 11 });
 
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(7.5);
