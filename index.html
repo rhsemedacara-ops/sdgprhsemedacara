@@ -3580,12 +3580,8 @@ function pdfParagraph(doc, runs, x, y, width, opts = {}){
 
     let cx = x + line.indent;
     if(align === 'justify' && !isLast){
-      const spaceWidth = doc.getTextWidth(' ');
       const spaces = toks.filter(t => /^\s+$/.test(t.w)).length;
-      let extra = spaces > 0 ? (width - line.indent - naturalWidth) / spaces : 0;
-      // Evita "rios" de espaço em branco quando a linha tem poucas palavras: limita
-      // o espaçamento extra a no máximo 2x o espaço normal de uma palavra.
-      if(extra > spaceWidth * 2) extra = spaceWidth * 2;
+      const extra = spaces > 0 ? (width - line.indent - naturalWidth) / spaces : 0;
       toks.forEach(t => {
         pdfFont(doc, t.b);
         doc.text(t.w, cx, y);
