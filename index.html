@@ -3571,12 +3571,23 @@ function pdfParagraph(doc, runs, x, y, width, opts = {}){
   });
   if(current.length) lines.push({ toks: current, indent: firstLine ? firstIndent : 0 });
 
+  // Garante que um espaço nunca "suma" (largura zero/quase-zero) por alguma
+  // particularidade de medição de fonte do jsPDF — usa um mínimo seguro.
+  function larguraToken(t, fontSizeAtual){
+    const w = doc.getTextWidth(t.w);
+    if(/^\s+$/.test(t.w)){
+      const minimo = fontSizeAtual * 0.09;
+      return w < minimo ? minimo : w;
+    }
+    return w;
+  }
+
   lines.forEach((line, idx) => {
     let toks = line.toks.slice();
     while(toks.length && /^\s+$/.test(toks[toks.length - 1].w)) toks.pop();
     const isLast = idx === lines.length - 1;
     let naturalWidth = 0;
-    toks.forEach(t => { pdfFont(doc, t.b); naturalWidth += doc.getTextWidth(t.w); });
+    toks.forEach(t => { pdfFont(doc, t.b); naturalWidth += larguraToken(t, fontSize); });
 
     let cx = x + line.indent;
     if(align === 'justify' && !isLast){
@@ -3585,13 +3596,13 @@ function pdfParagraph(doc, runs, x, y, width, opts = {}){
       toks.forEach(t => {
         pdfFont(doc, t.b);
         doc.text(t.w, cx, y);
-        cx += doc.getTextWidth(t.w) + (/^\s+$/.test(t.w) ? extra : 0);
+        cx += larguraToken(t, fontSize) + (/^\s+$/.test(t.w) ? extra : 0);
       });
     }else{
       toks.forEach(t => {
         pdfFont(doc, t.b);
         doc.text(t.w, cx, y);
-        cx += doc.getTextWidth(t.w);
+        cx += larguraToken(t, fontSize);
       });
     }
     y += lineH;
