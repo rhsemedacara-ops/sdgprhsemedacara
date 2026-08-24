@@ -59,7 +59,7 @@
   .bg-band{position:absolute; left:0; width:100%; height:90px; display:block;}
   .bg-band-top{top:0;}
   .bg-band-bottom{bottom:0;}
-  .bg-watermark-wrap{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden;}
+  .bg-watermark-wrap{position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;}
   .bg-watermark{
     position:absolute; inset:0;
     background-repeat:no-repeat;
@@ -99,13 +99,58 @@
     background:linear-gradient(155deg, var(--primary-dark), #0a3c38);
     box-shadow:0 2px 10px rgba(0,0,0,.18);
   }
-  .top-brand-bar .logout-btn{
-    position:absolute; top:50%; right:24px; transform:translateY(-50%);
-    background:rgba(255,255,255,.12);
-    border:1px solid rgba(255,255,255,.3);
+  .profile-menu-wrap{position:absolute; top:50%; right:24px; transform:translateY(-50%);}
+  .profile-icon-btn{
+    width:42px; height:42px;
+    border-radius:50%;
+    background:rgba(255,255,255,.14);
+    border:1.5px solid rgba(255,255,255,.4);
     color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Fraunces', serif;
+    font-size:16px; font-weight:700;
+    padding:0;
+    overflow:hidden;
   }
-  .top-brand-bar .logout-btn:hover{background:rgba(255,255,255,.22); border-color:rgba(255,255,255,.5);}
+  .profile-icon-btn:hover{background:rgba(255,255,255,.24);}
+  .profile-icon-btn img{width:100%; height:100%; object-fit:cover;}
+  .profile-dropdown{
+    display:none;
+    position:absolute;
+    top:calc(100% + 10px);
+    right:0;
+    width:230px;
+    background:var(--surface);
+    border:1px solid var(--line-strong);
+    border-radius:var(--r-md);
+    box-shadow:var(--shadow-md);
+    padding:16px;
+    z-index:200;
+  }
+  .profile-dropdown.open{display:block;}
+  .profile-dropdown-photo{
+    display:flex; justify-content:center; margin-bottom:10px;
+  }
+  .profile-dropdown-photo img, .profile-photo-placeholder{
+    width:64px; height:64px;
+    border-radius:50%;
+    object-fit:cover;
+    border:1px solid var(--line-strong);
+  }
+  .profile-photo-placeholder{
+    display:flex; align-items:center; justify-content:center;
+    background:#EFEEE7;
+    color:var(--muted);
+    font-size:10px; text-align:center;
+  }
+  .profile-dropdown-info{
+    margin:14px 0;
+    padding:12px 0;
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+    display:flex; flex-direction:column; gap:10px;
+  }
+  .profile-dropdown-info .session-info-value{white-space:normal; word-break:break-word;}
   .top-brand-bar::after{
     content:'';
     display:block;
@@ -543,23 +588,22 @@
   .app-shell{
     display:block;
   }
-  .main-panel{margin-left:244px; width:calc(100% - 244px); box-sizing:border-box; display:block;}
+  .main-panel{margin-left:0; width:100%; box-sizing:border-box; display:block;}
   #tableArea{display:block; width:100%;}
 
   .tabs{
     display:flex;
-    flex-direction:column;
-    flex-wrap:nowrap;
+    flex-direction:row;
+    flex-wrap:wrap;
     gap:8px;
-    width:220px;
-    position:fixed;
-    top:112px;
-    left:32px;
-    max-height:calc(100vh - 124px);
-    overflow-y:auto;
+    width:100%;
+    position:static;
+    max-height:none;
+    overflow-y:visible;
     z-index:30;
+    margin-bottom:20px;
   }
-  .tab-btn{white-space:nowrap; width:100%; text-align:left;}
+  .tab-btn{white-space:nowrap; text-align:center;}
   .tab-btn{
     display:block;
     background:var(--surface);
@@ -585,14 +629,7 @@
     border-left:4px solid var(--stamp-red);
   }
 
-  .session-info{
-    margin-top:14px;
-    padding:14px 14px;
-    background:var(--surface);
-    border:1.4px solid var(--line);
-    border-radius:var(--r-sm);
-    display:flex; flex-direction:column; gap:10px;
-  }
+  .session-info{display:none;}
   .session-info-item{display:flex; flex-direction:column; gap:2px;}
   .session-info-label{
     font-family:'IBM Plex Mono', monospace;
@@ -604,18 +641,7 @@
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
   }
   @media (max-width:900px){
-    .main-panel{margin-left:0; width:100%;}
-    .tabs{
-      flex-direction:row;
-      flex-wrap:wrap;
-      overflow-x:auto;
-      overflow-y:visible;
-      width:100%;
-      max-height:none;
-      position:static;
-      margin-bottom:16px;
-    }
-    .tab-btn{width:auto;}
+    .tab-btn{padding:9px 12px; font-size:12.5px;}
     .session-info{display:none;}
   }
 
@@ -1480,7 +1506,31 @@
       <span class="tb-sub2">RH · SEMED Acará — PA</span>
     </div>
   </div>
-  <button type="button" id="logoutBtn" class="logout-btn">Sair</button>
+  <div class="profile-menu-wrap">
+    <button type="button" id="profileIconBtn" class="profile-icon-btn">
+      <img id="profileIconImg" style="display:none;" alt="Foto do perfil">
+      <span id="profileIconInitial">?</span>
+    </button>
+    <div id="profileDropdown" class="profile-dropdown">
+      <div class="profile-dropdown-photo">
+        <img id="profileDropdownImg" style="display:none;" alt="Foto do perfil">
+        <div id="profileDropdownPlaceholder" class="profile-photo-placeholder">Sem foto</div>
+      </div>
+      <input type="file" id="profileFotoInput" accept="image/*" style="display:none;">
+      <button type="button" id="profileFotoBtn" class="btn-ghost btn-small" style="width:100%;">Alterar foto</button>
+      <div class="profile-dropdown-info">
+        <div class="session-info-item">
+          <span class="session-info-label">Usuário</span>
+          <span class="session-info-value" id="sessaoUsuario">—</span>
+        </div>
+        <div class="session-info-item">
+          <span class="session-info-label">Ano</span>
+          <span class="session-info-value" id="sessaoAno">—</span>
+        </div>
+      </div>
+      <button type="button" id="logoutBtn" class="btn-primary" style="width:100%;">Sair</button>
+    </div>
+  </div>
 </div>
 
 <div class="wrap" id="appWrap" style="display:none;">
@@ -1515,16 +1565,6 @@
     <a class="tab-btn" id="tabDashboard" href="#dashboard">Dashboard (Relatórios)</a>
     <a class="tab-btn" id="tabUsuarios" href="#usuarios">Usuários</a>
 
-    <div class="session-info">
-      <div class="session-info-item">
-        <span class="session-info-label">Usuário</span>
-        <span class="session-info-value" id="sessaoUsuario" style="white-space:normal; overflow:visible; text-overflow:clip; word-break:break-word;">—</span>
-      </div>
-      <div class="session-info-item">
-        <span class="session-info-label">Ano</span>
-        <span class="session-info-value" id="sessaoAno">—</span>
-      </div>
-    </div>
   </nav>
 
   <div class="main-panel">
@@ -2107,6 +2147,7 @@ const USUARIOS_COL = 'usuarios';
 const ACESSOS_COL = 'acessos_log';
 const ATIVIDADES_COL = 'atividades_log';
 const PRECADASTROS_COL = 'pre_cadastros';
+const PERFIS_FOTO_COL = 'perfis_foto';
 let records = [];
 let editingId = null;
 let fotoServidorAtual = null; // guarda a foto (base64) entre o pré-contratação e o registro final
@@ -2194,6 +2235,7 @@ auth.onAuthStateChanged((user) => {
       document.getElementById('rodapeTextoUsuario').style.display = ehAdmin ? 'none' : 'inline';
     });
     aplicarPermissoesDeAbas(user.uid);
+    carregarFotoEIniciaisDoPerfil();
     loadRecords();
     resetarTimersInatividade();
   }else{
@@ -2507,6 +2549,59 @@ function anoEstaLiberado(ano){
 // Busca o nome de quem está logado direto no banco (mais confiável que ler da tela,
 // que pode ainda estar com "Carregando..." se a ação for feita muito rápido).
 let nomeUsuarioAtualCache = null;
+// --- Menu de perfil (ícone no topo direito, com foto e botão Sair) ---
+document.getElementById('profileIconBtn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  document.getElementById('profileDropdown').classList.toggle('open');
+});
+document.addEventListener('click', (e) => {
+  const dropdown = document.getElementById('profileDropdown');
+  if(dropdown.classList.contains('open') && !dropdown.contains(e.target) && e.target.id !== 'profileIconBtn'){
+    dropdown.classList.remove('open');
+  }
+});
+
+document.getElementById('profileFotoBtn').addEventListener('click', () => document.getElementById('profileFotoInput').click());
+document.getElementById('profileFotoInput').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if(!file || !usuarioAtual) return;
+  comprimirFoto(file, async (base64) => {
+    aplicarFotoPerfilNaTela(base64);
+    try{
+      await db.collection(PERFIS_FOTO_COL).doc(usuarioAtual.uid).set({ foto: base64 });
+    }catch(err){
+      console.error('Não foi possível salvar a foto de perfil:', err);
+      showToast('Não foi possível salvar a foto de perfil.');
+    }
+  });
+});
+
+function aplicarFotoPerfilNaTela(base64){
+  const icone = document.getElementById('profileIconImg');
+  const iconeInicial = document.getElementById('profileIconInitial');
+  const dropdownImg = document.getElementById('profileDropdownImg');
+  const dropdownPlaceholder = document.getElementById('profileDropdownPlaceholder');
+  if(base64){
+    icone.src = base64; icone.style.display = 'block'; iconeInicial.style.display = 'none';
+    dropdownImg.src = base64; dropdownImg.style.display = 'block'; dropdownPlaceholder.style.display = 'none';
+  }else{
+    icone.style.display = 'none'; iconeInicial.style.display = 'block';
+    dropdownImg.style.display = 'none'; dropdownPlaceholder.style.display = 'flex';
+  }
+}
+
+async function carregarFotoEIniciaisDoPerfil(){
+  if(!usuarioAtual) return;
+  const nome = await obterNomeUsuarioAtual();
+  document.getElementById('profileIconInitial').textContent = (nome || '?').trim().charAt(0).toUpperCase();
+  try{
+    const doc = await db.collection(PERFIS_FOTO_COL).doc(usuarioAtual.uid).get();
+    aplicarFotoPerfilNaTela(doc.exists ? (doc.data().foto || null) : null);
+  }catch(e){
+    aplicarFotoPerfilNaTela(null);
+  }
+}
+
 async function obterNomeUsuarioAtual(){
   if(!usuarioAtual) return 'Administrador';
   if(nomeUsuarioAtualCache) return nomeUsuarioAtualCache;
