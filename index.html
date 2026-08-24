@@ -1532,6 +1532,7 @@
     <div class="month-tabs" id="cadastroSubTabs" style="margin-bottom:16px;">
       <button class="month-btn active" data-secao="form" type="button">Novo registro</button>
       <button class="month-btn" data-secao="pendentes" type="button">Pré-contratações pendentes<span class="month-count" id="pendentesCountBadge">0</span></button>
+      <button class="month-btn" data-secao="concluidas" type="button">Pré-contratações concluídas</button>
     </div>
 
     <div id="cadastroSecaoForm">
@@ -1798,6 +1799,16 @@
         <div id="precadastrosListaArea" style="padding:14px 22px 22px;"></div>
       </div>
     </div>
+
+    <div id="cadastroSecaoConcluidas" style="display:none;">
+      <div class="table-card">
+        <div style="padding:18px 22px 0;">
+          <h2 style="font-family:'Fraunces',serif;font-size:18px;color:var(--primary-dark);margin:0;">Pré-contratações concluídas</h2>
+          <p style="font-size:12.5px;color:var(--muted);margin:6px 0 0;">Todas as pré-contratações já concluídas por qualquer usuário, com quem enviou e quem deu andamento.</p>
+        </div>
+        <div id="concluidasGeralListaArea" style="padding:14px 22px 22px;"></div>
+      </div>
+    </div>
   </div>
 
   <div id="precadastroArea" style="display:none;">
@@ -1824,7 +1835,7 @@
         <div class="field"><label>Data de admissão *</label><input type="date" id="preAdmissao" autocomplete="off"></div>
         <div class="field"><label>CH (carga horária) *</label><input type="text" id="preCh" placeholder="ex: 40h" maxlength="3" autocomplete="off"></div>
         <div class="field full">
-          <label>Foto *</label>
+          <label>Foto</label>
           <div class="foto-botoes">
             <button type="button" class="btn-ghost btn-small" id="preFotoCameraBtn">📷 Tirar foto</button>
             <button type="button" class="btn-ghost btn-small" id="preFotoGaleriaBtn">🖼️ Escolher da galeria/arquivo</button>
@@ -1836,7 +1847,7 @@
             <button type="button" id="removerPreFotoBtn" class="foto-remove-btn" aria-label="Remover foto">×</button>
           </div>
         </div>
-        <div class="field"><label>Indicação *</label><input type="text" id="preIndicacao" list="preIndicacaoList" autocomplete="off"><datalist id="preIndicacaoList"></datalist></div>
+        <div class="field"><label>Indicação</label><input type="text" id="preIndicacao" list="preIndicacaoList" autocomplete="off"><datalist id="preIndicacaoList"></datalist></div>
         <div class="field combo-field">
           <label>Cargo *</label>
           <div class="combo" id="preCargoCombo">
@@ -4380,7 +4391,9 @@ function irParaSubAbaCadastro(secao){
   document.querySelectorAll('#cadastroSubTabs .month-btn').forEach(b => b.classList.toggle('active', b.dataset.secao === secao));
   document.getElementById('cadastroSecaoForm').style.display = secao === 'form' ? 'block' : 'none';
   document.getElementById('cadastroSecaoPendentes').style.display = secao === 'pendentes' ? 'block' : 'none';
+  document.getElementById('cadastroSecaoConcluidas').style.display = secao === 'concluidas' ? 'block' : 'none';
   if(secao === 'pendentes') renderPrecadastros();
+  if(secao === 'concluidas') renderConcluidasGeral();
 }
 
 document.getElementById('exportEmissoesBtn').addEventListener('click', ()=>{
@@ -5110,12 +5123,8 @@ document.getElementById('salvarPrecadastroBtn').addEventListener('click', async 
   const turno = document.getElementById('preTurno').value;
   const obs = document.getElementById('preObs').value.trim();
 
-  if(!nome || !nucleo || !local || !admissao || !ch || !indicacao || !contato || !cargo || !turno){
-    showToast('Preencha todos os campos obrigatórios (tudo, menos Observação).');
-    return;
-  }
-  if(!preFotoBase64){
-    showToast('A foto é obrigatória.');
+  if(!nome || !nucleo || !local || !admissao || !ch || !contato || !cargo || !turno){
+    showToast('Preencha todos os campos obrigatórios (tudo, menos Foto, Indicação e Observação).');
     return;
   }
 
@@ -5305,6 +5314,39 @@ function renderPrecadastros(){
   }).catch(e => {
     console.error(e);
     area.innerHTML = '<div class="empty-state">Não foi possível carregar os pré-contratações.</div>';
+  });
+}
+
+function renderConcluidasGeral(){
+  const area = document.getElementById('concluidasGeralListaArea');
+  if(!area) return;
+  area.innerHTML = '<div class="loading">Carregando…</div>';
+  db.collection(PRECADASTROS_COL).where('status', '==', 'processado').get().then(snap => {
+    if(snap.empty){
+      area.innerHTML = '<div class="empty-state">Nenhuma pré-contratação concluída ainda.</div>';
+      return;
+    }
+    const docsOrdenados = snap.docs.slice().sort((a, b) => (b.data().concluidoEm || 0) - (a.data().concluidoEm || 0));
+    const cards = docsOrdenados.map(doc => {
+      const p = doc.data();
+      const fotoHtml = p.foto
+        ? `<img src="${p.foto}" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid var(--line-strong);">`
+        : `<div style="width:56px;height:56px;border-radius:8px;background:#EFEEE7;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:10px;text-align:center;">Sem foto</div>`;
+      return `
+        <div class="pre-card">
+          ${fotoHtml}
+          <div class="pre-card-info">
+            <div class="servidor-name">${p.nome}</div>
+            <div class="pre-card-detalhe">${p.cargo || '—'} · ${p.local || '—'} · Admissão: ${p.admissao ? new Date(p.admissao+'T00:00:00').toLocaleDateString('pt-BR') : '—'}</div>
+            <div class="pre-card-detalhe" style="opacity:.7;">Enviado por ${p.enviadoPorNome || '—'}</div>
+            <div class="pre-card-detalhe" style="opacity:.7;">Concluído em ${p.concluidoEm ? new Date(p.concluidoEm).toLocaleString('pt-BR') : '—'}${p.concluidoPor ? `, por ${p.concluidoPor}` : ''}</div>
+          </div>
+        </div>`;
+    }).join('');
+    area.innerHTML = cards;
+  }).catch(e => {
+    console.error(e);
+    area.innerHTML = '<div class="empty-state">Não foi possível carregar as pré-contratações concluídas.</div>';
   });
 }
 
