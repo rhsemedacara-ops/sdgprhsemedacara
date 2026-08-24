@@ -2110,7 +2110,7 @@
       <button class="modal-close" id="docsModalClose">&times;</button>
     </div>
     <div class="modal-body">
-      <p style="font-size:13px;color:var(--muted);margin:0 0 16px;">Imprima os documentos prontos para seguir com o processo de contratação.</p>
+      <p id="docsModalSubtitulo" style="font-size:13px;color:var(--muted);margin:0 0 16px;">Imprima os documentos prontos para seguir com o processo de contratação.</p>
       <div id="docsModalLista" class="docs-modal-lista"></div>
     </div>
   </div>
@@ -3187,9 +3187,14 @@ function mostrarDocsDisponiveis(r, ehEdicao, tiposPermitidos){
 
   let disponiveis = docs.filter(d => d.disponivel);
   if(tiposPermitidos) disponiveis = disponiveis.filter(d => tiposPermitidos.includes(d.tipo));
-  document.getElementById('docsModalTitulo').textContent = ehEdicao
-    ? 'Alterações salvas com sucesso!'
-    : `Servidor ${r.servidor || ''} cadastrado com sucesso!`;
+
+  const ehSomenteDistrato = tiposPermitidos && tiposPermitidos.length === 1 && tiposPermitidos[0] === 'distrato';
+  document.getElementById('docsModalTitulo').textContent = ehSomenteDistrato
+    ? `Servidor(a) ${r.servidor || ''} distratado com sucesso!`
+    : (ehEdicao ? 'Alterações salvas com sucesso!' : `Servidor ${r.servidor || ''} cadastrado com sucesso!`);
+  document.getElementById('docsModalSubtitulo').textContent = ehSomenteDistrato
+    ? '*Imprimir 3 vias do documento.'
+    : 'Imprima os documentos prontos para seguir com o processo de contratação.';
 
   const lista = document.getElementById('docsModalLista');
   if(disponiveis.length === 0){
