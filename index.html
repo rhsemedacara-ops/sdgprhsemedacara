@@ -595,38 +595,46 @@
     display:flex;
     flex-direction:row;
     flex-wrap:wrap;
-    gap:8px;
-    width:100%;
-    position:static;
+    align-items:center;
+    gap:2px;
+    width:calc(100% + 64px);
+    margin-left:-32px;
+    margin-right:-32px;
+    position:sticky;
+    top:84px;
     max-height:none;
     overflow-y:visible;
-    z-index:30;
+    z-index:39;
     margin-bottom:20px;
+    background:linear-gradient(155deg, var(--primary-dark), #0a3c38);
+    box-shadow:0 4px 10px rgba(0,0,0,.14);
+    padding:0 32px;
   }
   .tab-btn{white-space:nowrap; text-align:center;}
   .tab-btn{
     display:block;
-    background:var(--surface);
-    color:var(--muted);
-    border:1.4px solid var(--line-strong);
-    border-radius:var(--r-sm);
-    padding:11px 16px;
-    margin-right:0;
+    background:transparent;
+    color:rgba(255,255,255,.78);
+    border:none;
+    border-radius:5px;
+    padding:15px 15px;
+    margin:6px 0;
     font-family:'IBM Plex Sans', sans-serif;
-    font-size:13.5px;
+    font-size:13px;
     font-weight:600;
+    letter-spacing:.01em;
     text-decoration:none;
     cursor:pointer;
-    box-shadow:var(--shadow-sm);
+    box-shadow:none;
     transition:all .15s ease;
   }
-  .tab-btn:hover{border-color:var(--primary); color:var(--primary-dark); transform:translateX(2px); box-shadow:var(--shadow);}
+  .tab-btn:hover{background:rgba(255,255,255,.08); color:#fff; transform:none; box-shadow:none;}
   .tab-btn.active{
     color:var(--primary-dark);
-    border-color:var(--primary-light);
-    background:linear-gradient(180deg, #E4EFE7, #CFE3D5);
-    box-shadow:inset 0 1px 2px rgba(27,51,42,.08), var(--shadow-sm);
-    border-left:4px solid var(--stamp-red);
+    background:var(--seal-gold-light);
+    border-color:transparent;
+    box-shadow:none;
+    border-left:none;
   }
 
   .session-info{display:none;}
@@ -641,7 +649,8 @@
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
   }
   @media (max-width:900px){
-    .tab-btn{padding:9px 12px; font-size:12.5px;}
+    .tabs{flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch;}
+    .tab-btn{padding:12px 12px; font-size:12.5px; margin:4px 0;}
     .session-info{display:none;}
   }
 
