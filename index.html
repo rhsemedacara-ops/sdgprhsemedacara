@@ -1294,6 +1294,36 @@
   }
   .docs-modal-item-nome{font-size:13.5px; font-weight:600; color:var(--ink);}
   .docs-modal-vazio{text-align:center; padding:30px 10px; color:var(--muted); font-size:13px;}
+
+  .anexos-cell{text-align:center; padding:6px !important;}
+  .anexo-btn{
+    position:relative;
+    display:inline-flex; align-items:center; justify-content:center;
+    width:30px; height:30px;
+    padding:0;
+    border-radius:7px;
+    background:transparent;
+    border:1px solid var(--line-strong);
+    color:var(--muted);
+  }
+  .anexo-btn:hover{background:#F2F0E6; border-color:var(--primary); color:var(--primary-dark);}
+  .anexo-count{
+    position:absolute; top:-6px; right:-6px;
+    min-width:16px; height:16px; padding:0 3px;
+    border-radius:8px;
+    background:var(--stamp-red);
+    color:#fff;
+    font-size:10px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+    line-height:1;
+  }
+  .anexo-upload-row{display:flex; align-items:center; gap:12px; padding-top:12px; border-top:1px solid var(--line);}
+  .anexo-item-nome{
+    font-size:13px; font-weight:600; color:var(--ink);
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:220px;
+  }
+  .anexo-item-data{font-size:11px; color:var(--muted); margin-top:2px;}
+  .anexo-item-acoes{display:flex; gap:6px; flex-shrink:0;}
   .perfil-grid{
     display:grid;
     grid-template-columns:repeat(2, 1fr);
@@ -2136,6 +2166,24 @@
   </div>
 </div>
 
+<div class="overlay" id="anexosOverlay">
+  <div class="modal docs-modal">
+    <div class="modal-head">
+      <h2 id="anexosModalTitulo">Anexos</h2>
+      <button class="modal-close" id="anexosModalClose">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--muted);margin:0 0 14px;">Documentos escaneados (PDF) referentes a este servidor, após a finalização do processo.</p>
+      <div id="anexosModalLista" class="docs-modal-lista" style="margin-bottom:16px;"></div>
+      <div class="anexo-upload-row">
+        <input type="file" id="anexoUploadInput" accept="application/pdf" style="display:none;">
+        <button class="btn-primary btn-small" id="anexoUploadBtn" type="button">+ Anexar PDF</button>
+        <span id="anexoUploadStatus" style="font-size:12px;color:var(--muted);"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="inactivity-warning" id="inactivityWarning">
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
   <span>Você será desconectado por inatividade em 5 minutos. Mexa o mouse ou clique na tela para continuar conectado(a).</span>
@@ -2195,6 +2243,7 @@ const ACESSOS_COL = 'acessos_log';
 const ATIVIDADES_COL = 'atividades_log';
 const PRECADASTROS_COL = 'pre_cadastros';
 const PERFIS_FOTO_COL = 'perfis_foto';
+const ANEXOS_COL = 'anexos';
 let records = [];
 let editingId = null;
 let fotoServidorAtual = null; // guarda a foto (base64) entre o pré-contratação e o registro final
@@ -4166,6 +4215,154 @@ function render(){
   return renderRegistros();
 }
 
+// --- Anexos (documentos escaneados por servidor) ---
+let anexoRegistroAtualId = null;
+
+// Atualiza os números pequenos no ícone de cada linha, sem travar a montagem da tabela.
+async function atualizarContagensAnexos(ids){
+  if(!ids || !ids.length) return;
+  try{
+    const snap = await db.collection(ANEXOS_COL).where('registroId', 'in', ids.slice(0, 30)).get();
+    const contagem = {};
+    snap.forEach(doc => {
+      const rid = doc.data().registroId;
+      contagem[rid] = (contagem[rid] || 0) + 1;
+    });
+    ids.forEach(id => {
+      const el = document.getElementById(`anexoCount-${id}`);
+      if(el) el.textContent = contagem[id] ? contagem[id] : '';
+    });
+  }catch(e){
+    console.error('Não foi possível carregar a contagem de anexos:', e);
+  }
+}
+
+window.abrirAnexos = function(registroId, nomeServidor){
+  anexoRegistroAtualId = registroId;
+  document.getElementById('anexosModalTitulo').textContent = `Anexos de ${nomeServidor || 'servidor'}`;
+  document.getElementById('anexoUploadStatus').textContent = '';
+  document.getElementById('anexosOverlay').classList.add('open');
+  renderListaAnexos();
+};
+
+function renderListaAnexos(){
+  const lista = document.getElementById('anexosModalLista');
+  lista.innerHTML = '<div class="loading">Carregando…</div>';
+  db.collection(ANEXOS_COL).where('registroId', '==', anexoRegistroAtualId).get().then(snap => {
+    if(snap.empty){
+      lista.innerHTML = '<div class="docs-modal-vazio">Nenhum anexo ainda.</div>';
+      return;
+    }
+    const docs = snap.docs.slice().sort((a, b) => (b.data().criadoEm || 0) - (a.data().criadoEm || 0));
+    lista.innerHTML = docs.map(doc => {
+      const a = doc.data();
+      const dataTexto = a.criadoEm ? new Date(a.criadoEm).toLocaleDateString('pt-BR') : '—';
+      return `
+        <div class="docs-modal-item">
+          <div>
+            <div class="anexo-item-nome" title="${(a.nome || 'documento.pdf').replace(/"/g,'&quot;')}">${a.nome || 'documento.pdf'}</div>
+            <div class="anexo-item-data">Anexado em ${dataTexto}</div>
+          </div>
+          <div class="anexo-item-acoes">
+            <button class="btn-ghost btn-small" onclick="baixarAnexo('${doc.id}')">Baixar</button>
+            <button class="btn-ghost btn-small" onclick="renomearAnexo('${doc.id}')">Editar nome</button>
+            <button class="btn-danger btn-small" onclick="excluirAnexo('${doc.id}')">Excluir</button>
+          </div>
+        </div>`;
+    }).join('');
+  }).catch(e => {
+    console.error(e);
+    lista.innerHTML = '<div class="docs-modal-vazio">Não foi possível carregar os anexos.</div>';
+  });
+}
+
+document.getElementById('anexoUploadBtn').addEventListener('click', () => document.getElementById('anexoUploadInput').click());
+document.getElementById('anexoUploadInput').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if(!file) return;
+  if(file.type !== 'application/pdf'){
+    showToast('Só é permitido anexar arquivos em PDF.');
+    return;
+  }
+  if(file.size > 700 * 1024){
+    showToast('O arquivo é muito grande (máx. ~700 KB). Tente escanear em qualidade menor.');
+    return;
+  }
+  const status = document.getElementById('anexoUploadStatus');
+  status.textContent = 'Enviando...';
+  const reader = new FileReader();
+  reader.onload = async () => {
+    try{
+      const nomeQuemAnexou = await obterNomeUsuarioAtual();
+      await db.collection(ANEXOS_COL).add({
+        registroId: anexoRegistroAtualId,
+        nome: file.name,
+        conteudo: reader.result,
+        criadoEm: Date.now(),
+        anexadoPor: nomeQuemAnexou
+      });
+      status.textContent = '';
+      showToast('Anexo salvo com sucesso.');
+      renderListaAnexos();
+      atualizarContagensAnexos([anexoRegistroAtualId]);
+    }catch(err){
+      console.error(err);
+      status.textContent = '';
+      showToast('Não foi possível salvar o anexo.');
+    }
+  };
+  reader.readAsDataURL(file);
+});
+
+window.baixarAnexo = async function(anexoId){
+  try{
+    const doc = await db.collection(ANEXOS_COL).doc(anexoId).get();
+    if(!doc.exists) return;
+    const a = doc.data();
+    const link = document.createElement('a');
+    link.href = a.conteudo;
+    link.download = a.nome || 'documento.pdf';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  }catch(e){
+    console.error(e);
+    showToast('Não foi possível baixar o anexo.');
+  }
+};
+
+window.renomearAnexo = async function(anexoId){
+  const novoNome = prompt('Novo nome do arquivo:');
+  if(!novoNome || !novoNome.trim()) return;
+  try{
+    await db.collection(ANEXOS_COL).doc(anexoId).update({ nome: novoNome.trim() });
+    renderListaAnexos();
+  }catch(e){
+    console.error(e);
+    showToast('Não foi possível renomear o anexo.');
+  }
+};
+
+window.excluirAnexo = async function(anexoId){
+  if(!confirm('Excluir este anexo definitivamente?')) return;
+  try{
+    await db.collection(ANEXOS_COL).doc(anexoId).delete();
+    renderListaAnexos();
+    atualizarContagensAnexos([anexoRegistroAtualId]);
+  }catch(e){
+    console.error(e);
+    showToast('Não foi possível excluir o anexo.');
+  }
+};
+
+document.getElementById('anexosModalClose').addEventListener('click', () => {
+  document.getElementById('anexosOverlay').classList.remove('open');
+});
+document.getElementById('anexosOverlay').addEventListener('click', (e) => {
+  if(e.target.id === 'anexosOverlay') document.getElementById('anexosOverlay').classList.remove('open');
+});
+
 function renderRegistros(){
   const q = document.getElementById('searchInput').value.trim();
   const statusVal = '';
@@ -4249,6 +4446,12 @@ function renderRegistros(){
       <td>${r.admissao ? new Date(r.admissao+'T00:00:00').toLocaleDateString('pt-BR') : '—'}</td>
       <td>${r.ch || '—'}</td>
       <td><span class="status-chip ${statusClass(r.situacao)}">${situacaoLabel(r.situacao)}</span></td>
+      <td class="anexos-cell">
+        <button class="anexo-btn" data-id="${r.id}" onclick="abrirAnexos('${r.id}','${(r.servidor || '').replace(/'/g, "\\'")}')" title="Anexos">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+          <span class="anexo-count" id="anexoCount-${r.id}"></span>
+        </button>
+      </td>
     </tr>
   `;
   }).join('');
@@ -4259,15 +4462,16 @@ function renderRegistros(){
         <colgroup>
           <col style="width:58px"><col style="width:58px"><col style="width:58px"><col style="width:58px"><col style="width:70px">
           <col style="width:64px"><col style="width:160px"><col style="width:130px"><col style="width:130px"><col style="width:120px"><col style="width:120px">
-          <col style="width:90px"><col style="width:50px"><col style="width:100px">
+          <col style="width:90px"><col style="width:50px"><col style="width:100px"><col style="width:60px">
         </colgroup>
         <thead><tr>
-          <th class="pdf-cell pdf-cell-narrow">Enc. MEMO</th><th class="pdf-cell pdf-cell-narrow">Enc. OFÍCIO</th><th class="pdf-cell pdf-cell-narrow">AUTORIZAÇÃO</th><th class="pdf-cell pdf-cell-narrow">DOC. ABERT. CONTA</th><th class="pdf-cell">DISTRATO</th><th>Identificação</th><th>Servidor</th><th>Cargo/Função</th><th>Núcleo</th><th>Diretor</th><th>Local</th><th>Admissão</th><th>CH</th><th>Situação</th>
+          <th class="pdf-cell pdf-cell-narrow">Enc. MEMO</th><th class="pdf-cell pdf-cell-narrow">Enc. OFÍCIO</th><th class="pdf-cell pdf-cell-narrow">AUTORIZAÇÃO</th><th class="pdf-cell pdf-cell-narrow">DOC. ABERT. CONTA</th><th class="pdf-cell">DISTRATO</th><th>Identificação</th><th>Servidor</th><th>Cargo/Função</th><th>Núcleo</th><th>Diretor</th><th>Local</th><th>Admissão</th><th>CH</th><th>Situação</th><th>Anexos</th>
         </tr></thead>
         <tbody>${rows}</tbody>
       </table>
     </div>
     ${renderPaginacaoRegistros(filtered.length, totalPaginas)}`;
+  atualizarContagensAnexos(paginaAtualRegistros.map(r => r.id));
 }
 
 function renderPaginacaoRegistros(totalRegistros, totalPaginas){
