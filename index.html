@@ -1591,7 +1591,30 @@
             <form id="recordForm" autocomplete="off">
 
         <fieldset>
-          <legend>01 · Processo</legend>
+          <legend>01 · Servidor</legend>
+          <div class="grid">
+            <div class="field full"><label>Nome do servidor *</label><input type="text" name="servidor" required autocomplete="off"></div>
+            <div class="field full" id="fotoServidorField">
+              <label>Foto</label>
+              <div class="foto-botoes">
+                <button type="button" class="btn-ghost btn-small" id="fotoServidorCameraBtn">📷 Tirar foto</button>
+                <button type="button" class="btn-ghost btn-small" id="fotoServidorGaleriaBtn">🖼️ Escolher da galeria/arquivo</button>
+              </div>
+              <input type="file" id="fotoServidorCamera" accept="image/*" capture="environment" style="display:none;">
+              <input type="file" id="fotoServidorGaleria" accept="image/*" style="display:none;">
+              <div id="fotoServidorPreviewWrap" style="display:none; margin-top:10px; position:relative; width:96px;">
+                <img id="fotoServidorPreview" style="width:96px; height:96px; object-fit:cover; border-radius:10px; border:1px solid var(--line-strong); display:block;">
+                <button type="button" id="removerFotoServidorBtn" class="foto-remove-btn" aria-label="Remover foto">×</button>
+              </div>
+            </div>
+            <div class="field"><label>CPF</label><input type="text" name="cpf" id="regCpfInput" placeholder="000.000.000-00" maxlength="14" autocomplete="off"></div>
+            <div class="field"><label>Contato</label><input type="tel" name="contato" id="regContatoInput" placeholder="(00) 00000-0000" maxlength="15" autocomplete="off"></div>
+            <div class="field full"><label>E-mail</label><input type="email" name="email" autocomplete="off"></div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>02 · Processo</legend>
           <div class="grid cols-3">
             <div class="field combo-field">
               <label>Nº Memo</label>
@@ -1720,29 +1743,6 @@
               </select>
             </div>
             <div class="field full"><label>Endereço *</label><input type="text" name="enderecoAbertura" autocomplete="off"></div>
-          </div>
-        </fieldset>
-
-        <fieldset>
-          <legend>02 · Servidor</legend>
-          <div class="grid">
-            <div class="field full"><label>Nome do servidor *</label><input type="text" name="servidor" required autocomplete="off"></div>
-            <div class="field full" id="fotoServidorField">
-              <label>Foto</label>
-              <div class="foto-botoes">
-                <button type="button" class="btn-ghost btn-small" id="fotoServidorCameraBtn">📷 Tirar foto</button>
-                <button type="button" class="btn-ghost btn-small" id="fotoServidorGaleriaBtn">🖼️ Escolher da galeria/arquivo</button>
-              </div>
-              <input type="file" id="fotoServidorCamera" accept="image/*" capture="environment" style="display:none;">
-              <input type="file" id="fotoServidorGaleria" accept="image/*" style="display:none;">
-              <div id="fotoServidorPreviewWrap" style="display:none; margin-top:10px; position:relative; width:96px;">
-                <img id="fotoServidorPreview" style="width:96px; height:96px; object-fit:cover; border-radius:10px; border:1px solid var(--line-strong); display:block;">
-                <button type="button" id="removerFotoServidorBtn" class="foto-remove-btn" aria-label="Remover foto">×</button>
-              </div>
-            </div>
-            <div class="field"><label>CPF</label><input type="text" name="cpf" id="regCpfInput" placeholder="000.000.000-00" maxlength="14" autocomplete="off"></div>
-            <div class="field"><label>Contato</label><input type="tel" name="contato" id="regContatoInput" placeholder="(00) 00000-0000" maxlength="15" autocomplete="off"></div>
-            <div class="field full"><label>E-mail</label><input type="email" name="email" autocomplete="off"></div>
           </div>
         </fieldset>
 
