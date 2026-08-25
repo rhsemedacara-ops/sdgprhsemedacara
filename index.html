@@ -678,6 +678,24 @@
   }
 
   /* Dashboard */
+  .dash-layout{
+    display:grid;
+    grid-template-columns:1.7fr 1fr;
+    gap:20px;
+    align-items:start;
+    width:100%;
+  }
+  .dash-col-principal{min-width:0;}
+  .dash-col-lateral{min-width:0; display:flex; flex-direction:column; gap:16px;}
+  .dash-col-lateral .dash-section{margin-bottom:0;}
+  .dash-grid-lateral{
+    grid-template-columns:repeat(2, 1fr);
+    margin-bottom:0;
+  }
+  @media (max-width:1100px){
+    .dash-layout{grid-template-columns:1fr;}
+  }
+
   .dash-grid{
     display:grid;
     grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));
@@ -1733,7 +1751,7 @@
               </div>
               <div class="dup-warning" id="oficioAberturaContaDupWarning"></div>
             </div>
-            <div class="field"><label>Salário base *</label><input type="text" name="salarioBaseAbertura" id="regSalarioAberturaInput" placeholder="0,00" inputmode="decimal" autocomplete="off"></div>
+            <div class="field"><label>Salário base *</label><input type="text" name="salarioBaseAbertura" id="regSalarioAberturaInput" placeholder="0,00" inputmode="decimal" autocomplete="off" list="salarioBaseList"><datalist id="salarioBaseList"></datalist></div>
             <div class="field">
               <label>Banco *</label>
               <select name="bancoAbertura" autocomplete="off">
@@ -3253,6 +3271,13 @@ function atualizarSugestoesFormulario(){
   document.getElementById('indicacaoList').innerHTML = indicacoes.map(v => `<option value="${v.replace(/"/g,'&quot;')}">`).join('');
   const preIndicacaoList = document.getElementById('preIndicacaoList');
   if(preIndicacaoList) preIndicacaoList.innerHTML = indicacoes.map(v => `<option value="${v.replace(/"/g,'&quot;')}">`).join('');
+  const salarios = [...new Set(records.map(r => (r.salarioBaseAbertura || '').trim()).filter(Boolean))].sort((a,b)=>{
+    const na = parseFloat(a.replace(/\./g,'').replace(',','.'));
+    const nb = parseFloat(b.replace(/\./g,'').replace(',','.'));
+    return (na||0) - (nb||0);
+  });
+  const salarioBaseList = document.getElementById('salarioBaseList');
+  if(salarioBaseList) salarioBaseList.innerHTML = salarios.map(v => `<option value="${v.replace(/"/g,'&quot;')}">`).join('');
   atualizarSugestoesFuncao();
 }
 
@@ -4937,34 +4962,38 @@ function renderDashboard(){
   const grupoNucleoHtml = montarGrupoNucleoHtml(nucleosOrdenados);
 
   area.innerHTML = `
-    <div class="dash-grid">
-      ${totalCard}
-      ${cards}
-    </div>
-
-    <div class="dash-section">
-      <h3>Contratações por mês (${selectedAno})</h3>
-      <div class="dash-monthbar-chart">${barrasMes}</div>
-    </div>
-
-    <div class="dash-section-row">
-      <div class="dash-section">
-        <h3>Distratado(a) por mês (${selectedAno})</h3>
-        <div class="dash-monthbar-chart">${barrasDistrato}</div>
+    <div class="dash-layout">
+      <div class="dash-col-principal">
+        <div class="dash-section">
+          <div class="dash-section-head">
+            <h3>Servidores por Núcleo, Local e Cargo (Ativos)</h3>
+            <input type="search" id="dashBuscaNucleo" class="dash-busca-nucleo" placeholder="Buscar núcleo...">
+          </div>
+          <div id="dashGrupoNucleoArea">${grupoNucleoHtml}</div>
+        </div>
       </div>
 
-      <div class="dash-section">
-        <h3>Finalizado por mês (${selectedAno})</h3>
-        <div class="dash-monthbar-chart">${barrasFinalizado}</div>
-      </div>
-    </div>
+      <div class="dash-col-lateral">
+        <div class="dash-grid dash-grid-lateral">
+          ${totalCard}
+          ${cards}
+        </div>
 
-    <div class="dash-section">
-      <div class="dash-section-head">
-        <h3>Servidores por Núcleo, Local e Cargo (Ativos)</h3>
-        <input type="search" id="dashBuscaNucleo" class="dash-busca-nucleo" placeholder="Buscar núcleo...">
+        <div class="dash-section">
+          <h3>Contratações por mês (${selectedAno})</h3>
+          <div class="dash-monthbar-chart">${barrasMes}</div>
+        </div>
+
+        <div class="dash-section">
+          <h3>Distratado(a) por mês (${selectedAno})</h3>
+          <div class="dash-monthbar-chart">${barrasDistrato}</div>
+        </div>
+
+        <div class="dash-section">
+          <h3>Finalizado por mês (${selectedAno})</h3>
+          <div class="dash-monthbar-chart">${barrasFinalizado}</div>
+        </div>
       </div>
-      <div id="dashGrupoNucleoArea">${grupoNucleoHtml}</div>
     </div>
   `;
 
