@@ -1831,7 +1831,7 @@
               <select name="situacao" autocomplete="off">
                 <option>Ativo</option>
                 <option>Distratado(a)</option>
-                <option>Finalizado</option>
+                <option value="Finalizado">Finalizado/Alterado</option>
               </select>
             </div>
             <div class="field" id="situacaoDataField" style="display:none;">
@@ -4115,7 +4115,7 @@ window.gerarPDF = function(id, tipo){
     ['Nº Memo', r.memo || '—'],
     ['Nº Ofício', r.oficio || '—'],
     ['Nº Autorização', r.autorizacao || '—'],
-    ['Situação do contrato', r.situacao || 'Ativo']
+    ['Situação do contrato', situacaoLabel(r.situacao)]
   ];
 
   doc.setFontSize(10);
@@ -4246,7 +4246,7 @@ function renderRegistros(){
       <td class="wrap-cell">${r.local || '—'}</td>
       <td>${r.admissao ? new Date(r.admissao+'T00:00:00').toLocaleDateString('pt-BR') : '—'}</td>
       <td>${r.ch || '—'}</td>
-      <td><span class="status-chip ${statusClass(r.situacao)}">${r.situacao || 'Ativo'}</span></td>
+      <td><span class="status-chip ${statusClass(r.situacao)}">${situacaoLabel(r.situacao)}</span></td>
     </tr>
   `;
   }).join('');
@@ -4898,7 +4898,7 @@ function renderDashboard(){
   const cards = statusOrder.map(s => `
     <div class="dash-card">
       <div class="num">${situacoes[s] || 0}</div>
-      <div class="lbl">${s}</div>
+      <div class="lbl">${situacaoLabel(s)}</div>
     </div>
   `).join('');
 
@@ -4990,7 +4990,7 @@ function renderDashboard(){
         </div>
 
         <div class="dash-section">
-          <h3>Finalizado por mês (${selectedAno})</h3>
+          <h3>Finalizado/Alterado por mês (${selectedAno})</h3>
           <div class="dash-monthbar-chart">${barrasFinalizado}</div>
         </div>
       </div>
@@ -5738,7 +5738,7 @@ window.abrirPerfil = function(id){
   }
 
   html += secao('Situação');
-  html += item('Situação do contrato', r.situacao || 'Ativo');
+  html += item('Situação do contrato', situacaoLabel(r.situacao));
   if(SITUACOES_COM_DATA.includes(r.situacao)) html += item(SITUACAO_DATA_LABELS[r.situacao] || 'Data', fmtData(r.situacaoData));
 
   if(r.aberturaConta === 'Sim'){
@@ -5803,6 +5803,15 @@ function abrirCadastroParaEditar(id){
 }
 
 const SITUACOES_COM_DATA = ['Distratado(a)', 'Finalizado'];
+
+// Traduz o valor salvo da situação para o texto exibido ao usuário.
+// O valor salvo continua sendo "Finalizado" (usado em filtros, dashboard, exportações),
+// só o texto mostrado na tela muda.
+function situacaoLabel(s){
+  const valor = s || 'Ativo';
+  if(valor === 'Finalizado') return 'Finalizado/Alterado';
+  return valor;
+}
 
 // Some com o pré-contratação de origem (aba "Concluído") quando o servidor sai do sistema
 // de vez (Finalizado/Distratado) ou é excluído — evita informação duplicada/desatualizada.
@@ -6162,7 +6171,7 @@ document.getElementById('exportExcelBtn').addEventListener('click', ()=>{
     'LOCAL': r.local || '',
     'CH': r.ch || '',
     'OBS': r.obs || '',
-    'SITUAÇÃO DO CONTRATO': r.situacao || '',
+    'SITUAÇÃO DO CONTRATO': r.situacao ? situacaoLabel(r.situacao) : '',
     'DATA DA SITUAÇÃO': fmtDateXLSX(r.situacaoData)
   }));
   const ws = XLSX.utils.json_to_sheet(rows);
