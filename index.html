@@ -5136,7 +5136,7 @@ function renderDashboard(){
       const cargosTexto = Object.entries(dadosLocal.cargos)
         .sort((a,b) => b[1]-a[1])
         .map(([cargo, qtd]) => `${cargo} (${qtd})`)
-        .join(', ');
+        .join(' | ') + ' |';
       return `
         <div class="dash-local-row">
           <div class="dash-local-nome">${local}</div>
