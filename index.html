@@ -2759,6 +2759,11 @@ async function aplicarPermissoesDeAbas(uid){
       const primeiraPermitida = TODAS_ABAS_PERMISSAO.find(k => abasPermitidas.includes(k)) || 'registros';
       switchTab(primeiraPermitida);
     }
+    // O sino é voltado pra quem acompanha e dá andamento nos pré-contratos enviados —
+    // só aparece pra quem tem acesso à aba "Novo Cadastro".
+    const temAcessoCadastro = abasPermitidas.includes('cadastro');
+    const notifWrap = document.querySelector('.notif-menu-wrap');
+    if(notifWrap) notifWrap.style.display = temAcessoCadastro ? '' : 'none';
   }catch(e){
     console.error('Não foi possível aplicar as permissões de abas:', e);
   }
@@ -4358,7 +4363,8 @@ window.gerarPDF = function(id, tipo){
 };
 
 function matchesFilter(r, q, statusVal){
-  const hay = [r.servidor, r.cpf, r.cargo, r.nucleo, r.contrato, r.memo, r.oficio, r.diretor, r.local]
+  const cpfSoDigitosBusca = (r.cpf || '').replace(/\D/g, '');
+  const hay = [r.servidor, r.cpf, cpfSoDigitosBusca, r.cargo, r.nucleo, r.contrato, r.memo, r.oficio, r.diretor, r.local]
     .filter(Boolean).join(' ').toLowerCase();
   const passQ = !q || hay.includes(q.toLowerCase());
   const passStatus = !statusVal || (r.situacao || 'Ativo') === statusVal;
