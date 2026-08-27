@@ -2541,15 +2541,23 @@ attachMask(document.getElementById('signupCpf'), maskCPF);
 
 let signupCpfCheckTimeout = null;
 let signupCpfDuplicado = false;
+let signupCpfInvalido = false;
 document.getElementById('signupCpf').addEventListener('input', (e) => {
   clearTimeout(signupCpfCheckTimeout);
   const warningEl = document.getElementById('signupCpfDupWarning');
   const cpfDigitado = e.target.value;
   const digitos = cpfSoDigitos(cpfDigitado);
   signupCpfDuplicado = false;
+  signupCpfInvalido = false;
   warningEl.classList.remove('show');
   warningEl.textContent = '';
   if(digitos.length !== 11) return;
+  if(!cpfEhValido(cpfDigitado)){
+    signupCpfInvalido = true;
+    warningEl.textContent = 'Digite um CPF válido.';
+    warningEl.classList.add('show');
+    return;
+  }
   signupCpfCheckTimeout = setTimeout(async () => {
     try{
       const jaExiste = await buscarEmailPorCpf(cpfDigitado);
@@ -2630,6 +2638,11 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
 
   if(!nome || !cpf || !emailReal || !senha){
     signupError.textContent = 'Preencha nome, CPF, e-mail e senha.';
+    signupError.style.display = 'block';
+    return;
+  }
+  if(!cpfEhValido(cpf)){
+    signupError.textContent = 'Digite um CPF válido.';
     signupError.style.display = 'block';
     return;
   }
