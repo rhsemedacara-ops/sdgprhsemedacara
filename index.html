@@ -2278,6 +2278,11 @@
   </div>
 </div>
 
+<div class="inactivity-warning" id="offlineWarning" style="background:#4A4D42;">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1l22 22"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.58 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><path d="M12 20h.01"/></svg>
+  <span>Você está sem conexão com a internet. É possível continuar navegando pelos dados já carregados — as alterações serão enviadas assim que a conexão voltar.</span>
+</div>
+
 <div class="inactivity-warning" id="inactivityWarning">
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
   <span>Você será desconectado por inatividade em 5 minutos. Mexa o mouse ou clique na tela para continuar conectado(a).</span>
@@ -2315,6 +2320,29 @@ const firebaseConfig = {
   appId: "1:849793806445:web:96934421dd3fd4376a4f64"
 };
 firebase.initializeApp(firebaseConfig);
+
+// Registra o Service Worker (permite abrir o site sem internet depois de já ter aberto
+// pelo menos uma vez conectado — login ainda precisa de conexão).
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js')
+      .catch(err => console.error('Não foi possível registrar o Service Worker:', err));
+  });
+}
+
+// Avisa a pessoa quando a conexão cai/volta, sem travar o uso do que já foi carregado.
+function atualizarAvisoConexao(){
+  const aviso = document.getElementById('offlineWarning');
+  if(!aviso) return;
+  if(navigator.onLine){
+    aviso.classList.remove('show');
+  }else{
+    aviso.classList.add('show');
+  }
+}
+window.addEventListener('online', atualizarAvisoConexao);
+window.addEventListener('offline', atualizarAvisoConexao);
+document.addEventListener('DOMContentLoaded', atualizarAvisoConexao);
 const db = firebase.firestore();
 // Em algumas redes (proxies, provedores rurais, conexões via rádio/satélite) a conexão
 // "streaming" padrão do Firestore trava silenciosamente. Forçar long-polling resolve isso.
@@ -2322,6 +2350,22 @@ try{
   db.settings({ experimentalForceLongPolling: true });
 }catch(e){
   console.error('Não foi possível ajustar as configurações de conexão do Firestore:', e);
+}
+
+// Guarda os dados no aparelho (IndexedDB) para continuar funcionando se a internet cair
+// no meio do uso — leituras usam o cache local e alterações ficam na fila até sincronizar.
+try{
+  db.enablePersistence({ synchronizeTabs: true }).catch(err => {
+    if(err.code === 'failed-precondition'){
+      console.warn('Persistência offline não ativada: outra aba já está usando o cache.');
+    }else if(err.code === 'unimplemented'){
+      console.warn('Este navegador não suporta persistência offline.');
+    }else{
+      console.error('Não foi possível ativar a persistência offline:', err);
+    }
+  });
+}catch(e){
+  console.error('Erro ao tentar ativar a persistência offline:', e);
 }
 const auth = firebase.auth();
 
