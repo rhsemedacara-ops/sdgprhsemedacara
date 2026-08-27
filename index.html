@@ -1751,7 +1751,7 @@
                 <button type="button" id="removerFotoServidorBtn" class="foto-remove-btn" aria-label="Remover foto">×</button>
               </div>
             </div>
-            <div class="field"><label>CPF</label><input type="text" name="cpf" id="regCpfInput" placeholder="000.000.000-00" maxlength="14" autocomplete="off"></div>
+            <div class="field"><label>CPF</label><input type="text" name="cpf" id="regCpfInput" placeholder="000.000.000-00" maxlength="14" autocomplete="off"><span id="cpfAvisoInvalido" style="display:none; color:var(--stamp-red); font-size:11.5px; margin-top:4px;">Digite um CPF válido.</span></div>
             <div class="field"><label>Contato</label><input type="tel" name="contato" id="regContatoInput" placeholder="(00) 00000-0000" maxlength="15" autocomplete="off"></div>
             <div class="field full"><label>E-mail</label><input type="email" name="email" autocomplete="off"></div>
           </div>
@@ -3659,6 +3659,24 @@ function maskCPF(value){
   if(d.length > 6) return d.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3');
   if(d.length > 3) return d.replace(/(\d{3})(\d{1,3})/, '$1.$2');
   return d;
+}
+
+// Valida um CPF pelo algoritmo oficial dos dígitos verificadores (não checa duplicidade,
+// só se o número em si é matematicamente válido).
+function cpfEhValido(cpf){
+  const d = (cpf || '').replace(/\D/g, '');
+  if(d.length !== 11) return false;
+  if(/^(\d)\1{10}$/.test(d)) return false; // todos os dígitos iguais (ex: 111.111.111-11)
+  const calcularDigito = (base) => {
+    let soma = 0;
+    let peso = base.length + 1;
+    for(let i = 0; i < base.length; i++){ soma += parseInt(base[i], 10) * peso; peso--; }
+    const resto = (soma * 10) % 11;
+    return resto === 10 ? 0 : resto;
+  };
+  const digito1 = calcularDigito(d.slice(0, 9));
+  const digito2 = calcularDigito(d.slice(0, 9) + digito1);
+  return digito1 === parseInt(d[9], 10) && digito2 === parseInt(d[10], 10);
 }
 
 function maskTelefone(value){
@@ -6427,6 +6445,11 @@ document.getElementById('saveBtn').addEventListener('click', async ()=>{
     showToast('Informe o "Local".');
     return;
   }
+  if(form.cpf.value.trim() && !cpfEhValido(form.cpf.value)){
+    showToast('Digite um CPF válido.');
+    form.cpf.focus();
+    return;
+  }
   if(!form.vinculo.value){
     showToast('Selecione o "Vínculo".');
     form.vinculo.focus();
@@ -6735,6 +6758,18 @@ document.getElementById('exportPeriodoBtn').addEventListener('click', ()=>{
 });
 
 attachMask(document.getElementById('regCpfInput'), maskCPF);
+
+document.getElementById('regCpfInput').addEventListener('input', (e) => {
+  const digitos = e.target.value.replace(/\D/g, '');
+  const aviso = document.getElementById('cpfAvisoInvalido');
+  if(digitos.length === 11 && !cpfEhValido(e.target.value)){
+    aviso.style.display = 'block';
+    e.target.style.borderColor = 'var(--stamp-red)';
+  }else{
+    aviso.style.display = 'none';
+    e.target.style.borderColor = '';
+  }
+});
 attachMask(document.getElementById('regContatoInput'), maskTelefone);
 attachMask(document.getElementById('preContato'), maskTelefone);
 attachMask(document.getElementById('regSalarioAberturaInput'), maskMoeda);
