@@ -102,6 +102,84 @@
     box-shadow:0 2px 10px rgba(0,0,0,.18);
   }
   .profile-menu-wrap{position:absolute; top:50%; right:24px; transform:translateY(-50%);}
+  .notif-menu-wrap{position:absolute; top:50%; right:78px; transform:translateY(-50%);}
+  .notif-icon-btn{
+    position:relative;
+    width:42px; height:42px;
+    border-radius:50%;
+    background:var(--seal-gold);
+    border:1.5px solid var(--seal-gold-light);
+    color:var(--primary-dark);
+    display:flex; align-items:center; justify-content:center;
+    padding:0;
+    box-shadow:0 1px 4px rgba(0,0,0,.3);
+  }
+  .notif-icon-btn:hover{background:var(--seal-gold-light);}
+  .notif-badge{
+    position:absolute; top:-3px; right:-3px;
+    min-width:18px; height:18px; padding:0 4px;
+    border-radius:9px;
+    background:var(--stamp-red);
+    color:#fff;
+    font-size:10.5px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+    line-height:1;
+    border:1.5px solid var(--primary-dark);
+  }
+  .notif-dropdown{width:300px; right:-46px;}
+  .notif-dropdown-titulo{
+    font-family:'Fraunces', serif;
+    font-size:14.5px;
+    color:var(--primary-dark);
+    margin-bottom:10px;
+    padding-bottom:8px;
+    border-bottom:1px solid var(--line);
+  }
+  .notif-lista{max-height:320px; overflow-y:auto; display:flex; flex-direction:column; gap:8px;}
+  .notif-item{
+    display:flex;
+    align-items:flex-start;
+    gap:6px;
+    padding:10px 8px 10px 12px;
+    border:1px solid var(--line-strong);
+    border-radius:var(--r-sm);
+    background:var(--surface);
+  }
+  .notif-item:hover{background:#F2F0E6; border-color:var(--primary);}
+  .notif-item-clicavel{
+    flex:1;
+    min-width:0;
+    display:block;
+    text-align:left;
+    background:none;
+    border:none;
+    padding:0;
+    cursor:pointer;
+  }
+  .notif-item-excluir{
+    flex:0 0 auto;
+    width:22px; height:22px;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:5px;
+    background:transparent;
+    border:none;
+    color:var(--muted);
+    font-size:16px;
+    line-height:1;
+    cursor:pointer;
+  }
+  .notif-item-excluir:hover{background:rgba(162,58,44,0.12); color:var(--stamp-red);}
+  .notif-item-nome{font-size:12.5px; font-weight:700; color:var(--ink);}
+  .notif-item-detalhe{font-size:11px; color:var(--muted); margin-top:2px;}
+  .notif-item-nao-lida{background:#FBEFE3; border-color:var(--seal-gold);}
+  .notif-dot{
+    display:inline-block;
+    width:7px; height:7px;
+    border-radius:50%;
+    background:var(--stamp-red);
+    margin-right:6px;
+    vertical-align:middle;
+  }
   .profile-icon-btn{
     width:42px; height:42px;
     border-radius:50%;
@@ -1571,6 +1649,18 @@
       <span class="tb-sub2">RH · SEMED Acará — PA</span>
     </div>
   </div>
+  <div class="notif-menu-wrap">
+    <button type="button" id="notifIconBtn" class="notif-icon-btn" title="Pré-contratações pendentes">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="notif-badge" id="notifBadge" style="display:none;">0</span>
+    </button>
+    <div id="notifDropdown" class="profile-dropdown notif-dropdown">
+      <div class="notif-dropdown-titulo">Pré-contratações pendentes</div>
+      <div id="notifLista" class="notif-lista">
+        <div class="docs-modal-vazio" style="padding:16px 4px;">Nenhuma pendente no momento.</div>
+      </div>
+    </div>
+  </div>
   <div class="profile-menu-wrap">
     <button type="button" id="profileIconBtn" class="profile-icon-btn">
       <img id="profileIconImg" style="display:none;" alt="Foto do perfil">
@@ -2294,6 +2384,7 @@ function resetarTimersInatividade(){
     esconderAvisoInatividade();
     localStorage.removeItem('sdgp_ano_sessao');
     if(unsubscribeRecords){ unsubscribeRecords(); unsubscribeRecords = null; }
+    if(unsubscribeNotificacoesPrecadastro){ unsubscribeNotificacoesPrecadastro(); unsubscribeNotificacoesPrecadastro = null; }
     await registrarSaida('Automático (inatividade)');
     auth.signOut();
   }, INATIVIDADE_LIMITE_MS);
@@ -2336,6 +2427,7 @@ auth.onAuthStateChanged((user) => {
     });
     aplicarPermissoesDeAbas(user.uid);
     carregarFotoEIniciaisDoPerfil();
+    iniciarListenerNotificacoesPrecadastro();
     loadRecords();
     resetarTimersInatividade();
   }else{
@@ -2631,6 +2723,7 @@ async function aplicarPermissoesDeAbas(uid){
 document.getElementById('logoutBtn').addEventListener('click', async () => {
   localStorage.removeItem('sdgp_ano_sessao');
   if(unsubscribeRecords){ unsubscribeRecords(); unsubscribeRecords = null; }
+  if(unsubscribeNotificacoesPrecadastro){ unsubscribeNotificacoesPrecadastro(); unsubscribeNotificacoesPrecadastro = null; }
   await registrarSaida('Manual (botão Sair)');
   auth.signOut();
 });
@@ -2652,6 +2745,7 @@ let nomeUsuarioAtualCache = null;
 // --- Menu de perfil (ícone no topo direito, com foto e botão Sair) ---
 document.getElementById('profileIconBtn').addEventListener('click', (e) => {
   e.stopPropagation();
+  document.getElementById('notifDropdown').classList.remove('open');
   document.getElementById('profileDropdown').classList.toggle('open');
 });
 document.addEventListener('click', (e) => {
@@ -3297,6 +3391,7 @@ document.getElementById('docsOverlay').addEventListener('click', (e) => {
 
 let loadError = false;
 let unsubscribeRecords = null;
+let unsubscribeNotificacoesPrecadastro = null;
 
 function loadRecords(){
   loadError = false;
@@ -5727,6 +5822,125 @@ function atualizarBadgePendentes(){
     badge.textContent = snap.size;
   }).catch(() => {});
 }
+
+// --- Sino de notificações: avisa em tempo real quando chega um novo pré-contrato pendente ---
+let ultimaListaNotificacoesPendentes = [];
+
+function iniciarListenerNotificacoesPrecadastro(){
+  if(unsubscribeNotificacoesPrecadastro) return;
+  unsubscribeNotificacoesPrecadastro = db.collection(PRECADASTROS_COL)
+    .where('status', '==', 'pendente')
+    .onSnapshot(snap => {
+      const uid = usuarioAtual ? usuarioAtual.uid : null;
+      const docsVisiveis = snap.docs
+        .filter(doc => {
+          const dispensadoPor = doc.data().dispensadoPor || [];
+          return !uid || !dispensadoPor.includes(uid);
+        })
+        .sort((a, b) => (a.data().criadoEm || 0) - (b.data().criadoEm || 0));
+      ultimaListaNotificacoesPendentes = docsVisiveis;
+      const naoLidas = docsVisiveis.filter(doc => {
+        const vistoPor = doc.data().vistoPor || [];
+        return !uid || !vistoPor.includes(uid);
+      });
+      atualizarBadgeNotificacoes(naoLidas.length);
+      renderListaNotificacoes(docsVisiveis);
+    }, e => console.error('Não foi possível escutar notificações de pré-contratação:', e));
+}
+
+// Marca todos os pré-contratos pendentes visíveis agora como "vistos" por este usuário —
+// o sino zera na hora pra ele, mesmo que o pré-contrato continue pendente de verdade.
+async function marcarNotificacoesComoVistas(){
+  if(!usuarioAtual) return;
+  const uid = usuarioAtual.uid;
+  const pendentesDeMarcar = ultimaListaNotificacoesPendentes.filter(doc => {
+    const vistoPor = doc.data().vistoPor || [];
+    return !vistoPor.includes(uid);
+  });
+  if(!pendentesDeMarcar.length) return;
+  try{
+    await Promise.all(pendentesDeMarcar.map(doc =>
+      db.collection(PRECADASTROS_COL).doc(doc.id).update({
+        vistoPor: firebase.firestore.FieldValue.arrayUnion(uid)
+      })
+    ));
+  }catch(e){
+    console.error('Não foi possível marcar notificações como vistas:', e);
+  }
+}
+
+function atualizarBadgeNotificacoes(qtd){
+  const badge = document.getElementById('notifBadge');
+  if(!badge) return;
+  if(qtd > 0){
+    badge.textContent = qtd > 99 ? '99+' : qtd;
+    badge.style.display = 'flex';
+  }else{
+    badge.style.display = 'none';
+  }
+}
+
+function renderListaNotificacoes(docs){
+  const lista = document.getElementById('notifLista');
+  if(!lista) return;
+  if(!docs.length){
+    lista.innerHTML = '<div class="docs-modal-vazio" style="padding:16px 4px;">Nenhuma pendente no momento.</div>';
+    return;
+  }
+  const uid = usuarioAtual ? usuarioAtual.uid : null;
+  lista.innerHTML = docs.map(doc => {
+    const p = doc.data();
+    const dataTexto = p.criadoEm ? new Date(p.criadoEm).toLocaleString('pt-BR') : '—';
+    const vistoPor = p.vistoPor || [];
+    const naoLida = uid && !vistoPor.includes(uid);
+    return `
+      <div class="notif-item ${naoLida ? 'notif-item-nao-lida' : ''}">
+        <button type="button" class="notif-item-clicavel" onclick="irParaPrecadastroPendente('${doc.id}')">
+          <div class="notif-item-nome">${naoLida ? '<span class="notif-dot"></span>' : ''}${p.nome || 'Sem nome'}</div>
+          <div class="notif-item-detalhe">${p.cargo || '—'} · Enviado por ${p.enviadoPorNome || '—'}</div>
+          <div class="notif-item-detalhe">${dataTexto}</div>
+        </button>
+        ${!naoLida ? `<button type="button" class="notif-item-excluir" title="Excluir notificação" onclick="event.stopPropagation(); excluirNotificacao('${doc.id}')">×</button>` : ''}
+      </div>`;
+  }).join('');
+}
+
+window.excluirNotificacao = async function(id){
+  if(!usuarioAtual) return;
+  try{
+    await db.collection(PRECADASTROS_COL).doc(id).update({
+      dispensadoPor: firebase.firestore.FieldValue.arrayUnion(usuarioAtual.uid)
+    });
+  }catch(e){
+    console.error('Não foi possível excluir a notificação:', e);
+  }
+};
+
+window.irParaPrecadastroPendente = function(id){
+  document.getElementById('notifDropdown').classList.remove('open');
+  switchTab('cadastro');
+  irParaSubAbaCadastro('pendentes');
+  setTimeout(() => {
+    const el = document.getElementById('precadastrosListaArea');
+    if(el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 200);
+};
+
+document.getElementById('notifIconBtn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  document.getElementById('profileDropdown').classList.remove('open');
+  const dropdown = document.getElementById('notifDropdown');
+  const abrindoAgora = !dropdown.classList.contains('open');
+  dropdown.classList.toggle('open');
+  if(abrindoAgora) marcarNotificacoesComoVistas();
+});
+document.addEventListener('click', (e) => {
+  const dropdown = document.getElementById('notifDropdown');
+  const btn = document.getElementById('notifIconBtn');
+  if(dropdown.classList.contains('open') && !dropdown.contains(e.target) && !btn.contains(e.target)){
+    dropdown.classList.remove('open');
+  }
+});
 
 function renderPrecadastros(){
   const area = document.getElementById('precadastrosListaArea');
