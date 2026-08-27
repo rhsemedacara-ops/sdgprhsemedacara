@@ -1650,14 +1650,14 @@
     </div>
   </div>
   <div class="notif-menu-wrap">
-    <button type="button" id="notifIconBtn" class="notif-icon-btn" title="Pré-contratações pendentes">
+    <button type="button" id="notifIconBtn" class="notif-icon-btn" title="Mensagens">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       <span class="notif-badge" id="notifBadge" style="display:none;">0</span>
     </button>
     <div id="notifDropdown" class="profile-dropdown notif-dropdown">
-      <div class="notif-dropdown-titulo">Pré-contratações pendentes</div>
+      <div class="notif-dropdown-titulo">Mensagens</div>
       <div id="notifLista" class="notif-lista">
-        <div class="docs-modal-vazio" style="padding:16px 4px;">Nenhuma pendente no momento.</div>
+        <div class="docs-modal-vazio" style="padding:16px 4px;">Sem registros</div>
       </div>
     </div>
   </div>
@@ -5884,7 +5884,7 @@ function renderListaNotificacoes(docs){
   const lista = document.getElementById('notifLista');
   if(!lista) return;
   if(!docs.length){
-    lista.innerHTML = '<div class="docs-modal-vazio" style="padding:16px 4px;">Nenhuma pendente no momento.</div>';
+    lista.innerHTML = '<div class="docs-modal-vazio" style="padding:16px 4px;">Sem registros</div>';
     return;
   }
   const uid = usuarioAtual ? usuarioAtual.uid : null;
