@@ -5920,36 +5920,13 @@ function iniciarListenerNotificacoesPrecadastro(){
         })
         .sort((a, b) => (a.data().criadoEm || 0) - (b.data().criadoEm || 0));
       ultimaListaNotificacoesPendentes = docsVisiveis;
-      const naoLidas = docsVisiveis.filter(doc => {
-        const vistoPor = doc.data().vistoPor || [];
-        return !uid || !vistoPor.includes(uid);
-      });
-      atualizarBadgeNotificacoes(naoLidas.length);
+      atualizarBadgeNotificacoes(docsVisiveis.length);
       renderListaNotificacoes(docsVisiveis);
     }, e => console.error('Não foi possível escutar notificações de pré-contratação:', e));
 }
 
 // Marca todos os pré-contratos pendentes visíveis agora como "vistos" por este usuário —
 // o sino zera na hora pra ele, mesmo que o pré-contrato continue pendente de verdade.
-async function marcarNotificacoesComoVistas(){
-  if(!usuarioAtual) return;
-  const uid = usuarioAtual.uid;
-  const pendentesDeMarcar = ultimaListaNotificacoesPendentes.filter(doc => {
-    const vistoPor = doc.data().vistoPor || [];
-    return !vistoPor.includes(uid);
-  });
-  if(!pendentesDeMarcar.length) return;
-  try{
-    await Promise.all(pendentesDeMarcar.map(doc =>
-      db.collection(PRECADASTROS_COL).doc(doc.id).update({
-        vistoPor: firebase.firestore.FieldValue.arrayUnion(uid)
-      })
-    ));
-  }catch(e){
-    console.error('Não foi possível marcar notificações como vistas:', e);
-  }
-}
-
 function atualizarBadgeNotificacoes(qtd){
   const badge = document.getElementById('notifBadge');
   if(!badge) return;
@@ -5968,20 +5945,17 @@ function renderListaNotificacoes(docs){
     lista.innerHTML = '<div class="docs-modal-vazio" style="padding:16px 4px;">Sem registros</div>';
     return;
   }
-  const uid = usuarioAtual ? usuarioAtual.uid : null;
   lista.innerHTML = docs.map(doc => {
     const p = doc.data();
     const dataTexto = p.criadoEm ? new Date(p.criadoEm).toLocaleString('pt-BR') : '—';
-    const vistoPor = p.vistoPor || [];
-    const naoLida = uid && !vistoPor.includes(uid);
     return `
-      <div class="notif-item ${naoLida ? 'notif-item-nao-lida' : ''}">
+      <div class="notif-item notif-item-nao-lida">
         <button type="button" class="notif-item-clicavel" onclick="irParaPrecadastroPendente('${doc.id}')">
-          <div class="notif-item-nome">${naoLida ? '<span class="notif-dot"></span>' : ''}${p.nome || 'Sem nome'}</div>
+          <div class="notif-item-nome"><span class="notif-dot"></span>${p.nome || 'Sem nome'}</div>
           <div class="notif-item-detalhe">${p.cargo || '—'} · Enviado por ${p.enviadoPorNome || '—'}</div>
           <div class="notif-item-detalhe">${dataTexto}</div>
         </button>
-        ${!naoLida ? `<button type="button" class="notif-item-excluir" title="Excluir notificação" onclick="event.stopPropagation(); excluirNotificacao('${doc.id}')">×</button>` : ''}
+        <button type="button" class="notif-item-excluir" title="Excluir notificação" onclick="event.stopPropagation(); excluirNotificacao('${doc.id}')">×</button>
       </div>`;
   }).join('');
 }
@@ -5999,6 +5973,7 @@ window.excluirNotificacao = async function(id){
 
 window.irParaPrecadastroPendente = function(id){
   document.getElementById('notifDropdown').classList.remove('open');
+  excluirNotificacao(id);
   switchTab('cadastro');
   irParaSubAbaCadastro('pendentes');
   setTimeout(() => {
@@ -6010,10 +5985,7 @@ window.irParaPrecadastroPendente = function(id){
 document.getElementById('notifIconBtn').addEventListener('click', (e) => {
   e.stopPropagation();
   document.getElementById('profileDropdown').classList.remove('open');
-  const dropdown = document.getElementById('notifDropdown');
-  const abrindoAgora = !dropdown.classList.contains('open');
-  dropdown.classList.toggle('open');
-  if(abrindoAgora) marcarNotificacoesComoVistas();
+  document.getElementById('notifDropdown').classList.toggle('open');
 });
 document.addEventListener('click', (e) => {
   const dropdown = document.getElementById('notifDropdown');
